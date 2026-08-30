@@ -38,3 +38,5 @@ Every stage writes its drop counts to `reports/filter_counts.json`.
   with the verified 125 bps/side curve fee, not the quoted price.
 - Time-based, creator-grouped splits; creator features use only outcomes resolved before the launch.
 - The fetcher is sharded and resumable; the Mac's IP is shared with a live collector and stays untouched.
+- Mayhem-mode coins (~20 % of launches; the program rewrites their virtual reserves via `set_mayhem_virtual_params`)
+  cannot be priced from the tape and are excluded and counted — a known v1 limitation.

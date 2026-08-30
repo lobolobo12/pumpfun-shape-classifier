@@ -6,6 +6,7 @@ they bound it. Price on the curve is virtual_sol / virtual_token, so reaching
     needed = (sqrt(1 + tp) - 1) * initial_virtual_sol
 real SOL at some point in the horizon (12.4 SOL for tp = 1). Strata:
 
+  mayhem      is_mayhem_mode in the create frame -> a curve v1 cannot simulate; dropped, counted
   no_inflow   polls exist and never show SOL in the curve -> cannot have min_trades; dropped, counted
   candidate   max real SOL >= needed, or graduated -> fetched in full
   unlikely    polls exist, never reached `needed` -> uniform sample at sample_rate_unlikely
@@ -77,7 +78,9 @@ def run(cfg: Config) -> pl.DataFrame:
     need = needed_sol(cfg)
     rates = {"candidate": 1.0, "unlikely": cfg.prescreen.sample_rate_unlikely, "unknown": cfg.prescreen.sample_rate_unknown}
     df = tokens.join(marks, on="mint", how="left").with_columns(
-        stratum=pl.when(pl.col("n_marks") == 0)
+        stratum=pl.when(pl.col("mayhem").fill_null(False))
+        .then(pl.lit("mayhem"))
+        .when(pl.col("n_marks") == 0)
         .then(pl.lit("unknown"))
         .when(pl.col("max_real_sol") <= 0)
         .then(pl.lit("no_inflow"))
@@ -108,7 +111,7 @@ def run(cfg: Config) -> pl.DataFrame:
     committed.parent.mkdir(parents=True, exist_ok=True)
     queue.write_parquet(committed)
 
-    sizes = {s: int(df.filter(pl.col("stratum") == s).height) for s in (*STRATA, "no_inflow")}
+    sizes = {s: int(df.filter(pl.col("stratum") == s).height) for s in (*STRATA, "no_inflow", "mayhem")}
     picked = {s: int(queue.filter(pl.col("stratum") == s).height) for s in STRATA}
     counts = {
         "universe_tokens": tokens.height,
@@ -116,6 +119,7 @@ def run(cfg: Config) -> pl.DataFrame:
         "strata": sizes,
         "queued": picked,
         "prescreen_no_inflow_dropped": sizes["no_inflow"],
+        "prescreen_mayhem_dropped": sizes["mayhem"],
         "fetch_queue": queue.height,
         "sample_rates": rates,
     }

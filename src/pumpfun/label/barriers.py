@@ -83,17 +83,15 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
     fees = cs.CurveFees(cfg.fee_protocol_bps, cfg.fee_creator_bps)
     pfees = ps.PoolFees(cfg.pool_fee_bps.lp, cfg.pool_fee_bps.protocol, cfg.pool_fee_bps.creator)
     w = cfg.window_seconds
-    entry_from = cfg.entry_offset_seconds
-    entry_to = entry_from + cfg.entry_max_wait_seconds
+    t_entry = float(cfg.entry_offset_seconds)
 
     n_window = sum(1 for t in trades if t.t_s < w)
     if not trades or trades[-1].t_s < w:
         raise Drop("lifetime_lt_window")
     if n_window < cfg.min_trades_in_window:
         raise Drop("lt_min_trades")
-    entry_idx = next((t.idx for t in trades if entry_from <= t.t_s <= entry_to), None)
-    if entry_idx is None:
-        raise Drop("no_fill")
+    # The curve fills at any moment: the entry is the state after the last trade before t_entry.
+    entry_idx = next((t.idx for t in trades if t.t_s >= t_entry), len(trades))
 
     # --- replay to the entry, checking the tape against the curve maths
     curve = cs.initial_reserves(p)
@@ -107,14 +105,13 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
     residual = sorted(resid)[len(resid) // 2] if resid else 0.0
     if residual > cfg.curve_param_tolerance:
         raise Drop("non_standard_curve")
-    if curve.complete or trades[entry_idx].program != CURVE_PROGRAM:
+    if curve.complete:
         raise Drop("graduated_before_entry")
 
-    entry = trades[entry_idx]
     entry_price = curve.spot_sol_per_token(raw_per)
     buy = cs.buy_exact_sol_in(curve, cfg.position_lamports, fees)
     if buy.tokens_out <= 0:
-        raise Drop("no_fill")
+        raise Drop("entry_zero_tokens")
     if buy.completed:
         raise Drop("entry_completes_curve")
     cost = buy.total_paid + cfg.tx_fee_lamports + _router_fee(cfg.position_lamports, cfg.router_fee_pct)
@@ -135,13 +132,13 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
         gross_net = s.quote_out_net if s.real_reserves_ok else min(s.quote_out_net, r.quote)
         return gross_net - _router_fee(gross_net, cfg.router_fee_pct) - cfg.tx_fee_lamports
 
-    # --- the entry trade itself is the first state we could sell into (it happened right after us)
-    horizon_end = entry.t_s + cfg.horizon_seconds
+    # --- every later trade is a state we could sell into
+    horizon_end = t_entry + cfg.horizon_seconds
     pool: ps.PoolReserves | None = None
     graduated = False
     peak_net = 0
     peak_ratio = 0.0
-    label, reason, exit_t, exit_net = 0, "vertical", entry.t_s, 0
+    label, reason, exit_t, exit_net = 0, "vertical_no_trades", t_entry, net_curve(curve)
     n_horizon = 0
     for t in trades[entry_idx:]:
         if t.t_s > horizon_end:
@@ -171,13 +168,11 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
         if stop:
             label, reason = 0, "sl"
             break
-    else:
-        if n_horizon <= 1:
-            reason = "vertical_no_trades"
+        reason = "vertical"
     return LabelRow(
         mint=mint,
         label=label,
-        entry_t=entry.t_s,
+        entry_t=t_entry,
         entry_idx=entry_idx,
         entry_price=entry_price,
         entry_fill_price=cost / cs.LAMPORTS_PER_SOL / (held / raw_per),
@@ -207,11 +202,16 @@ def tape_from_frame(df: pl.DataFrame) -> list[TapeTrade]:
 
 
 def run(cfg: Config) -> pl.DataFrame:
-    tokens = pl.read_parquet(cfg.tokens_path).select("mint", "launch_day", "creator")
+    tokens = pl.read_parquet(cfg.tokens_path).select("mint", "launch_day", "creator", "mayhem")
+    mayhem = set(tokens.filter(pl.col("mayhem").fill_null(False))["mint"].to_list())
+    tokens = tokens.drop("mayhem")
     trades = read_trades(cfg).sort("mint", "slot", "slot_index").collect()
     rows: list[dict] = []
     drops: Counter[str] = Counter()
     for (mint,), df in trades.group_by("mint", maintain_order=True):
+        if mint in mayhem:
+            drops["mayhem_mode"] += 1
+            continue
         try:
             rows.append(asdict(label_tape(cfg, str(mint), tape_from_frame(df))))
         except Drop as d:
@@ -258,7 +258,7 @@ def _summary(cfg: Config, labels: pl.DataFrame, tokens: pl.DataFrame, fetched: p
         lab = labels.join(strata.select("mint", "stratum"), on="mint", how="left")
         rows = []
         est = 0.0
-        for st in ("candidate", "unlikely", "unknown", "no_inflow"):
+        for st in ("candidate", "unlikely", "unknown", "no_inflow", "mayhem"):
             size = strata.filter(pl.col("stratum") == st).height
             n_f = f.filter(pl.col("stratum") == st).height
             n_l = lab.filter(pl.col("stratum") == st).height

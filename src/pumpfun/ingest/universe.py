@@ -108,8 +108,12 @@ def build_tokens(cfg: Config, snapshot: Path) -> tuple[pl.DataFrame, dict[str, i
     extra = frames.filter(~pl.col("mint").is_in(seen_at_birth["mint"].implode()))
     counts["pumpportal_frames_in_range"] = frames.height
     counts["universe_added_from_frames"] = extra.height
-    cols = ["mint", "creator", "launch_time_ms", "source", "first_seen_age_s", "launch_day"]
+    cols = ["mint", "creator", "launch_time_ms", "source", "first_seen_age_s", "launch_day", "mayhem"]
+    # The sweep does not know about mayhem mode; take the flag from the frame when one exists.
+    seen_at_birth = seen_at_birth.join(frames.select("mint", "mayhem"), on="mint", how="left")
     union = pl.concat([seen_at_birth.select(cols), extra.select(cols)])
+    counts["universe_mayhem_flagged"] = int(union["mayhem"].fill_null(False).sum())
+    counts["universe_mayhem_unknown"] = int(union["mayhem"].is_null().sum())
     tokens = (
         union.join(grads, on="mint", how="left")
         .with_columns(
@@ -143,20 +147,30 @@ def _iter_create_frames(raw_dir: Path, days: set[str]):
                             continue
                         p = fr.get("payload") or {}
                         if p.get("txType") == "create" and isinstance(p.get("mint"), str):
-                            yield p["mint"], int(fr["receivedAt"]), str(p.get("traderPublicKey") or "")
+                            yield (
+                                p["mint"],
+                                int(fr["receivedAt"]),
+                                str(p.get("traderPublicKey") or ""),
+                                bool(p.get("is_mayhem_mode", False)),
+                            )
             except (EOFError, zlib.error, OSError) as e:
                 log.warning("%s: stopped at a truncated block (%s)", f.name, e.__class__.__name__)
 
 
 def frame_tokens(cfg: Config, days: set[str]) -> pl.DataFrame:
     """On-chain create frames as token rows (source = pumpportal); creator = the create tx signer."""
-    rows: dict[str, tuple[int, str]] = {}
-    for mint, at, creator in _iter_create_frames(cfg.sources.pumpportal_raw, days):
+    rows: dict[str, tuple[int, str, bool]] = {}
+    for mint, at, creator, mayhem in _iter_create_frames(cfg.sources.pumpportal_raw, days):
         if creator and mint not in rows:
-            rows[mint] = (at, creator)
+            rows[mint] = (at, creator, mayhem)
     df = pl.DataFrame(
-        {"mint": list(rows), "launch_time_ms": [v[0] for v in rows.values()], "creator": [v[1] for v in rows.values()]},
-        schema={"mint": pl.String, "launch_time_ms": pl.Int64, "creator": pl.String},
+        {
+            "mint": list(rows),
+            "launch_time_ms": [v[0] for v in rows.values()],
+            "creator": [v[1] for v in rows.values()],
+            "mayhem": [v[2] for v in rows.values()],
+        },
+        schema={"mint": pl.String, "launch_time_ms": pl.Int64, "creator": pl.String, "mayhem": pl.Boolean},
     )
     return df.with_columns(
         source=pl.lit("pumpportal"),
@@ -190,7 +204,7 @@ def coverage_check(cfg: Config, snapshot: Path, tokens: pl.DataFrame) -> dict:
         return i < len(polls) and polls[i] <= ms + slack_ms
 
     per_day: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
-    for mint, at, _creator in _iter_create_frames(cfg.sources.pumpportal_raw, days):
+    for mint, at, _creator, _mayhem in _iter_create_frames(cfg.sources.pumpportal_raw, days):
         day = datetime.fromtimestamp(at / 1000, UTC).strftime("%Y-%m-%d")
         c = per_day[day]
         c["frames"] += 1

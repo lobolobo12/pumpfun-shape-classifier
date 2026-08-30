@@ -8,8 +8,7 @@ tp: 1.0                      # upper barrier: net exit >= cost * (1 + tp)
 sl: 0.4                      # lower barrier: net exit <= cost * (1 - sl)
 trailing_stop: false         # false: sl is from entry; true: sl is from the running peak of net exit
 position_sol: 0.5            # hypothetical position, spent as buy_exact_sol_in
-entry_lag_seconds: 0         # entry = first trade at/after launch + window + lag
-entry_max_wait_seconds: 30   # no trade within this after the entry time -> "no fill", dropped and counted
+entry_lag_seconds: 0         # entry at launch + window + lag, on the curve state at that moment
 
 # --- filters / sampling ---------------------------------------------------
 min_trades_in_window: 10

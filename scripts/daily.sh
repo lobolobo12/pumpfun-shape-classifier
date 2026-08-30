@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Daily top-up: refresh the universe from the collector, extend the queue, commit it, dispatch the fetch,
+# and fold any finished runs into the local cache. Safe to run any time; everything is resumable.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+uv run pf gh-pull --limit 20 2>&1 | grep -E "merged|no successful" || true
+uv run pf universe --no-strict | tail -4
+uv run pf prescreen | tail -2
+if ! git diff --quiet -- data/queue/fetch_queue.parquet; then
+  git add data/queue/fetch_queue.parquet
+  git -c commit.gpgsign=false commit -q -m "queue: $(date -u +%F) top-up"
+  git push -q origin main
+fi
+if gh run list --workflow fetch.yml --status in_progress --limit 1 --json databaseId -q '.[0].databaseId' | grep -q .; then
+  echo "a fetch run is already in progress; not dispatching another"
+else
+  gh workflow run fetch.yml -f shards="${SHARDS:-12}" -f rps="${RPS:-0.28}" -f probe=0 -f max_minutes="${MAX_MINUTES:-300}"
+  echo "dispatched fetch (${SHARDS:-12} shards)"
+fi

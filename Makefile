@@ -1,4 +1,4 @@
-.PHONY: sync check test lint universe prescreen probe fetch label bench-render bench-label features leakage xgb cnn
+.PHONY: sync check test lint universe prescreen probe fetch label bench-render bench-label features leakage xgb cnn daily pull
 
 sync:
 	uv sync --group dev --extra models
@@ -43,3 +43,9 @@ xgb:
 
 cnn:
 	uv run pf cnn
+
+daily:
+	scripts/daily.sh
+
+pull:
+	uv run pf gh-pull && uv run pf to-parquet && uv run pf curve-params && uv run pf label

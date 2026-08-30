@@ -6,7 +6,7 @@ from pumpfun.config import load_config
 from pumpfun.label import curve_sim as cs
 from pumpfun.label.barriers import Drop, TapeTrade, label_tape
 
-CFG = load_config(overrides=["min_trades_in_window=3", "entry_max_wait_seconds=30"])
+CFG = load_config(overrides=["min_trades_in_window=3"])
 P = cs.CurveParams(
     CFG.curve_expected.initial_virtual_sol_lamports,
     CFG.curve_expected.initial_virtual_token_raw,
@@ -83,8 +83,9 @@ def test_filters():
         label_tape(CFG, "m", _tape([(10, 1.0), (20, 1.0), (30, 1.0)]))
     with pytest.raises(Drop, match="lt_min_trades"):
         label_tape(CFG, "m", _tape([(10, 1.0), (300, 1.0), (400, 1.0)]))
-    with pytest.raises(Drop, match="no_fill"):
-        label_tape(CFG, "m", _tape([(10, 1.0), (20, 1.0), (30, 1.0), (400, 1.0)]))
+    # Alive but quiet at t = 300: the curve still fills; the later trade is the first exit state.
+    row = label_tape(CFG, "m", _tape([(10, 1.0), (20, 1.0), (30, 1.0), (400, 1.0)]))
+    assert row.entry_t == 300 and row.exit_reason == "vertical" and row.n_trades_horizon == 1
 
 
 def test_entry_price_is_pre_entry_marginal_and_fill_is_worse():

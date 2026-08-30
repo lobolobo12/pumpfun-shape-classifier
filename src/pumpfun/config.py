@@ -90,7 +90,6 @@ class Config:
     trailing_stop: bool
     position_sol: float
     entry_lag_seconds: int
-    entry_max_wait_seconds: int
     min_trades_in_window: int
     neg_pos_ratio: float
     zone_sol: tuple[float, float]
@@ -165,9 +164,7 @@ class Config:
     @property
     def tape_until_seconds(self) -> int:
         """Seconds after launch up to which trades are needed."""
-        return (
-            self.entry_offset_seconds + self.entry_max_wait_seconds + self.horizon_seconds + self.swap_api.horizon_margin_seconds
-        )
+        return self.entry_offset_seconds + self.horizon_seconds + self.swap_api.horizon_margin_seconds
 
 
 def _deep_merge(base: dict[str, Any], over: dict[str, Any]) -> dict[str, Any]:
@@ -240,7 +237,6 @@ def _build(d: dict[str, Any], preset: str | None) -> Config:
         trailing_stop=bool(d["trailing_stop"]),
         position_sol=float(d["position_sol"]),
         entry_lag_seconds=int(d["entry_lag_seconds"]),
-        entry_max_wait_seconds=int(d["entry_max_wait_seconds"]),
         min_trades_in_window=int(d["min_trades_in_window"]),
         neg_pos_ratio=float(d["neg_pos_ratio"]),
         zone_sol=(float(d["zone_sol"][0]), float(d["zone_sol"][1])),
