@@ -66,10 +66,12 @@ def evaluate(cfg: Config, df: pl.DataFrame, p: np.ndarray) -> dict:
             "pr_auc": float(average_precision_score(y, p, sample_weight=w)) if y.sum() and (1 - y).sum() else None,
             "precision_at": {str(f): weighted_precision_at(y, p, w, f) for f in cfg.metrics["top_fractions"]},
         }
-    if "in_zone" in df.columns:
-        z = df["in_zone"].to_numpy().astype(bool)
-        if z.sum() >= 10 and y[z].sum() and (1 - y[z]).sum():
-            out["zone"] = evaluate(cfg, df.filter(pl.Series(z)).drop("in_zone"), p[z])
+    for slice_col in ("in_zone", "active_at_entry"):
+        if slice_col in df.columns:
+            z = df[slice_col].fill_null(False).to_numpy().astype(bool)
+            if z.sum() >= 10 and y[z].sum() and (1 - y[z]).sum():
+                sliced = df.filter(pl.Series(z)).drop([c for c in ("in_zone", "active_at_entry") if c in df.columns])
+                out[f"slice_{slice_col}"] = evaluate(cfg, sliced, p[z])
     return out
 
 

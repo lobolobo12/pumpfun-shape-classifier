@@ -69,7 +69,8 @@
   ],
   "side": [
     "curve_sol_at_entry",
-    "in_zone"
+    "in_zone",
+    "active_at_entry"
   ],
   "splits": {
     "creator_straddle_dropped": 962,

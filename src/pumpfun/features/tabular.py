@@ -68,7 +68,7 @@ HOLDERS = [
     "tokens_out_pct",
 ]
 CREATOR = ["creator_prior_launches", "creator_prior_resolved", "creator_prior_tp_rate"]
-SIDE = ["curve_sol_at_entry", "in_zone"]
+SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]
 GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR}
 
 
@@ -276,5 +276,8 @@ def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFr
         feats = shape_and_holders(cfg, list(g.select(cols).iter_rows()), creator, sol_at_entry, entry_price)
         rows.append({"mint": mint, **feats})
     df = pl.DataFrame(rows).join(creator_history(cfg, tokens, labels), on="mint", how="left")
+    df = df.with_columns(
+        active_at_entry=(pl.col("last_trade_t") >= cfg.window_seconds - float(cfg.metrics["active_silence_max"]))
+    )
     side = labels.select("mint", "label", "launch_day", "curve_sol_at_entry", pl.col("in_zone").cast(pl.Float64))
     return side.join(df, on="mint", how="inner")
