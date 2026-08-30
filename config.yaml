@@ -66,11 +66,13 @@ universe:
   max_first_seen_age_seconds: 120   # a coin first seen older than this was not captured at birth
   coverage_min: 0.99                # sweep must contain this share of pumpportal create frames
 prescreen:
-  # Strata from the 20 s curve polls. "candidate" = the curve ever held enough SOL for the price to
-  # reach (1 + tp)x from any entry (derived from tp and the virtual reserves), or graduated: fetched in full.
-  # "unlikely" (never did) and "unknown" (no polls) are sampled uniformly by mint hash; their weight
-  # (1 / rate) enters every base rate and metric.
-  sample_rate_unlikely: 0.2
+  # Strata from the 20 s curve polls (nothing here looks at outcomes):
+  #   candidate        the curve ever held enough SOL for a (1 + tp)x price from any entry, or graduated -> all
+  #   unlikely_active  never did, but the curve's SOL changed after the window -> alive at entry -> all
+  #   unlikely_quiet   never did and no change after the window (87 % dead) -> sampled
+  #   unknown          no polls at all -> sampled
+  # Sampled strata carry weight 1 / rate into every base rate and metric.
+  sample_rate_unlikely_quiet: 0.2
   sample_rate_unknown: 0.2
 
 # --- benchmark ------------------------------------------------------------

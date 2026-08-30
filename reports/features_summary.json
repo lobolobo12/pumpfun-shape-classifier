@@ -1,0 +1,84 @@
+{
+  "groups": {
+    "creator": [
+      "creator_prior_launches",
+      "creator_prior_resolved",
+      "creator_prior_tp_rate"
+    ],
+    "holders": [
+      "holders_n",
+      "buyers_n",
+      "top1_share",
+      "top3_share",
+      "top10_share",
+      "dev_share",
+      "dev_sold",
+      "gini_hold",
+      "first_slot_share",
+      "launch_bundle_share",
+      "same_size_share",
+      "exited_share",
+      "tokens_out_pct"
+    ],
+    "shape": [
+      "n_trades",
+      "n_buyers",
+      "n_sellers",
+      "buy_ratio_count",
+      "buy_ratio_sol",
+      "largest_buy_share",
+      "gini_buy_size",
+      "price_slope",
+      "volume_slope",
+      "time_to_10_trades",
+      "iti_median",
+      "iti_std",
+      "iti_cv",
+      "bundle_slots",
+      "max_drawdown",
+      "lows",
+      "lows_per_min",
+      "step_gini",
+      "buy_size_cv",
+      "sol_last60",
+      "trades_last60",
+      "buyers_last60",
+      "sellers_last60",
+      "biggest_buy_vs_curve",
+      "run_from_low",
+      "from_peak",
+      "log_ret_window",
+      "sell_share_sol",
+      "n_slots",
+      "first_trade_t",
+      "last_trade_t"
+    ]
+  },
+  "sequence_channels": [
+    "log_price",
+    "volume_share",
+    "trade_count",
+    "unique_buyers",
+    "imbalance",
+    "curve_fill"
+  ],
+  "sequence_shape": [
+    5,
+    300,
+    6
+  ],
+  "side": [
+    "curve_sol_at_entry",
+    "in_zone"
+  ],
+  "splits": {
+    "creator_straddle_dropped": 0,
+    "test_n": 0,
+    "test_pos": 0,
+    "train_n": 5,
+    "train_negatives_dropped": 21,
+    "train_pos": 1,
+    "val_n": 0,
+    "val_pos": 0
+  }
+}

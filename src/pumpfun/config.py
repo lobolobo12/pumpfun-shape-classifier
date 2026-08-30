@@ -70,7 +70,7 @@ class Universe:
 
 @dataclass(frozen=True)
 class Prescreen:
-    sample_rate_unlikely: float
+    sample_rate_unlikely_quiet: float
     sample_rate_unknown: float
 
 
@@ -284,7 +284,7 @@ def _build(d: dict[str, Any], preset: str | None) -> Config:
             coverage_min=float(un["coverage_min"]),
         ),
         prescreen=Prescreen(
-            sample_rate_unlikely=float(ps["sample_rate_unlikely"]),
+            sample_rate_unlikely_quiet=float(ps["sample_rate_unlikely_quiet"]),
             sample_rate_unknown=float(ps["sample_rate_unknown"]),
         ),
         bench=Bench(

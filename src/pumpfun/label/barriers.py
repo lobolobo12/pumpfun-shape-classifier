@@ -258,7 +258,7 @@ def _summary(cfg: Config, labels: pl.DataFrame, tokens: pl.DataFrame, fetched: p
         lab = labels.join(strata.select("mint", "stratum"), on="mint", how="left")
         rows = []
         est = 0.0
-        for st in ("candidate", "unlikely", "unknown", "no_inflow", "mayhem"):
+        for st in ("candidate", "unlikely_active", "unlikely_quiet", "unknown", "no_inflow", "mayhem"):
             size = strata.filter(pl.col("stratum") == st).height
             n_f = f.filter(pl.col("stratum") == st).height
             n_l = lab.filter(pl.col("stratum") == st).height
@@ -271,8 +271,7 @@ def _summary(cfg: Config, labels: pl.DataFrame, tokens: pl.DataFrame, fetched: p
         base["per_stratum"] = rows
         base["estimated_overall"] = est / tokens.height if tokens.height else None
         base["estimated_positives"] = est
-        unlikely = next(r for r in rows if r["stratum"] == "unlikely")
-        base["bound_check_unlikely_positives"] = unlikely["positives"]
+        base["bound_check_unlikely_positives"] = sum(r["positives"] for r in rows if r["stratum"].startswith("unlikely"))
     else:
         base["overall"] = (float(labels["label"].sum()) / tokens.height) if tokens.height else None
     return {

@@ -8,9 +8,11 @@ real SOL at some point in the horizon (12.4 SOL for tp = 1). Strata:
 
   mayhem      is_mayhem_mode in the create frame -> a curve v1 cannot simulate; dropped, counted
   no_inflow   polls exist and never show SOL in the curve -> cannot have min_trades; dropped, counted
-  candidate   max real SOL >= needed, or graduated -> fetched in full
-  unlikely    polls exist, never reached `needed` -> uniform sample at sample_rate_unlikely
-  unknown     no polls (coins the collector never saw) -> uniform sample at sample_rate_unknown
+  candidate        max real SOL >= needed, or graduated -> fetched in full
+  unlikely_active  never reached `needed`, but the curve's SOL changed after the window (so the coin
+                   was alive at the entry; validated 26/26 on probe tapes) -> fetched in full
+  unlikely_quiet   never reached `needed`, no change after the window (mostly dead) -> sampled
+  unknown          no polls (coins the collector never saw) -> sampled
 
 Sampling is by mint hash, so it is stable as the universe grows. Every token
 gets a `weight` = 1 / its stratum's rate, and the "unlikely" stratum's
@@ -30,7 +32,7 @@ from pumpfun.ingest.universe import SNAPSHOT_NAME
 from pumpfun.reports import update_counts
 
 POLL_SLACK_MS = 20_000
-STRATA = ("candidate", "unlikely", "unknown")
+STRATA = ("candidate", "unlikely_active", "unlikely_quiet", "unknown")
 
 
 def needed_sol(cfg: Config) -> float:
@@ -47,15 +49,17 @@ def run(cfg: Config) -> pl.DataFrame:
     snap = cfg.raw_dir / SNAPSHOT_NAME
     con = sqlite3.connect(f"file:{snap}?mode=ro", uri=True)
     try:
-        con.execute("create temp table u(mint text primary key, cutoff_ms integer)")
+        con.execute("create temp table u(mint text primary key, after_ms integer, cutoff_ms integer)")
         cutoff = cfg.tape_until_seconds * 1000 + POLL_SLACK_MS
+        after = cfg.window_seconds * 1000 - POLL_SLACK_MS
         con.executemany(
-            "insert into u values (?, ?)",
-            [(m, int(ms) + cutoff) for m, ms in tokens.select("mint", "launch_time_ms").iter_rows()],
+            "insert into u values (?, ?, ?)",
+            [(m, int(ms) + after, int(ms) + cutoff) for m, ms in tokens.select("mint", "launch_time_ms").iter_rows()],
         )
         rows = con.execute(
             """
-            select u.mint, max(m.real_sol_reserves), count(m.at), max(m.complete)
+            select u.mint, max(m.real_sol_reserves), count(m.at), max(m.complete),
+                   count(distinct case when m.at >= u.after_ms then m.real_sol_reserves end)
               from u left join (
                 select mint, at, real_sol_reserves, complete from early_marks
                 union all
@@ -72,11 +76,23 @@ def run(cfg: Config) -> pl.DataFrame:
             "max_real_sol": [(r[1] or 0) / 1e9 for r in rows],
             "n_marks": [int(r[2]) for r in rows],
             "completed": [bool(r[3]) for r in rows],
+            "distinct_after": [int(r[4]) for r in rows],
         },
-        schema={"mint": pl.String, "max_real_sol": pl.Float64, "n_marks": pl.Int64, "completed": pl.Boolean},
+        schema={
+            "mint": pl.String,
+            "max_real_sol": pl.Float64,
+            "n_marks": pl.Int64,
+            "completed": pl.Boolean,
+            "distinct_after": pl.Int64,
+        },
     )
     need = needed_sol(cfg)
-    rates = {"candidate": 1.0, "unlikely": cfg.prescreen.sample_rate_unlikely, "unknown": cfg.prescreen.sample_rate_unknown}
+    rates = {
+        "candidate": 1.0,
+        "unlikely_active": 1.0,
+        "unlikely_quiet": cfg.prescreen.sample_rate_unlikely_quiet,
+        "unknown": cfg.prescreen.sample_rate_unknown,
+    }
     df = tokens.join(marks, on="mint", how="left").with_columns(
         stratum=pl.when(pl.col("mayhem").fill_null(False))
         .then(pl.lit("mayhem"))
@@ -86,7 +102,9 @@ def run(cfg: Config) -> pl.DataFrame:
         .then(pl.lit("no_inflow"))
         .when(pl.col("completed") | (pl.col("max_real_sol") >= need))
         .then(pl.lit("candidate"))
-        .otherwise(pl.lit("unlikely")),
+        .when(pl.col("distinct_after") >= 2)
+        .then(pl.lit("unlikely_active"))
+        .otherwise(pl.lit("unlikely_quiet")),
         u=pl.col("mint").map_elements(unit_hash, return_dtype=pl.Float64),
     )
     df = df.with_columns(
