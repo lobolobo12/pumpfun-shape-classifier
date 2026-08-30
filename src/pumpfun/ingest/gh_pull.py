@@ -83,3 +83,18 @@ def run(cfg: Config, run_ids: list[int], limit: int) -> None:
         log.info("run %d: merged %d tapes, %d ledger rows", rid, tapes, rows)
         for rep in dst.rglob("cost_probe.json"):
             log.info("cost probe from run %d:\n%s", rid, rep.read_text())
+    write_done_list(cfg)
+
+
+def write_done_list(cfg: Config) -> int:
+    """data/queue/done.parquet — every mint the Mac already holds; runners skip these whatever the shard count."""
+    import polars as pl
+
+    con = sqlite3.connect(cfg.ledger_path)
+    mints = [r[0] for r in con.execute("select mint from fetch where status in ('ok','empty')")]
+    con.close()
+    out = cfg.data_dir / "queue" / "done.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame({"mint": mints}, schema={"mint": pl.String}).write_parquet(out)
+    log.info("done list: %d mints -> %s", len(mints), out)
+    return len(mints)

@@ -187,6 +187,9 @@ def run(  # noqa: PLR0913
         n = import_seed(cfg, queue, ledger)
         log.info("imported %d seed tapes from %s", n, cfg.sources.seed_trade_cache)
     done = ledger.done()
+    done_file = cfg.data_dir / "queue" / "done.parquet"
+    if done_file.exists():
+        done |= set(pl.read_parquet(done_file)["mint"].to_list())
     todo = queue.filter(~pl.col("mint").is_in(list(done)))
     if probe_n:
         rnd = random.Random(cfg.seed)
