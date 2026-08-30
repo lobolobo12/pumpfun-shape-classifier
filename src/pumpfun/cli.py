@@ -46,7 +46,9 @@ def _parser() -> argparse.ArgumentParser:
     c.add_argument("what", choices=["leakage", "schema"])
 
     b = sub.add_parser("bench", help="milestone 0")
-    b.add_argument("what", choices=["render", "label"])
+    b.add_argument("what", choices=["render", "label", "page", "import"])
+    b.add_argument("--code", help="import: the answer code from the web page")
+    b.add_argument("--who", default="operator", help="import: who answered (file suffix)")
 
     sub.add_parser("xgb", help="milestone 4")
     sub.add_parser("cnn", help="milestone 5")
@@ -123,6 +125,16 @@ def main(argv: list[str] | None = None) -> int:
             from pumpfun.bench import render_charts
 
             render_charts.run(cfg)
+        elif args.what == "page":
+            from pumpfun.bench import web_page
+
+            web_page.build(cfg)
+        elif args.what == "import":
+            from pumpfun.bench import web_page
+
+            if not args.code:
+                raise SystemExit("--code is required")
+            web_page.score_code(cfg, args.code, args.who)
         else:
             from pumpfun.bench import manual_label
 

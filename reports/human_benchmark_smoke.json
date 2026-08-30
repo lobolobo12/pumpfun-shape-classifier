@@ -1,0 +1,29 @@
+{
+  "all": {
+    "accuracy": 1.0,
+    "confusion": {
+      "fn": 0,
+      "fp": 0,
+      "tn": 1,
+      "tp": 1
+    },
+    "n": 2,
+    "precision": 1.0,
+    "recall": 1.0
+  },
+  "answered": 2,
+  "total": 2,
+  "who": "smoke",
+  "zone": {
+    "accuracy": 1.0,
+    "confusion": {
+      "fn": 0,
+      "fp": 0,
+      "tn": 0,
+      "tp": 1
+    },
+    "n": 1,
+    "precision": 1.0,
+    "recall": 1.0
+  }
+}
