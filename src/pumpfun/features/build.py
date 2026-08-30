@@ -41,8 +41,11 @@ def run(cfg: Config) -> None:
     tab.write_parquet(cfg.processed_dir / "features.parquet")
 
     ordered = labels.join(tab.select("mint"), on="mint", how="inner").sort("mint")
-    x, mints = sequence.encode(cfg, wt.filter(pl.col("mint").is_in(ordered["mint"].implode())), ordered)
+    wt_ord = wt.filter(pl.col("mint").is_in(ordered["mint"].implode()))
+    x, mints = sequence.encode(cfg, wt_ord, ordered)
     np.save(cfg.processed_dir / "sequences.npy", x)
+    xt, _ = sequence.encode_trades(cfg, wt_ord, ordered, int(cfg.cnn["trade_steps"]))
+    np.save(cfg.processed_dir / "sequences_trades.npy", xt)
     pl.DataFrame({"mint": mints}).write_parquet(cfg.processed_dir / "sequence_index.parquet")
 
     update_counts(cfg.reports_dir, "features", {"labeled_in": labels.height, "features_out": tab.height, **counts})
@@ -53,6 +56,8 @@ def run(cfg: Config) -> None:
             "side": tabular.SIDE,
             "sequence_channels": sequence.CHANNELS,
             "sequence_shape": list(x.shape),
+            "trade_channels": sequence.TRADE_CHANNELS,
+            "trade_shape": list(xt.shape),
             "splits": counts,
         },
     )

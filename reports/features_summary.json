@@ -80,5 +80,18 @@
     "train_pos": 57,
     "val_n": 1823,
     "val_pos": 171
-  }
+  },
+  "trade_channels": [
+    "log_price",
+    "log1p_dt",
+    "side",
+    "log1p_sol",
+    "new_buyer",
+    "curve_fill"
+  ],
+  "trade_shape": [
+    2299,
+    256,
+    6
+  ]
 }

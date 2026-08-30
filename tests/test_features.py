@@ -115,3 +115,19 @@ def test_prescreen_threshold_is_derived_from_tp():
 
     assert needed_sol(CFG) == pytest.approx((2**0.5 - 1) * 30, rel=1e-6)
     assert needed_sol(load_config(overrides=["tp=3.0"])) == pytest.approx(30.0, rel=1e-6)
+
+
+def test_trade_encoding_right_aligned_with_dt():
+    tr = _trades(
+        "A",
+        [(10, True, 1.0, 1e7, "w1", 1e-8), (40, True, 2.0, 1e7, "w2", 3e-8), (41, False, 0.5, 5e6, "w1", 2.5e-8)],
+    )
+    lab = _labels("A")
+    x, mints = sequence.encode_trades(CFG, sequence.window_trades(CFG, tr.lazy(), lab), lab, steps=8)
+    assert x.shape == (1, 8, 6)
+    assert (x[0, :5] == 0).all()  # left padding
+    assert x[0, 5, 2] == 1.0 and x[0, 7, 2] == -1.0  # sides
+    assert x[0, 6, 1] == pytest.approx(np.log1p(30.0))  # dt 10 -> 40
+    assert x[0, 7, 1] == pytest.approx(np.log1p(1.0))
+    assert x[0, 5, 4] == 1.0 and x[0, 7, 4] == 0.0  # w1 new at first trade, not at its second
+    assert x[0, 7, 0] == pytest.approx(np.log(2.5e-8 / 2e-8))

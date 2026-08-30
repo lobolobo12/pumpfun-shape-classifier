@@ -22,6 +22,9 @@ from pumpfun.ingest.to_parquet import curve_params
 from pumpfun.label import curve_sim as cs
 
 CHANNELS = ["log_price", "volume_share", "trade_count", "unique_buyers", "imbalance", "curve_fill"]
+# Per-trade encoding (the trading repo's recommendation): one step per trade, right-aligned at the
+# decision, so dead time compresses into the dt channel instead of hundreds of empty bins.
+TRADE_CHANNELS = ["log_price", "log1p_dt", "side", "log1p_sol", "new_buyer", "curve_fill"]
 
 
 def launch_price(cfg: Config) -> float:
@@ -99,4 +102,38 @@ def encode(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame) -> tuple[np.ndar
         idx = np.maximum.accumulate(idx, axis=1)
         filled = np.take_along_axis(x[:, :, ch], np.clip(idx, 0, None), axis=1)
         x[:, :, ch] = np.where(idx >= 0, filled, x[:, :, ch])
+    return x, mints
+
+
+def encode_trades(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, steps: int) -> tuple[np.ndarray, list[str]]:
+    """Dense [N, steps, 6] float32, one step per trade, right-aligned (last step = last pre-entry trade)."""
+    mints = labels["mint"].to_list()
+    pos = {m: i for i, m in enumerate(mints)}
+    entry_price = dict(labels.select("mint", "entry_price").iter_rows())
+    grad = graduation_sol(cfg)
+    x = np.zeros((len(mints), steps, len(TRADE_CHANNELS)), dtype=np.float32)
+    cols = ["seconds_since_launch", "is_buy", "sol_amount", "trader", "price_sol", "curve_sol_after"]
+    for (mint,), g in wt.group_by("mint", maintain_order=True):
+        i = pos[mint]
+        rows = list(g.select(cols).iter_rows())[-steps:]
+        seen: set[str] = set()
+        # first-buyer flags need the full window's history, not just the kept tail
+        head = list(g.select("trader").iter_rows())[: max(0, g.height - steps)]
+        for (tr,) in head:
+            seen.add(tr)
+        off = steps - len(rows)
+        prev_t = rows[0][0] if rows else 0.0
+        ep = entry_price[mint]
+        for k, (t, is_buy, sol, trader, px, fill) in enumerate(rows):
+            new = trader not in seen
+            seen.add(trader)
+            x[i, off + k] = (
+                np.log(px / ep) if px > 0 else 0.0,
+                np.log1p(max(0.0, t - prev_t)),
+                1.0 if is_buy else -1.0,
+                np.log1p(sol),
+                1.0 if new else 0.0,
+                (fill / grad) if fill is not None else 0.0,
+            )
+            prev_t = t
     return x, mints

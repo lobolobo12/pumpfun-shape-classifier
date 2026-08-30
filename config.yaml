@@ -89,6 +89,8 @@ xgb:
   colsample_bytree: 0.8
   early_stopping_rounds: 50
 cnn:
+  encoding: "steps"        # "steps" (spec: fixed 1 s bins) or "trades" (one step per trade, right-aligned)
+  trade_steps: 256
   channels: 64
   blocks: 4
   kernel: 5

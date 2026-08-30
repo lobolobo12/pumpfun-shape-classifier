@@ -67,11 +67,12 @@ def _device() -> torch.device:
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def _prep_seq(x: np.ndarray) -> np.ndarray:
-    """Per-channel scaling that keeps the shape: counts -> log1p, the rest as is."""
+def _prep_seq(x: np.ndarray, encoding: str) -> np.ndarray:
+    """Per-channel scaling that keeps the shape: counts -> log1p; trade encoding is already scaled."""
     x = x.copy()
-    x[:, :, 2] = np.log1p(x[:, :, 2])
-    x[:, :, 3] = np.log1p(x[:, :, 3])
+    if encoding == "steps":
+        x[:, :, 2] = np.log1p(x[:, :, 2])
+        x[:, :, 3] = np.log1p(x[:, :, 3])
     return x.transpose(0, 2, 1).astype(np.float32)  # [N, C, T]
 
 
@@ -79,7 +80,8 @@ def _load(cfg: Config) -> tuple[pl.DataFrame, np.ndarray]:
     feats = pl.read_parquet(cfg.processed_dir / "features.parquet")
     labels = pl.read_parquet(cfg.interim_dir / "labels.parquet").select("mint", "entry_cost_sol", "exit_net_sol")
     feats = feats.join(labels, on="mint", how="left")
-    seq = np.load(cfg.processed_dir / "sequences.npy")
+    enc = str(cfg.cnn.get("encoding", "steps"))
+    seq = np.load(cfg.processed_dir / ("sequences.npy" if enc == "steps" else "sequences_trades.npy"))
     idx = pl.read_parquet(cfg.processed_dir / "sequence_index.parquet").with_row_index("row")
     feats = feats.join(idx, on="mint", how="inner")
     return feats, seq
@@ -91,8 +93,8 @@ def train_one(
     torch.manual_seed(seed)
     np.random.seed(seed)
     c = cfg.cnn
-    xs = torch.tensor(_prep_seq(seq[tr["row"].to_numpy()]))
-    xv = torch.tensor(_prep_seq(seq[va["row"].to_numpy()]))
+    xs = torch.tensor(_prep_seq(seq[tr["row"].to_numpy()], str(cfg.cnn.get("encoding", "steps"))))
+    xv = torch.tensor(_prep_seq(seq[va["row"].to_numpy()], str(cfg.cnn.get("encoding", "steps"))))
     ys = torch.tensor(tr["label"].to_numpy(), dtype=torch.float32)
     yv = torch.tensor(va["label"].to_numpy(), dtype=torch.float32)
     mean, std = side_stats
@@ -135,10 +137,10 @@ def train_one(
     return model, best, n_params
 
 
-def predict(model, seq_rows: np.ndarray, side: np.ndarray | None, dev: torch.device) -> np.ndarray:
+def predict(model, seq_rows: np.ndarray, side: np.ndarray | None, dev: torch.device, encoding: str = "steps") -> np.ndarray:
     model.eval()
     with torch.no_grad():
-        x = torch.tensor(_prep_seq(seq_rows)).to(dev)
+        x = torch.tensor(_prep_seq(seq_rows, encoding)).to(dev)
         s = None if side is None else torch.tensor(side.astype(np.float32)).to(dev)
         return torch.sigmoid(model(x, s)).cpu().numpy()
 
@@ -161,10 +163,10 @@ def run(cfg: Config) -> dict:
     for s in range(int(cfg.cnn["seeds"])):
         model, best_val, n_params = train_one(cfg, cfg.seed + s, tr, va, seq, side_stats, use_side, dev)
         side_te = ((te.select(SIDE_COLS).fill_null(0).to_numpy() - side_stats[0]) / side_stats[1]) if use_side else None
-        preds.append(predict(model, seq[te["row"].to_numpy()], side_te, dev))
+        preds.append(predict(model, seq[te["row"].to_numpy()], side_te, dev, enc))
         vals.append(best_val)
     p = np.mean(preds, axis=0)
-    name = "cnn_seq+side" if use_side else "cnn_seq_only"
+    name = f"cnn_{enc}" + ("+side" if use_side else "")
     result = metrics.evaluate(cfg, te, p)
     result["val_pr_auc_per_seed"] = [float(v) for v in vals]
     result["n_params"] = int(n_params)
