@@ -76,11 +76,10 @@ def _prep_seq(x: np.ndarray, encoding: str) -> np.ndarray:
     return x.transpose(0, 2, 1).astype(np.float32)  # [N, C, T]
 
 
-def _load(cfg: Config) -> tuple[pl.DataFrame, np.ndarray]:
+def _load(cfg: Config, enc: str) -> tuple[pl.DataFrame, np.ndarray]:
     feats = pl.read_parquet(cfg.processed_dir / "features.parquet")
     labels = pl.read_parquet(cfg.interim_dir / "labels.parquet").select("mint", "entry_cost_sol", "exit_net_sol")
     feats = feats.join(labels, on="mint", how="left")
-    enc = str(cfg.cnn.get("encoding", "steps"))
     seq = np.load(cfg.processed_dir / ("sequences.npy" if enc == "steps" else "sequences_trades.npy"))
     idx = pl.read_parquet(cfg.processed_dir / "sequence_index.parquet").with_row_index("row")
     feats = feats.join(idx, on="mint", how="inner")
@@ -146,7 +145,8 @@ def predict(model, seq_rows: np.ndarray, side: np.ndarray | None, dev: torch.dev
 
 
 def run(cfg: Config) -> dict:
-    feats, seq = _load(cfg)
+    enc = str(cfg.cnn.get("encoding", "steps"))
+    feats, seq = _load(cfg, enc)
     use_side = bool(cfg.cnn.get("side", True))
     tr = feats.filter(pl.col("split") == "train")
     va = feats.filter(pl.col("split") == "val")
