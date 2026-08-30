@@ -10,6 +10,11 @@ trailing_stop: false         # false: sl is from entry; true: sl is from the run
 position_sol: 0.5            # hypothetical position, spent as buy_exact_sol_in
 entry_lag_seconds: 0         # entry at launch + window + lag, on the curve state at that moment
 
+# --- population the models train and score on ------------------------------
+# "active": only coins still trading at the decision (last window trade within metrics.active_silence_max).
+# Dead-at-entry coins are handled by that gate rule, not by the model. "all": the spec's full population.
+population: "active"
+
 # --- filters / sampling ---------------------------------------------------
 min_trades_in_window: 10
 neg_pos_ratio: 4             # negatives per positive in the TRAIN split only

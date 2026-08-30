@@ -148,6 +148,8 @@ def run(cfg: Config) -> dict:
     enc = str(cfg.cnn.get("encoding", "steps"))
     feats, seq = _load(cfg, enc)
     use_side = bool(cfg.cnn.get("side", True))
+    if str(cfg.raw.get("population", "all")) == "active":
+        feats = feats.filter(pl.col("active_at_entry").fill_null(False))
     tr = feats.filter(pl.col("split") == "train")
     va = feats.filter(pl.col("split") == "val")
     te = feats.filter(pl.col("split") == "test")

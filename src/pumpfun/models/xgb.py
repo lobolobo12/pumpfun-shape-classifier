@@ -88,6 +88,8 @@ def run(cfg: Config) -> dict:
     feats = pl.read_parquet(cfg.processed_dir / "features.parquet")
     labels = pl.read_parquet(cfg.interim_dir / "labels.parquet").select("mint", "entry_cost_sol", "exit_net_sol")
     feats = feats.join(labels, on="mint", how="left")
+    if str(cfg.raw.get("population", "all")) == "active":
+        feats = feats.filter(pl.col("active_at_entry").fill_null(False))
     train = feats.filter(pl.col("split") == "train")
     val = feats.filter(pl.col("split") == "val")
     test = feats.filter(pl.col("split") == "test")
