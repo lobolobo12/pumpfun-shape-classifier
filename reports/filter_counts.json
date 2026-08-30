@@ -1,0 +1,45 @@
+{
+  "label": {
+    "dropped_graduated_before_entry": 2,
+    "dropped_lifetime_lt_window": 127,
+    "dropped_lt_min_trades": 7,
+    "dropped_no_fill": 25,
+    "dropped_non_standard_curve": 7,
+    "labeled": 13,
+    "tokens_with_tape": 181,
+    "updated_at": 1788107165
+  },
+  "prescreen": {
+    "fetch_queue": 20387,
+    "needed_sol_for_tp": 12.426,
+    "prescreen_no_inflow_dropped": 9964,
+    "queued": {
+      "candidate": 6034,
+      "unknown": 4155,
+      "unlikely": 10198
+    },
+    "sample_rates": {
+      "candidate": 1.0,
+      "unknown": 0.2,
+      "unlikely": 0.2
+    },
+    "strata": {
+      "candidate": 6034,
+      "no_inflow": 9964,
+      "unknown": 21122,
+      "unlikely": 51638
+    },
+    "universe_tokens": 88758,
+    "updated_at": 1788107130
+  },
+  "universe": {
+    "attention_meta_total": 89978,
+    "in_date_range": 71113,
+    "pumpportal_frames_in_range": 84781,
+    "universe_added_from_frames": 22683,
+    "universe_no_creator": 0,
+    "universe_seen_late_dropped": 5038,
+    "universe_tokens": 88758,
+    "updated_at": 1788100995
+  }
+}

@@ -1,0 +1,106 @@
+# Single source of every knob. No magic numbers in src/.
+
+# --- decision window / label ---------------------------------------------
+window_seconds: 300          # features see [launch, launch + window)
+resample_steps: 300          # sequence steps over the window (1 s bins)
+horizon_seconds: 3600        # barriers evaluated until entry + horizon
+tp: 1.0                      # upper barrier: net exit >= cost * (1 + tp)
+sl: 0.4                      # lower barrier: net exit <= cost * (1 - sl)
+trailing_stop: false         # false: sl is from entry; true: sl is from the running peak of net exit
+position_sol: 0.5            # hypothetical position, spent as buy_exact_sol_in
+entry_lag_seconds: 0         # entry = first trade at/after launch + window + lag
+entry_max_wait_seconds: 30   # no trade within this after the entry time -> "no fill", dropped and counted
+
+# --- filters / sampling ---------------------------------------------------
+min_trades_in_window: 10
+neg_pos_ratio: 4             # negatives per positive in the TRAIN split only
+zone_sol: [4, 30]            # the friends' zone (real SOL in curve at entry); reported as a slice
+
+# --- dates / splits (launch day, in split_timezone) -----------------------
+date_start: "2026-08-28"
+date_end: "2026-09-04"
+split_train_end: "2026-09-01"
+split_val_end: "2026-09-02"
+split_timezone: "Europe/Ljubljana"
+
+# --- costs (verified on mainnet, see nn-side-project-handoff.md and axiom-holy-sol/docs/pre-graduation.md)
+fee_protocol_bps: 95         # curve: FeeConfig tier from zero mcap = protocol 95 + creator 30 = 125 bps/side
+fee_creator_bps: 30
+pool_fee_bps:                # PumpSwap GlobalConfig; canonical pools may have mcap tiers (validated vs fillPriceSol)
+  lp: 20
+  protocol: 5
+  creator: 5
+router_fee_pct: 0.0          # Axiom-style router fee per side (friends preset: 0.01)
+tx_fee_sol: 0.001            # base + priority fee per transaction, charged on entry and exit
+
+# --- curve constants are DERIVED (label/curve_params.py) and asserted against these expectations
+curve_expected:
+  initial_virtual_sol_lamports: 30000000000
+  initial_virtual_token_raw: 1073000000000000
+  initial_real_token_raw: 793100000000000
+  token_total_supply_raw: 1000000000000000
+  token_decimals: 6
+curve_param_tolerance: 0.02  # relative residual above which a coin is "non_standard" and dropped
+
+# --- migration / PumpSwap seeding (observed constants, axiom-holy-sol BOOST)
+migration:
+  base_tokens_raw: 206900000000000
+  quote_lamports: 84990360349
+  virtual_quote_lamports: 17584505556
+
+# --- data sources ---------------------------------------------------------
+swap_api:
+  base_url: "https://swap-api.pump.fun/v2/coins"
+  user_agent: "pumpfun-shape-classifier/0.1 (research)"
+  page_limit: 100
+  rps_mac: 0.25
+  rps_vps: 4.0
+  slot_ms_estimate: 500      # over-estimate so the synthetic cursor lands AFTER the target
+  horizon_margin_seconds: 120
+  timeout_seconds: 20
+  max_pages_per_coin: 80
+sources:
+  attention_db: "/Users/lovrobor/axiom-holy-sol/data/attention.db"
+  pumpportal_raw: "/Users/lovrobor/axiom-holy-sol/data/raw/pumpportal"
+  seed_trade_cache: "/Users/lovrobor/axiom-holy-sol/data/cache/pumpfun-trades"
+universe:
+  max_first_seen_age_seconds: 120   # a coin first seen older than this was not captured at birth
+  coverage_min: 0.99                # sweep must contain this share of pumpportal create frames
+prescreen:
+  # Strata from the 20 s curve polls. "candidate" = the curve ever held enough SOL for the price to
+  # reach (1 + tp)x from any entry (derived from tp and the virtual reserves), or graduated: fetched in full.
+  # "unlikely" (never did) and "unknown" (no polls) are sampled uniformly by mint hash; their weight
+  # (1 / rate) enters every base rate and metric.
+  sample_rate_unlikely: 0.2
+  sample_rate_unknown: 0.2
+
+# --- benchmark ------------------------------------------------------------
+bench:
+  n_per_class: 100
+  image_px: [640, 360]
+
+# --- models ---------------------------------------------------------------
+xgb:
+  n_estimators: 600
+  max_depth: 4
+  learning_rate: 0.03
+  subsample: 0.8
+  colsample_bytree: 0.8
+  early_stopping_rounds: 50
+cnn:
+  channels: 64
+  blocks: 4
+  kernel: 5
+  dropout: 0.3
+  epochs: 40
+  batch_size: 256
+  lr: 0.001
+  patience: 6
+  seeds: 5
+metrics:
+  top_fractions: [0.01, 0.05, 0.10]
+
+paths:
+  data: "data"
+  reports: "reports"
+seed: 42

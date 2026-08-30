@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+data/*
+!data/.gitkeep
+!data/queue/
+reports/*.png
+reports/charts/
+.env
+*.log
+.DS_Store
+# local-only documents (strategy details); kept on disk, never in the repo
+pumpfun-classifier-spec.md
+nn-side-project-handoff.md
+presets/friends.yaml

@@ -1,0 +1,88 @@
+name: fetch
+
+# Trade-tape fetcher on GitHub-hosted runners: each shard is its own job with
+# its own IP, resumes from the previous run's cache, stops before the job
+# limit, and uploads its tapes + ledger as an artifact for `pf gh-pull`.
+on:
+  workflow_dispatch:
+    inputs:
+      shards:
+        description: "number of parallel shards (each = one runner/IP)"
+        default: "1"
+      rps:
+        description: "requests per second per shard"
+        default: "2.0"
+      probe:
+        description: "if > 0: fetch this many random coins per shard and write cost_probe.json"
+        default: "0"
+      max_minutes:
+        description: "time budget per shard (job limit is 360)"
+        default: "330"
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - id: m
+        run: |
+          n=${{ inputs.shards }}
+          echo "matrix=$(python3 -c "import json;print(json.dumps(list(range($n))))")" >> "$GITHUB_OUTPUT"
+
+  fetch:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --no-dev
+      - name: restore shard state
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/raw/cache
+            data/raw/fetch_ledger.shard${{ matrix.shard }}of${{ inputs.shards }}.sqlite
+          key: fetch-shard-${{ matrix.shard }}of${{ inputs.shards }}-${{ github.run_id }}
+          restore-keys: |
+            fetch-shard-${{ matrix.shard }}of${{ inputs.shards }}-
+      - name: fetch
+        run: |
+          probe=${{ inputs.probe }}
+          extra=""
+          if [ "$probe" -gt 0 ]; then extra="--probe $probe"; fi
+          uv run pf fetch --host vps \
+            --shard ${{ matrix.shard }}/${{ inputs.shards }} \
+            --rps ${{ inputs.rps }} \
+            --max-minutes ${{ inputs.max_minutes }} \
+            --queue data/queue/fetch_queue.parquet $extra
+      - name: save shard state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/raw/cache
+            data/raw/fetch_ledger.shard${{ matrix.shard }}of${{ inputs.shards }}.sqlite
+          key: fetch-shard-${{ matrix.shard }}of${{ inputs.shards }}-${{ github.run_id }}
+      - name: upload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fetch-shard-${{ matrix.shard }}of${{ inputs.shards }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            data/raw/cache
+            data/raw/fetch_ledger.shard${{ matrix.shard }}of${{ inputs.shards }}.sqlite
+            reports/fetch_runs.json
+            reports/cost_probe.json
