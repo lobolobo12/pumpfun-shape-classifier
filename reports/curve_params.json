@@ -5,23 +5,23 @@
   },
   "graduation_sol_by_month": [
     {
-      "max": 118.441938436,
-      "median": 85.005359253,
-      "min": 0.044993507,
+      "max": 150.611470555,
+      "median": 85.0053592215,
+      "min": 0.032543131,
       "month": "2026-08",
-      "n": 347
+      "n": 560
     }
   ],
   "months": {
     "2026-08": {
-      "coins_fitted": 346,
-      "coins_standard": 325,
+      "coins_fitted": 359,
+      "coins_standard": 337,
       "rel_diff_vs_expected": {
-        "virtual_sol": 0.0,
+        "virtual_sol": 1.1102230246251565e-16,
         "virtual_token": 1.1102230246251565e-16
       },
-      "share_non_standard": 0.0607,
-      "virtual_sol0_lamports": 30000000000.0,
+      "share_non_standard": 0.0613,
+      "virtual_sol0_lamports": 29999999999.999996,
       "virtual_token0_raw": 1072999999999999.9
     }
   },

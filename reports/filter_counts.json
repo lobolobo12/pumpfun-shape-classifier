@@ -14,14 +14,14 @@
   },
   "label": {
     "dropped_entry_completes_curve": 1,
-    "dropped_entry_zero_tokens": 2,
-    "dropped_graduated_before_entry": 276,
-    "dropped_lifetime_lt_window": 6505,
-    "dropped_lt_min_trades": 1171,
-    "dropped_non_standard_curve": 809,
-    "labeled": 3762,
-    "tokens_with_tape": 12526,
-    "updated_at": 1788126236
+    "dropped_entry_zero_tokens": 6,
+    "dropped_graduated_before_entry": 403,
+    "dropped_lifetime_lt_window": 9282,
+    "dropped_lt_min_trades": 4038,
+    "dropped_non_standard_curve": 2081,
+    "labeled": 9230,
+    "tokens_with_tape": 25041,
+    "updated_at": 1788135525
   },
   "prescreen": {
     "fetch_queue": 25452,
