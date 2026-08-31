@@ -1,16 +1,16 @@
 {
   "features": {
-    "creator_straddle_dropped": 962,
-    "features_out": 2299,
-    "labeled_in": 3762,
-    "test_n": 191,
-    "test_pos": 8,
+    "creator_straddle_dropped": 3055,
+    "features_out": 5522,
+    "labeled_in": 9230,
+    "test_n": 2248,
+    "test_pos": 106,
     "train_n": 285,
-    "train_negatives_dropped": 501,
+    "train_negatives_dropped": 653,
     "train_pos": 57,
-    "updated_at": 1788128682,
-    "val_n": 1823,
-    "val_pos": 171
+    "updated_at": 1788135557,
+    "val_n": 2989,
+    "val_pos": 175
   },
   "label": {
     "dropped_entry_completes_curve": 1,
