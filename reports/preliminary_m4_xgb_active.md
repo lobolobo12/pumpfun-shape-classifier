@@ -5,7 +5,8 @@
 | xgb_shape | 1290 | 0.179 | 0.786 | 0.08 | 0.16 | 0.22 | -4.94 | -7.27 |
 | xgb_holders | 1290 | 0.191 | 0.777 | 0.08 | 0.20 | 0.22 | -3.49 | -5.96 |
 | xgb_shape+holders | 1290 | 0.204 | 0.801 | 0.23 | 0.25 | 0.22 | -4.59 | -7.06 |
-| xgb_all | 1290 | 0.194 | 0.790 | 0.23 | 0.22 | 0.18 | -9.15 | -10.95 |
+| xgb_all | 1290 | 0.192 | 0.791 | 0.15 | 0.19 | 0.24 | -2.45 | -4.81 |
+| xgb_context | 1290 | 0.069 | 0.496 | 0.00 | 0.05 | 0.06 | -4.21 | -6.05 |
 | logistic_repo_recipe | 1290 | 0.163 | 0.745 | 0.15 | 0.19 | 0.19 | -6.87 | -8.74 |
 | human (M0) | — | not yet recorded: run `pf bench label` | | | | | | |
 
@@ -64,18 +65,26 @@
 
 ## xgb_all: top gain features
 
-- buyers_last60: 20.079
-- run_from_low: 15.997
-- tokens_out_pct: 13.243
-- top3_share: 12.865
-- biggest_buy_vs_curve: 9.231
-- n_buyers: 8.264
-- creator_prior_launches: 7.612
-- gini_hold: 7.182
-- holders_n: 6.958
-- step_gini: 6.906
-- log_ret_window: 6.832
-- top1_share: 6.411
-- n_trades: 6.238
-- max_drawdown: 6.234
-- from_peak: 6.227
+- tokens_out_pct: 14.73
+- buyers_last60: 14.615
+- run_from_low: 13.328
+- is_native_launch: 11.962
+- top3_share: 11.265
+- top10_share: 10.358
+- biggest_buy_vs_curve: 8.71
+- log_ret_window: 8.153
+- n_buyers: 6.877
+- max_drawdown: 6.623
+- holders_n: 6.084
+- n_trades: 6.0
+- price_slope: 5.654
+- top1_share: 5.628
+- trades_last60: 5.489
+
+## xgb_context: top gain features
+
+- hour_cos: 2.345
+- live_at_entry: 1.685
+- hour_sin: 1.515
+- replies_at_entry: 1.225
+- is_native_launch: 1.124

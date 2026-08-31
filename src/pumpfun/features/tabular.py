@@ -68,8 +68,11 @@ HOLDERS = [
     "tokens_out_pct",
 ]
 CREATOR = ["creator_prior_launches", "creator_prior_resolved", "creator_prior_tp_rate"]
+# v1.5: causal context that is not the meme itself (spec §7 keeps name/image out of v1).
+CONTEXT = ["is_native_launch", "hour_sin", "hour_cos", "replies_at_entry", "live_at_entry"]
 SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]
-GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR}
+GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR, "context": CONTEXT}
+NATIVE_HOSTS = {"ipfs.io", "pump.mypinata.cloud"}
 
 
 def gini(xs: list[float]) -> float:
@@ -262,6 +265,31 @@ def creator_history(cfg: Config, tokens: pl.DataFrame, labels: pl.DataFrame) -> 
     return pl.DataFrame(out)
 
 
+def context_features(cfg: Config, tokens: pl.DataFrame) -> pl.DataFrame:
+    """Launch origin, launch hour (periodic), platform attention frozen strictly before the entry."""
+    strata_path = cfg.interim_dir / "strata.parquet"
+    att = (
+        pl.read_parquet(strata_path).select("mint", "replies_at_entry", "live_at_entry")
+        if strata_path.exists() and "replies_at_entry" in pl.read_parquet_schema(strata_path)
+        else pl.DataFrame(schema={"mint": pl.String, "replies_at_entry": pl.Int64, "live_at_entry": pl.Boolean})
+    )
+    two_pi = 2 * math.pi
+    return (
+        tokens.select("mint", "launch_time", "meta_host")
+        .with_columns(
+            is_native_launch=pl.col("meta_host").is_in(sorted(NATIVE_HOSTS)).cast(pl.Float64),
+            hour=(pl.from_epoch("launch_time").dt.replace_time_zone("UTC").dt.convert_time_zone(cfg.split_timezone).dt.hour()),
+        )
+        .with_columns(
+            hour_sin=(pl.col("hour") * two_pi / 24).sin(),
+            hour_cos=(pl.col("hour") * two_pi / 24).cos(),
+        )
+        .join(att, on="mint", how="left")
+        .with_columns(live_at_entry=pl.col("live_at_entry").cast(pl.Float64))
+        .select("mint", "is_native_launch", "hour_sin", "hour_cos", "replies_at_entry", "live_at_entry")
+    )
+
+
 def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFrame) -> pl.DataFrame:
     meta = {
         m: (c, s, e)
@@ -275,7 +303,11 @@ def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFr
         creator, sol_at_entry, entry_price = meta[mint]
         feats = shape_and_holders(cfg, list(g.select(cols).iter_rows()), creator, sol_at_entry, entry_price)
         rows.append({"mint": mint, **feats})
-    df = pl.DataFrame(rows).join(creator_history(cfg, tokens, labels), on="mint", how="left")
+    df = (
+        pl.DataFrame(rows)
+        .join(creator_history(cfg, tokens, labels), on="mint", how="left")
+        .join(context_features(cfg, tokens), on="mint", how="left")
+    )
     df = df.with_columns(
         active_at_entry=(pl.col("last_trade_t") >= cfg.window_seconds - float(cfg.metrics["active_silence_max"]))
     )

@@ -8,7 +8,7 @@
     "train_n": 285,
     "train_negatives_dropped": 653,
     "train_pos": 57,
-    "updated_at": 1788135557,
+    "updated_at": 1788192854,
     "val_n": 2989,
     "val_pos": 175
   },
@@ -24,15 +24,15 @@
     "updated_at": 1788135525
   },
   "prescreen": {
-    "fetch_queue": 25452,
+    "fetch_queue": 29881,
     "needed_sol_for_tp": 12.426,
-    "prescreen_mayhem_dropped": 20480,
-    "prescreen_no_inflow_dropped": 12355,
+    "prescreen_mayhem_dropped": 22648,
+    "prescreen_no_inflow_dropped": 14714,
     "queued": {
-      "candidate": 6575,
-      "unknown": 3405,
-      "unlikely_active": 8009,
-      "unlikely_quiet": 7463
+      "candidate": 7752,
+      "unknown": 3420,
+      "unlikely_active": 9864,
+      "unlikely_quiet": 8845
     },
     "sample_rates": {
       "candidate": 1.0,
@@ -41,26 +41,26 @@
       "unlikely_quiet": 0.2
     },
     "strata": {
-      "candidate": 6575,
-      "mayhem": 20480,
-      "no_inflow": 12355,
-      "unknown": 17327,
-      "unlikely_active": 8009,
-      "unlikely_quiet": 37761
+      "candidate": 7752,
+      "mayhem": 22648,
+      "no_inflow": 14714,
+      "unknown": 17434,
+      "unlikely_active": 9864,
+      "unlikely_quiet": 44552
     },
-    "universe_tokens": 102507,
-    "updated_at": 1788126340
+    "universe_tokens": 116964,
+    "updated_at": 1788192842
   },
   "universe": {
-    "attention_meta_total": 106069,
-    "in_date_range": 84935,
-    "pumpportal_frames_in_range": 98062,
-    "universe_added_from_frames": 22904,
-    "universe_mayhem_flagged": 20480,
-    "universe_mayhem_unknown": 4445,
+    "attention_meta_total": 125440,
+    "in_date_range": 100406,
+    "pumpportal_frames_in_range": 110566,
+    "universe_added_from_frames": 23233,
+    "universe_mayhem_flagged": 22648,
+    "universe_mayhem_unknown": 6398,
     "universe_no_creator": 0,
-    "universe_seen_late_dropped": 5332,
-    "universe_tokens": 102507,
-    "updated_at": 1788126338
+    "universe_seen_late_dropped": 6675,
+    "universe_tokens": 116964,
+    "updated_at": 1788192839
   }
 }

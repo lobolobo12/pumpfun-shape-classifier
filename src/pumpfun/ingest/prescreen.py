@@ -59,11 +59,13 @@ def run(cfg: Config) -> pl.DataFrame:
         rows = con.execute(
             """
             select u.mint, max(m.real_sol_reserves), count(m.at), max(m.complete),
-                   count(distinct case when m.at >= u.after_ms then m.real_sol_reserves end)
+                   count(distinct case when m.at >= u.after_ms then m.real_sol_reserves end),
+                   max(case when m.at < u.after_ms then m.reply_count end),
+                   max(case when m.at < u.after_ms then m.is_currently_live end)
               from u left join (
-                select mint, at, real_sol_reserves, complete from early_marks
+                select mint, at, real_sol_reserves, complete, reply_count, is_currently_live from early_marks
                 union all
-                select mint, at, real_sol_reserves, complete from attention_marks
+                select mint, at, real_sol_reserves, complete, reply_count, is_currently_live from attention_marks
               ) m on m.mint = u.mint and m.at <= u.cutoff_ms
              group by u.mint
             """
@@ -77,6 +79,8 @@ def run(cfg: Config) -> pl.DataFrame:
             "n_marks": [int(r[2]) for r in rows],
             "completed": [bool(r[3]) for r in rows],
             "distinct_after": [int(r[4]) for r in rows],
+            "replies_at_entry": [None if r[5] is None else int(r[5]) for r in rows],
+            "live_at_entry": [None if r[6] is None else bool(r[6]) for r in rows],
         },
         schema={
             "mint": pl.String,
@@ -84,6 +88,8 @@ def run(cfg: Config) -> pl.DataFrame:
             "n_marks": pl.Int64,
             "completed": pl.Boolean,
             "distinct_after": pl.Int64,
+            "replies_at_entry": pl.Int64,
+            "live_at_entry": pl.Boolean,
         },
     )
     need = needed_sol(cfg)
@@ -113,7 +119,9 @@ def run(cfg: Config) -> pl.DataFrame:
         selected=(pl.col("u") < pl.col("rate")),
         weight=pl.when(pl.col("rate") > 0).then(1.0 / pl.col("rate")).otherwise(0.0),
     )
-    strata = df.select("mint", "launch_day", "stratum", "max_real_sol", "n_marks", "selected", "weight")
+    strata = df.select(
+        "mint", "launch_day", "stratum", "max_real_sol", "n_marks", "selected", "weight", "replies_at_entry", "live_at_entry"
+    )
     cfg.interim_dir.mkdir(parents=True, exist_ok=True)
     strata.write_parquet(cfg.interim_dir / "strata.parquet")
 

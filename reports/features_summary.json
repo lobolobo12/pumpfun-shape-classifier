@@ -1,5 +1,12 @@
 {
   "groups": {
+    "context": [
+      "is_native_launch",
+      "hour_sin",
+      "hour_cos",
+      "replies_at_entry",
+      "live_at_entry"
+    ],
     "creator": [
       "creator_prior_launches",
       "creator_prior_resolved",

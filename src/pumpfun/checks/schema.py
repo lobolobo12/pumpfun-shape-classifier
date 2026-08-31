@@ -39,6 +39,7 @@ TOKENS_SCHEMA: dict[str, pl.DataType] = {
     "first_seen_age_s": pl.Float64,  # additive
     "launch_day": pl.String,  # additive: YYYY-MM-DD in split_timezone
     "mayhem": pl.Boolean,  # additive: is_mayhem_mode from the on-chain create frame; null when no frame was recorded
+    "meta_host": pl.String,  # additive: host of the metadata URI from the create frame (launch-origin fingerprint)
 }
 
 

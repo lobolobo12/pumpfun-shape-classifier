@@ -16,7 +16,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 from pumpfun.config import Config
-from pumpfun.features.tabular import CREATOR, HOLDERS, SHAPE
+from pumpfun.features.tabular import CONTEXT, CREATOR, HOLDERS, SHAPE
 from pumpfun.models import metrics
 from pumpfun.reports import write_json
 
@@ -26,7 +26,8 @@ VARIANTS = {
     "xgb_shape": SHAPE,
     "xgb_holders": HOLDERS,
     "xgb_shape+holders": SHAPE + HOLDERS,
-    "xgb_all": SHAPE + HOLDERS + CREATOR,
+    "xgb_all": SHAPE + HOLDERS + CREATOR + CONTEXT,
+    "xgb_context": CONTEXT,
 }
 # analyse.ts MODEL_FEATURES, translated to our names (sameSlotShare and ageS have no counterpart here).
 LOGISTIC_FEATURES = [
