@@ -50,6 +50,7 @@ class LabelRow:
     label: int
     entry_t: float
     entry_idx: int
+    n_visible: int  # trades the features may see (age: strictly before entry time; cross: incl. the crossing trade)
     entry_price: float  # marginal price just before the entry (sequence normaliser)
     entry_fill_price: float  # cost / tokens
     entry_cost_sol: float
@@ -82,27 +83,52 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
     raw_per = p.raw_per_token
     fees = cs.CurveFees(cfg.fee_protocol_bps, cfg.fee_creator_bps)
     pfees = ps.PoolFees(cfg.pool_fee_bps.lp, cfg.pool_fee_bps.protocol, cfg.pool_fee_bps.creator)
-    w = cfg.window_seconds
-    t_entry = float(cfg.entry_offset_seconds)
 
-    n_window = sum(1 for t in trades if t.t_s < w)
-    if not trades or trades[-1].t_s < w:
-        raise Drop("lifetime_lt_window")
-    if n_window < cfg.min_trades_in_window:
-        raise Drop("lt_min_trades")
-    # The curve fills at any moment: the entry is the state after the last trade before t_entry.
-    entry_idx = next((t.idx for t in trades if t.t_s >= t_entry), len(trades))
+    def replay_check(upto: int) -> tuple[cs.CurveReserves, float]:
+        """Replay trades[:upto] on the curve, tracking the tape-vs-maths residual."""
+        c = cs.initial_reserves(p)
+        resid: list[float] = []
+        for t in trades[:upto]:
+            if t.program != CURVE_PROGRAM:
+                raise Drop("graduated_before_entry")
+            c = cs.apply_tape_trade(c, t.is_buy, cs.sol_to_lamports(t.sol), cs.tokens_to_raw(t.tokens, raw_per))
+            if len(resid) < RESIDUAL_CHECK_TRADES and t.price_sol > 0 and c.virtual_token > 0:
+                resid.append(abs(c.spot_sol_per_token(raw_per) / t.price_sol - 1))
+        return c, (sorted(resid)[len(resid) // 2] if resid else 0.0)
 
-    # --- replay to the entry, checking the tape against the curve maths
-    curve = cs.initial_reserves(p)
-    resid: list[float] = []
-    for t in trades[:entry_idx]:
-        if t.program != CURVE_PROGRAM:
-            raise Drop("graduated_before_entry")
-        curve = cs.apply_tape_trade(curve, t.is_buy, cs.sol_to_lamports(t.sol), cs.tokens_to_raw(t.tokens, raw_per))
-        if len(resid) < RESIDUAL_CHECK_TRADES and t.price_sol > 0 and curve.virtual_token > 0:
-            resid.append(abs(curve.spot_sol_per_token(raw_per) / t.price_sol - 1))
-    residual = sorted(resid)[len(resid) // 2] if resid else 0.0
+    if cfg.decision_mode == "age":
+        w = cfg.window_seconds
+        t_entry = float(cfg.entry_offset_seconds)
+        if not trades or trades[-1].t_s < w:
+            raise Drop("lifetime_lt_window")
+        # The curve fills at any moment: the entry is the state after the last trade before t_entry.
+        entry_idx = next((t.idx for t in trades if t.t_s >= t_entry), len(trades))
+        n_visible = entry_idx
+        if sum(1 for t in trades[:n_visible] if t.t_s < w) < cfg.min_trades_in_window:
+            raise Drop("lt_min_trades")
+        curve, residual = replay_check(entry_idx)
+    elif cfg.decision_mode == "cross":
+        level = cs.sol_to_lamports(cfg.cross_level_sol)
+        c = cs.initial_reserves(p)
+        cross_i: int | None = None
+        for i, t in enumerate(trades):
+            if t.program != CURVE_PROGRAM:
+                break
+            c = cs.apply_tape_trade(c, t.is_buy, cs.sol_to_lamports(t.sol), cs.tokens_to_raw(t.tokens, raw_per))
+            if c.real_sol >= level:
+                cross_i = i
+                break
+        if cross_i is None:
+            raise Drop("never_crossed_level")
+        entry_idx = cross_i + 1  # the crossing trade is visible; we buy right after it
+        n_visible = entry_idx
+        t_entry = trades[cross_i].t_s
+        if n_visible < cfg.min_trades_in_window:
+            raise Drop("lt_min_trades")
+        curve, residual = replay_check(entry_idx)
+    else:
+        raise SystemExit(f"unknown decision_mode {cfg.decision_mode!r}")
+
     if residual > cfg.curve_param_tolerance:
         raise Drop("non_standard_curve")
     if curve.complete:
@@ -174,6 +200,7 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
         label=label,
         entry_t=t_entry,
         entry_idx=entry_idx,
+        n_visible=n_visible,
         entry_price=entry_price,
         entry_fill_price=cost / cs.LAMPORTS_PER_SOL / (held / raw_per),
         entry_cost_sol=cost / cs.LAMPORTS_PER_SOL,
@@ -185,7 +212,7 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
         peak_ratio=peak_ratio,
         curve_sol_at_entry=curve_sol_at_entry,
         in_zone=cfg.zone_sol[0] <= curve_sol_at_entry <= cfg.zone_sol[1],
-        n_trades_window=n_window,
+        n_trades_window=n_visible,
         n_trades_horizon=n_horizon,
         graduated_in_horizon=graduated,
         residual=residual,

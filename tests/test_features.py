@@ -38,6 +38,7 @@ def _labels(mint: str, entry_t: float = 300.0, label: int = 1) -> pl.DataFrame:
         {
             "mint": [mint],
             "entry_t": [entry_t],
+            "n_visible": [10**6],
             "entry_price": [2e-8],
             "curve_sol_at_entry": [5.0],
             "in_zone": [True],
@@ -47,12 +48,13 @@ def _labels(mint: str, entry_t: float = 300.0, label: int = 1) -> pl.DataFrame:
     )
 
 
-def test_window_trades_excludes_post_window_and_asserts_causality():
+def test_window_trades_slices_by_rank_and_asserts_causality():
     tr = _trades("A", [(1, True, 1.0, 1e7, "w1", 1e-8), (299, True, 1.0, 1e7, "w2", 2e-8), (300, True, 1.0, 1e7, "w3", 3e-8)])
-    wt = sequence.window_trades(CFG, tr.lazy(), _labels("A"))
+    lab = _labels("A").with_columns(n_visible=pl.lit(2))
+    wt = sequence.window_trades(CFG, tr.lazy(), lab)
     assert wt.height == 2
     with pytest.raises(AssertionError):
-        sequence.window_trades(CFG, tr.lazy(), _labels("A", entry_t=250.0))
+        sequence.window_trades(CFG, tr.lazy(), lab.with_columns(entry_t=pl.lit(250.0), n_visible=pl.lit(3)))
 
 
 def test_encoder_shape_and_forward_fill():
@@ -75,7 +77,7 @@ def test_holder_features_by_construction():
         (5.0, 1010, True, 1.0, 100.0, "b2", 1e-8),
         (6.0, 1012, False, 0.5, 60.0, "dev", 1e-8),
     ]
-    f = tabular.shape_and_holders(CFG, rows, creator="dev", curve_sol_at_entry=2.5, entry_price=1e-8)
+    f = tabular.shape_and_holders(CFG, rows, creator="dev", curve_sol_at_entry=2.5, entry_price=1e-8, window_s=300.0)
     assert f["holders_n"] == 3 and f["buyers_n"] == 3
     assert f["dev_share"] == pytest.approx(40 / 240)
     assert f["dev_sold"] == 1.0

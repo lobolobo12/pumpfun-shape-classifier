@@ -46,13 +46,20 @@ def run(cfg: Config) -> dict:
 
     # --- pass 1: mutate everything after the window; features must not move
     rng = np.random.default_rng(cfg.seed)
-    post = trades.filter(pl.col("seconds_since_launch") >= cfg.window_seconds).collect()
+    ranked = (
+        trades.sort("mint", "slot", "slot_index")
+        .with_columns(rank=pl.int_range(pl.len()).over("mint"))
+        .join(labels.select("mint", "n_visible").lazy(), on="mint", how="inner")
+        .collect()
+    )
+    post = ranked.filter(pl.col("rank") >= pl.col("n_visible")).drop("rank", "n_visible")
     noise = post.with_columns(
         sol_amount=pl.Series(rng.random(post.height) * 10),
         is_buy=pl.Series(rng.random(post.height) > 0.5),
         price_sol=pl.Series(rng.random(post.height) * 1e-6),
     )
-    mutated = pl.concat([trades.filter(pl.col("seconds_since_launch") < cfg.window_seconds).collect(), noise]).lazy()
+    pre = ranked.filter(pl.col("rank") < pl.col("n_visible")).drop("rank", "n_visible")
+    mutated = pl.concat([pre, noise]).lazy()
     wt2 = sequence.window_trades(cfg, mutated, labels)
     base = tabular.build(cfg, wt, labels, tokens).sort("mint")
     again = tabular.build(cfg, wt2, labels, tokens).sort("mint")
@@ -67,7 +74,7 @@ def run(cfg: Config) -> dict:
     swapped = wt.with_columns(pl.col("mint").replace_strict(remap))
     # entry_price / curve_sol_at_entry belong to the window, so they travel with it
     lab_sw = labels.with_columns(pl.col("mint").replace_strict(remap)).select(
-        "mint", "entry_t", "entry_price", "curve_sol_at_entry", "in_zone", "launch_day", "label"
+        "mint", "entry_t", "entry_price", "n_visible", "curve_sol_at_entry", "in_zone", "launch_day", "label"
     )
     lab_sw = lab_sw.join(labels.select("mint", "label").rename({"label": "true_label"}), on="mint")
     perm_feats = tabular.build(cfg, swapped, lab_sw.drop("label").rename({"true_label": "label"}), tokens)

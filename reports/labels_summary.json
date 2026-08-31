@@ -1,8 +1,8 @@
 {
   "base_rate": {
     "bound_check_unlikely_positives": 11,
-    "estimated_overall": 0.005846557488548389,
-    "estimated_positives": 599.3130684786297,
+    "estimated_overall": 0.005852074909931709,
+    "estimated_positives": 684.4820897652523,
     "note": "positives per universe token. With strata: sum over strata of size * (positives / fetched) \u2014 unfetched coins are represented by their stratum's sampled rate",
     "per_day": [
       {
@@ -24,7 +24,14 @@
         "labeled": 4041,
         "launch_day": "2026-08-30",
         "positives": 201,
-        "universe": 36886
+        "universe": 37273
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-31",
+        "positives": null,
+        "universe": 14070
       }
     ],
     "per_stratum": [
@@ -33,31 +40,31 @@
         "labeled": 3978,
         "positive_rate_per_fetched": 0.06935975609756098,
         "positives": 455,
-        "size": 6575,
+        "size": 7752,
         "stratum": "candidate"
       },
       {
-        "fetched": 8005,
-        "labeled": 4189,
-        "positive_rate_per_fetched": 0.0013741411617738913,
+        "fetched": 8011,
+        "labeled": 4191,
+        "positive_rate_per_fetched": 0.0013731119710398202,
         "positives": 11,
-        "size": 8009,
+        "size": 9864,
         "stratum": "unlikely_active"
       },
       {
-        "fetched": 7463,
-        "labeled": 598,
+        "fetched": 7461,
+        "labeled": 596,
         "positive_rate_per_fetched": 0.0,
         "positives": 0,
-        "size": 37761,
+        "size": 44552,
         "stratum": "unlikely_quiet"
       },
       {
-        "fetched": 3013,
+        "fetched": 3009,
         "labeled": 465,
-        "positive_rate_per_fetched": 0.007633587786259542,
+        "positive_rate_per_fetched": 0.007643735460285809,
         "positives": 23,
-        "size": 17327,
+        "size": 17434,
         "stratum": "unknown"
       },
       {
@@ -65,7 +72,7 @@
         "labeled": 0,
         "positive_rate_per_fetched": 0.0,
         "positives": 0,
-        "size": 12355,
+        "size": 14714,
         "stratum": "no_inflow"
       },
       {
@@ -73,7 +80,7 @@
         "labeled": 0,
         "positive_rate_per_fetched": 0.0,
         "positives": 0,
-        "size": 20480,
+        "size": 22648,
         "stratum": "mayhem"
       }
     ]

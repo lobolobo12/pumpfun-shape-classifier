@@ -94,3 +94,15 @@ def test_entry_price_is_pre_entry_marginal_and_fill_is_worse():
     assert row.entry_fill_price > row.entry_price
     assert row.curve_sol_at_entry == pytest.approx(3.0 * 10_000 / (10_000 + FEES.total_bps), rel=1e-3)
     assert 0 < row.entry_cost_sol - CFG.position_sol < 0.01
+
+
+def test_cross_mode_enters_at_the_level_crossing():
+    cfg = load_config(overrides=["decision_mode=cross", "cross_level_sol=8.6", "min_trades_in_window=3"])
+    # 3 buys of 3 SOL put ~8.89 SOL in the curve net of fees: the third buy is the crossing.
+    tape = _tape([(10, 3.0), (20, 3.0), (30, 3.0), (40, 3.0)] + [(60 + 30 * k, 3.0) for k in range(12)])
+    row = label_tape(cfg, "m", tape)
+    assert row.entry_t == 30 and row.n_visible == 3
+    assert row.curve_sol_at_entry >= 8.6
+    assert row.label == 1 and row.exit_reason == "tp"
+    with pytest.raises(Drop, match="never_crossed_level"):
+        label_tape(cfg, "m", _tape([(10, 1.0), (20, 1.0), (400, 1.0)]))

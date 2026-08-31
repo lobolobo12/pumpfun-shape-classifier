@@ -108,10 +108,12 @@ def slope(y: list[float], t: list[float]) -> float:
     return float((a * (b - b.mean())).sum() / den) if den > 0 else 0.0
 
 
-def shape_and_holders(cfg: Config, rows: list[tuple], creator: str, curve_sol_at_entry: float, entry_price: float) -> dict:
-    """One token's window: rows = (t_s, slot, is_buy, sol, tokens, trader, price_sol) in tape order."""
+def shape_and_holders(
+    cfg: Config, rows: list[tuple], creator: str, curve_sol_at_entry: float, entry_price: float, window_s: float
+) -> dict:
+    """One token's visible tape: rows = (t_s, slot, is_buy, sol, tokens, trader, price_sol) in order."""
     p = curve_params(cfg)
-    w = cfg.window_seconds
+    w = max(window_s, 1.0)
     n = len(rows)
     buys = [r for r in rows if r[2]]
     sells = [r for r in rows if not r[2]]
@@ -292,24 +294,24 @@ def context_features(cfg: Config, tokens: pl.DataFrame) -> pl.DataFrame:
 
 def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFrame) -> pl.DataFrame:
     meta = {
-        m: (c, s, e)
-        for m, c, s, e in labels.join(tokens.select("mint", "creator"), on="mint", how="left")
-        .select("mint", "creator", "curve_sol_at_entry", "entry_price")
+        m: (c, s, e, t)
+        for m, c, s, e, t in labels.join(tokens.select("mint", "creator"), on="mint", how="left")
+        .select("mint", "creator", "curve_sol_at_entry", "entry_price", "entry_t")
         .iter_rows()
     }
     rows = []
     cols = ["seconds_since_launch", "slot", "is_buy", "sol_amount", "token_amount", "trader", "price_sol"]
     for (mint,), g in wt.group_by("mint", maintain_order=True):
-        creator, sol_at_entry, entry_price = meta[mint]
-        feats = shape_and_holders(cfg, list(g.select(cols).iter_rows()), creator, sol_at_entry, entry_price)
-        rows.append({"mint": mint, **feats})
+        creator, sol_at_entry, entry_price, entry_t = meta[mint]
+        feats = shape_and_holders(cfg, list(g.select(cols).iter_rows()), creator, sol_at_entry, entry_price, entry_t)
+        rows.append({"mint": mint, "entry_t_": entry_t, **feats})
     df = (
         pl.DataFrame(rows)
         .join(creator_history(cfg, tokens, labels), on="mint", how="left")
         .join(context_features(cfg, tokens), on="mint", how="left")
     )
     df = df.with_columns(
-        active_at_entry=(pl.col("last_trade_t") >= cfg.window_seconds - float(cfg.metrics["active_silence_max"]))
-    )
+        active_at_entry=(pl.col("last_trade_t") >= pl.col("entry_t_") - float(cfg.metrics["active_silence_max"]))
+    ).drop("entry_t_")
     side = labels.select("mint", "label", "launch_day", "curve_sol_at_entry", pl.col("in_zone").cast(pl.Float64))
     return side.join(df, on="mint", how="inner")

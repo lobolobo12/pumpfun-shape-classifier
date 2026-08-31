@@ -1,7 +1,10 @@
 # Single source of every knob. No magic numbers in src/.
 
-# --- decision window / label ---------------------------------------------
-window_seconds: 300          # features see [launch, launch + window)
+# --- decision moment / label ----------------------------------------------
+decision_mode: "age"         # "age": decide at launch + window_seconds; "cross": decide at the first trade
+                             # after which the curve holds >= cross_level_sol real SOL (live-recognizable trigger)
+cross_level_sol: 8.6
+window_seconds: 300          # age mode: features see [launch, launch + window)
 resample_steps: 300          # sequence steps over the window (1 s bins)
 horizon_seconds: 3600        # barriers evaluated until entry + horizon
 tp: 1.0                      # upper barrier: net exit >= cost * (1 + tp)

@@ -82,6 +82,8 @@ class Bench:
 
 @dataclass(frozen=True)
 class Config:
+    decision_mode: str
+    cross_level_sol: float
     window_seconds: int
     resample_steps: int
     horizon_seconds: int
@@ -229,6 +231,8 @@ def _build(d: dict[str, Any], preset: str | None) -> Config:
     be = d["bench"]
     pf = d["pool_fee_bps"]
     return Config(
+        decision_mode=str(d["decision_mode"]),
+        cross_level_sol=float(d["cross_level_sol"]),
         window_seconds=int(d["window_seconds"]),
         resample_steps=int(d["resample_steps"]),
         horizon_seconds=int(d["horizon_seconds"]),

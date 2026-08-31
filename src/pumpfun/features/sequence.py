@@ -40,25 +40,24 @@ def graduation_sol(cfg: Config) -> float:
 
 
 def window_trades(cfg: Config, trades: pl.LazyFrame, labels: pl.DataFrame) -> pl.DataFrame:
-    """Trades strictly inside the feature window, joined to the entry so causality can be asserted."""
-    w = cfg.window_seconds
-    lab = labels.select("mint", "entry_t", "entry_price").lazy()
+    """The trades each decision may see: the first `n_visible` of the tape, per token (both decision modes)."""
+    lab = labels.select("mint", "entry_t", "entry_price", "n_visible").lazy()
     df = (
-        trades.join(lab, on="mint", how="inner")
-        .filter(pl.col("seconds_since_launch") < w)
-        .sort("mint", "slot", "slot_index")
+        trades.sort("mint", "slot", "slot_index")
+        .with_columns(rank=pl.int_range(pl.len()).over("mint"))
+        .join(lab, on="mint", how="inner")
+        .filter(pl.col("rank") < pl.col("n_visible"))
         .collect()
     )
-    late = df.filter(pl.col("seconds_since_launch") >= pl.col("entry_t"))
+    late = df.filter(pl.col("seconds_since_launch") > pl.col("entry_t"))
     if late.height:
-        raise AssertionError(f"{late['mint'].n_unique()} tokens have window trades at/after their entry — not causal")
+        raise AssertionError(f"{late['mint'].n_unique()} tokens have visible trades after their entry — not causal")
     return df
 
 
 def encode(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame) -> tuple[np.ndarray, list[str]]:
     """Dense [N, steps, 6] float32 in the order of `labels.mint`."""
     steps = cfg.resample_steps
-    w = cfg.window_seconds
     mints = labels["mint"].to_list()
     pos = {m: i for i, m in enumerate(mints)}
     entry_price = dict(labels.select("mint", "entry_price").iter_rows())
@@ -70,8 +69,11 @@ def encode(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame) -> tuple[np.ndar
     for m, ep in entry_price.items():
         x[pos[m], :, 0] = np.log(p0 / ep)
 
+    # Per-coin window length: entry_t (age mode: the fixed window; cross mode: the coin's own trigger time).
     binned = (
-        wt.with_columns(b=(pl.col("seconds_since_launch") * steps / w).floor().cast(pl.Int32).clip(0, steps - 1))
+        wt.with_columns(
+            b=(pl.col("seconds_since_launch") * steps / pl.col("entry_t").clip(1.0)).floor().cast(pl.Int32).clip(0, steps - 1)
+        )
         .group_by("mint", "b")
         .agg(
             last_price=pl.col("price_sol").last(),
