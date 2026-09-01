@@ -1,0 +1,215 @@
+{
+  "config": {
+    "batch_size": 256,
+    "blocks": 4,
+    "channels": 64,
+    "dropout": 0.3,
+    "encoding": "trades",
+    "epochs": 40,
+    "kernel": 5,
+    "lr": 0.001,
+    "patience": 6,
+    "seeds": 5,
+    "trade_steps": 256
+  },
+  "preset": null,
+  "results": {
+    "cnn_trades+side": {
+      "base_rate": 0.21656050955414013,
+      "n": 157,
+      "n_params": 181313,
+      "pnl_all_sol": -3.6445647290000007,
+      "pnl_at": {
+        "0.01": {
+          "k": 2,
+          "mean_per_trade_sol": 0.36947816800000005,
+          "pnl_ex_top3_sol": 0.0,
+          "pnl_sol": 0.7389563360000001,
+          "win_rate": 0.5
+        },
+        "0.05": {
+          "k": 8,
+          "mean_per_trade_sol": 0.035558933125,
+          "pnl_ex_top3_sol": -1.254508305,
+          "pnl_sol": 0.284471465,
+          "win_rate": 0.25
+        },
+        "0.1": {
+          "k": 16,
+          "mean_per_trade_sol": 0.14567174675,
+          "pnl_ex_top3_sol": 0.10229994999999992,
+          "pnl_sol": 2.330747948,
+          "win_rate": 0.4375
+        }
+      },
+      "positives": 34,
+      "pr_auc": 0.33748893574307953,
+      "precision_at": {
+        "0.01": {
+          "k": 2,
+          "precision": 0.5
+        },
+        "0.05": {
+          "k": 8,
+          "precision": 0.25
+        },
+        "0.1": {
+          "k": 16,
+          "precision": 0.4375
+        }
+      },
+      "roc_auc": 0.6169296987087518,
+      "slice_active_at_entry": {
+        "base_rate": 0.21656050955414013,
+        "n": 157,
+        "pnl_all_sol": -3.6445647290000007,
+        "pnl_at": {
+          "0.01": {
+            "k": 2,
+            "mean_per_trade_sol": 0.36947816800000005,
+            "pnl_ex_top3_sol": 0.0,
+            "pnl_sol": 0.7389563360000001,
+            "win_rate": 0.5
+          },
+          "0.05": {
+            "k": 8,
+            "mean_per_trade_sol": 0.035558933125,
+            "pnl_ex_top3_sol": -1.254508305,
+            "pnl_sol": 0.284471465,
+            "win_rate": 0.25
+          },
+          "0.1": {
+            "k": 16,
+            "mean_per_trade_sol": 0.14567174675,
+            "pnl_ex_top3_sol": 0.10229994999999992,
+            "pnl_sol": 2.330747948,
+            "win_rate": 0.4375
+          }
+        },
+        "positives": 34,
+        "pr_auc": 0.33748893574307953,
+        "precision_at": {
+          "0.01": {
+            "k": 2,
+            "precision": 0.5
+          },
+          "0.05": {
+            "k": 8,
+            "precision": 0.25
+          },
+          "0.1": {
+            "k": 16,
+            "precision": 0.4375
+          }
+        },
+        "roc_auc": 0.6169296987087518,
+        "weighted": {
+          "base_rate": 0.23204419889502761,
+          "pr_auc": 0.3156512049388518,
+          "precision_at": {
+            "0.01": {
+              "k": 2,
+              "precision": 0.5
+            },
+            "0.05": {
+              "k": 6,
+              "precision": 0.2
+            },
+            "0.1": {
+              "k": 15,
+              "precision": 0.3684210526315789
+            }
+          }
+        }
+      },
+      "slice_in_zone": {
+        "base_rate": 0.21656050955414013,
+        "n": 157,
+        "pnl_all_sol": -3.6445647290000007,
+        "pnl_at": {
+          "0.01": {
+            "k": 2,
+            "mean_per_trade_sol": 0.36947816800000005,
+            "pnl_ex_top3_sol": 0.0,
+            "pnl_sol": 0.7389563360000001,
+            "win_rate": 0.5
+          },
+          "0.05": {
+            "k": 8,
+            "mean_per_trade_sol": 0.035558933125,
+            "pnl_ex_top3_sol": -1.254508305,
+            "pnl_sol": 0.284471465,
+            "win_rate": 0.25
+          },
+          "0.1": {
+            "k": 16,
+            "mean_per_trade_sol": 0.14567174675,
+            "pnl_ex_top3_sol": 0.10229994999999992,
+            "pnl_sol": 2.330747948,
+            "win_rate": 0.4375
+          }
+        },
+        "positives": 34,
+        "pr_auc": 0.33748893574307953,
+        "precision_at": {
+          "0.01": {
+            "k": 2,
+            "precision": 0.5
+          },
+          "0.05": {
+            "k": 8,
+            "precision": 0.25
+          },
+          "0.1": {
+            "k": 16,
+            "precision": 0.4375
+          }
+        },
+        "roc_auc": 0.6169296987087518,
+        "weighted": {
+          "base_rate": 0.23204419889502761,
+          "pr_auc": 0.3156512049388518,
+          "precision_at": {
+            "0.01": {
+              "k": 2,
+              "precision": 0.5
+            },
+            "0.05": {
+              "k": 6,
+              "precision": 0.2
+            },
+            "0.1": {
+              "k": 15,
+              "precision": 0.3684210526315789
+            }
+          }
+        }
+      },
+      "val_pr_auc_per_seed": [
+        0.273087649813868,
+        0.3031070400700376,
+        0.316535797903473,
+        0.29574180869784017,
+        0.29138090290824614
+      ],
+      "weighted": {
+        "base_rate": 0.23204419889502761,
+        "pr_auc": 0.3156512049388518,
+        "precision_at": {
+          "0.01": {
+            "k": 2,
+            "precision": 0.5
+          },
+          "0.05": {
+            "k": 6,
+            "precision": 0.2
+          },
+          "0.1": {
+            "k": 15,
+            "precision": 0.3684210526315789
+          }
+        }
+      }
+    }
+  }
+}

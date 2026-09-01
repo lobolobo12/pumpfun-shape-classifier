@@ -46,6 +46,6 @@
     "trades_last60": -0.029565184637132567,
     "volume_slope": -0.011727522051888012
   },
-  "threshold": 0.05,
+  "threshold": 0.059021707380300194,
   "violations": {}
 }

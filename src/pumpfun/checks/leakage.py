@@ -24,7 +24,8 @@ from pumpfun.reports import write_json
 
 log = logging.getLogger(__name__)
 
-THRESHOLD = 0.05
+BASE_THRESHOLD = 0.05
+Z = 4.0  # threshold = max(0.05, Z / sqrt(n)): 44 features are tested, the null corr has std ~ 1/sqrt(n)
 
 
 def _corr(a: np.ndarray, b: np.ndarray) -> float:
@@ -80,8 +81,9 @@ def run(cfg: Config) -> dict:
     perm_feats = tabular.build(cfg, swapped, lab_sw.drop("label").rename({"true_label": "label"}), tokens)
     y = perm_feats["label"].to_numpy()
     corrs = {c: _corr(perm_feats[c].to_numpy(), y) for c in window_cols}
-    bad = {c: v for c, v in corrs.items() if abs(v) > THRESHOLD}
-    report = {"threshold": THRESHOLD, "n": len(y), "permuted_window_corr": corrs, "violations": bad}
+    threshold = max(BASE_THRESHOLD, Z / max(len(y), 1) ** 0.5)
+    bad = {c: v for c, v in corrs.items() if abs(v) > threshold}
+    report = {"threshold": threshold, "n": len(y), "permuted_window_corr": corrs, "violations": bad}
     write_json(cfg.reports_dir / "leakage_check.json", report)
     if bad:
         raise SystemExit(f"leakage: window-derived features correlate with the label after window permutation: {bad}")
