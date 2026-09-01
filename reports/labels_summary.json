@@ -1,8 +1,8 @@
 {
   "base_rate": {
-    "bound_check_unlikely_positives": 13,
-    "estimated_overall": 0.005868645637448639,
-    "estimated_positives": 750.2711328739838,
+    "bound_check_unlikely_positives": 18,
+    "estimated_overall": 0.005857820528725324,
+    "estimated_positives": 748.8872076743603,
     "note": "positives per universe token. With strata: sum over strata of size * (positives / fetched) \u2014 unfetched coins are represented by their stratum's sampled rate",
     "per_day": [
       {
@@ -27,49 +27,49 @@
         "universe": 37273
       },
       {
-        "in_zone": 377,
-        "labeled": 1677,
+        "in_zone": 497,
+        "labeled": 2161,
         "launch_day": "2026-08-31",
-        "positives": 82,
+        "positives": 111,
         "universe": 19539
       },
       {
-        "in_zone": null,
-        "labeled": null,
+        "in_zone": 123,
+        "labeled": 453,
         "launch_day": "2026-09-01",
-        "positives": null,
+        "positives": 30,
         "universe": 5411
       }
     ],
     "per_stratum": [
       {
-        "fetched": 7732,
-        "labeled": 4741,
-        "positive_rate_per_fetched": 0.06971029487842731,
-        "positives": 539,
+        "fetched": 8625,
+        "labeled": 5235,
+        "positive_rate_per_fetched": 0.06875362318840579,
+        "positives": 593,
         "size": 8643,
         "stratum": "candidate"
       },
       {
-        "fetched": 9862,
-        "labeled": 5067,
-        "positive_rate_per_fetched": 0.0013181910363009532,
-        "positives": 13,
+        "fetched": 10465,
+        "labeled": 5393,
+        "positive_rate_per_fetched": 0.0016244624940277114,
+        "positives": 17,
         "size": 10469,
         "stratum": "unlikely_active"
       },
       {
-        "fetched": 8841,
-        "labeled": 688,
-        "positive_rate_per_fetched": 0.0,
-        "positives": 0,
+        "fetched": 9987,
+        "labeled": 805,
+        "positive_rate_per_fetched": 0.00010013016921998598,
+        "positives": 1,
         "size": 50324,
         "stratum": "unlikely_quiet"
       },
       {
-        "fetched": 3021,
+        "fetched": 3052,
         "labeled": 467,
-        "positive_rate_per_fetched": 0.007613373055279708,
+        "positive_rate_per_fetched": 0.007536041939711665,
         "positives": 23,
         "size": 17596,
         "stratum": "unknown"
@@ -105,25 +105,25 @@
   "exit_reasons": [
     {
       "exit_reason": "sl",
-      "len": 1465
+      "len": 1627
     },
     {
       "exit_reason": "tp",
-      "len": 575
+      "len": 634
     },
     {
       "exit_reason": "vertical",
-      "len": 8911
+      "len": 9626
     },
     {
       "exit_reason": "vertical_no_trades",
-      "len": 12
+      "len": 13
     }
   ],
-  "labeled": 10963,
-  "median_entry_slippage": 0.030829881770194634,
-  "positive_rate_labeled": 0.05244914713125969,
-  "positive_rate_zone": 0.12867190732312783,
+  "labeled": 11900,
+  "median_entry_slippage": 0.03081753113383834,
+  "positive_rate_labeled": 0.05327731092436975,
+  "positive_rate_zone": 0.12857142857142856,
   "preset": null,
-  "zone_n": 2417
+  "zone_n": 2660
 }

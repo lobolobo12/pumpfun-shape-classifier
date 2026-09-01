@@ -1,27 +1,27 @@
 {
   "features": {
-    "creator_straddle_dropped": 2621,
-    "features_out": 4593,
-    "labeled_in": 10963,
-    "test_n": 869,
-    "test_pos": 48,
+    "creator_straddle_dropped": 3014,
+    "features_out": 5137,
+    "labeled_in": 11900,
+    "test_n": 1413,
+    "test_pos": 87,
     "train_n": 1440,
     "train_negatives_dropped": 3749,
     "train_pos": 288,
-    "updated_at": 1788275820,
+    "updated_at": 1788278498,
     "val_n": 2284,
     "val_pos": 109
   },
   "label": {
     "dropped_entry_completes_curve": 1,
     "dropped_entry_zero_tokens": 6,
-    "dropped_graduated_before_entry": 472,
-    "dropped_lifetime_lt_window": 10594,
-    "dropped_lt_min_trades": 4926,
-    "dropped_non_standard_curve": 2494,
-    "labeled": 10963,
-    "tokens_with_tape": 29456,
-    "updated_at": 1788275806
+    "dropped_graduated_before_entry": 533,
+    "dropped_lifetime_lt_window": 11645,
+    "dropped_lt_min_trades": 5224,
+    "dropped_non_standard_curve": 2820,
+    "labeled": 11900,
+    "tokens_with_tape": 32129,
+    "updated_at": 1788278482
   },
   "prescreen": {
     "fetch_queue": 32556,
