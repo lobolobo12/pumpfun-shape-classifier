@@ -1,38 +1,38 @@
 {
   "features": {
-    "creator_straddle_dropped": 3055,
-    "features_out": 5522,
-    "labeled_in": 9230,
-    "test_n": 2248,
-    "test_pos": 106,
-    "train_n": 285,
-    "train_negatives_dropped": 653,
-    "train_pos": 57,
-    "updated_at": 1788192854,
-    "val_n": 2989,
-    "val_pos": 175
+    "creator_straddle_dropped": 2621,
+    "features_out": 4593,
+    "labeled_in": 10963,
+    "test_n": 869,
+    "test_pos": 48,
+    "train_n": 1440,
+    "train_negatives_dropped": 3749,
+    "train_pos": 288,
+    "updated_at": 1788275346,
+    "val_n": 2284,
+    "val_pos": 109
   },
   "label": {
     "dropped_entry_completes_curve": 1,
     "dropped_entry_zero_tokens": 6,
-    "dropped_graduated_before_entry": 403,
-    "dropped_lifetime_lt_window": 9282,
-    "dropped_lt_min_trades": 4038,
-    "dropped_non_standard_curve": 2081,
-    "labeled": 9230,
-    "tokens_with_tape": 25041,
-    "updated_at": 1788193229
+    "dropped_graduated_before_entry": 472,
+    "dropped_lifetime_lt_window": 10594,
+    "dropped_lt_min_trades": 4926,
+    "dropped_non_standard_curve": 2494,
+    "labeled": 10963,
+    "tokens_with_tape": 29456,
+    "updated_at": 1788275332
   },
   "prescreen": {
-    "fetch_queue": 29881,
+    "fetch_queue": 32556,
     "needed_sol_for_tp": 12.426,
-    "prescreen_mayhem_dropped": 22648,
-    "prescreen_no_inflow_dropped": 14714,
+    "prescreen_mayhem_dropped": 24280,
+    "prescreen_no_inflow_dropped": 16532,
     "queued": {
-      "candidate": 7752,
-      "unknown": 3420,
-      "unlikely_active": 9864,
-      "unlikely_quiet": 8845
+      "candidate": 8643,
+      "unknown": 3457,
+      "unlikely_active": 10469,
+      "unlikely_quiet": 9987
     },
     "sample_rates": {
       "candidate": 1.0,
@@ -41,26 +41,26 @@
       "unlikely_quiet": 0.2
     },
     "strata": {
-      "candidate": 7752,
-      "mayhem": 22648,
-      "no_inflow": 14714,
-      "unknown": 17434,
-      "unlikely_active": 9864,
-      "unlikely_quiet": 44552
+      "candidate": 8643,
+      "mayhem": 24280,
+      "no_inflow": 16532,
+      "unknown": 17596,
+      "unlikely_active": 10469,
+      "unlikely_quiet": 50324
     },
-    "universe_tokens": 116964,
-    "updated_at": 1788192842
+    "universe_tokens": 127844,
+    "updated_at": 1788275293
   },
   "universe": {
-    "attention_meta_total": 125440,
-    "in_date_range": 100406,
-    "pumpportal_frames_in_range": 110566,
-    "universe_added_from_frames": 23233,
-    "universe_mayhem_flagged": 22648,
-    "universe_mayhem_unknown": 6398,
+    "attention_meta_total": 141590,
+    "in_date_range": 114207,
+    "pumpportal_frames_in_range": 118262,
+    "universe_added_from_frames": 23577,
+    "universe_mayhem_flagged": 24280,
+    "universe_mayhem_unknown": 9582,
     "universe_no_creator": 0,
-    "universe_seen_late_dropped": 6675,
-    "universe_tokens": 116964,
-    "updated_at": 1788192839
+    "universe_seen_late_dropped": 9940,
+    "universe_tokens": 127844,
+    "updated_at": 1788275290
   }
 }
