@@ -68,9 +68,11 @@ def conform(df: pl.DataFrame, schema: dict[str, pl.DataType], name: str) -> pl.D
 
 
 def assert_causal(trades: pl.DataFrame, entry_time: int, mint: str) -> None:
-    """Every row a feature may see must be strictly before the entry timestamp."""
+    """No visible row may be later than the entry. Equality is allowed: timestamps have 1 s resolution
+    and in cross mode the crossing trade shares the entry second; ordering within the second is
+    enforced upstream by (slot, slot_index) rank."""
     if trades.height == 0:
         return
     mx = int(trades["block_time"].max())  # type: ignore[arg-type]
-    if mx >= entry_time:
-        raise AssertionError(f"{mint}: feature input contains block_time {mx} >= entry_time {entry_time}")
+    if mx > entry_time:
+        raise AssertionError(f"{mint}: feature input contains block_time {mx} > entry_time {entry_time}")
