@@ -4,6 +4,7 @@
 decision_mode: "age"         # "age": decide at launch + window_seconds; "cross": decide at the first trade
                              # after which the curve holds >= cross_level_sol real SOL (live-recognizable trigger)
 cross_level_sol: 8.6
+cross_min_age_seconds: 10  # a crossing younger than this is the launch bundle itself, not a crowd (handoff §3)
 window_seconds: 300          # age mode: features see [launch, launch + window)
 resample_steps: 300          # sequence steps over the window (1 s bins)
 horizon_seconds: 3600        # barriers evaluated until entry + horizon

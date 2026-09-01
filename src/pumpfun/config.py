@@ -84,6 +84,7 @@ class Bench:
 class Config:
     decision_mode: str
     cross_level_sol: float
+    cross_min_age_seconds: float
     window_seconds: int
     resample_steps: int
     horizon_seconds: int
@@ -233,6 +234,7 @@ def _build(d: dict[str, Any], preset: str | None) -> Config:
     return Config(
         decision_mode=str(d["decision_mode"]),
         cross_level_sol=float(d["cross_level_sol"]),
+        cross_min_age_seconds=float(d["cross_min_age_seconds"]),
         window_seconds=int(d["window_seconds"]),
         resample_steps=int(d["resample_steps"]),
         horizon_seconds=int(d["horizon_seconds"]),

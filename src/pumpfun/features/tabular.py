@@ -157,7 +157,7 @@ def shape_and_holders(
     nb = 10
     vol_bins = [0.0] * nb
     for r in rows:
-        vol_bins[min(nb - 1, int(r[0] * nb / w))] += r[3]
+        vol_bins[max(0, min(nb - 1, int(r[0] * nb / w)))] += r[3]
     shape = {
         "n_trades": n,
         "n_buyers": len({r[5] for r in buys}),

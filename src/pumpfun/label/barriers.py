@@ -120,6 +120,8 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
                 break
         if cross_i is None:
             raise Drop("never_crossed_level")
+        if trades[cross_i].t_s < cfg.cross_min_age_seconds:
+            raise Drop("crossed_too_young")
         entry_idx = cross_i + 1  # the crossing trade is visible; we buy right after it
         n_visible = entry_idx
         t_entry = trades[cross_i].t_s
