@@ -148,12 +148,17 @@ def universe_extension(cfg: Config) -> pl.DataFrame:
     files = sorted((cfg.raw_dir / "bitquery").glob("*.parquet"))
     if len(files) <= WARMUP_DAYS:
         raise SystemExit("not enough bitquery day files; run the history pull first")
-    frames = [
-        pl.read_parquet(f).with_columns(
-            r=pl.col("px_high") / pl.when(pl.col("px_low") > 0).then(pl.col("px_low")).otherwise(None)
+    cols = ["mint", "first_iv", "px_high", "px_low", "fdv_max", "pre_sampled", "pre_weight"]
+    frames = []
+    for f in files:
+        df = pl.read_parquet(f)
+        if "pre_sampled" not in df.columns:
+            df = df.with_columns(pre_sampled=pl.lit(False), pre_weight=pl.lit(1.0))
+        frames.append(
+            df.select(cols).with_columns(
+                r=pl.col("px_high") / pl.when(pl.col("px_low") > 0).then(pl.col("px_low")).otherwise(None)
+            )
         )
-        for f in files
-    ]
     seen: set[str] = set()
     for df in frames[:WARMUP_DAYS]:
         seen.update(df["mint"].to_list())
@@ -163,7 +168,7 @@ def universe_extension(cfg: Config) -> pl.DataFrame:
         new = df.filter(~pl.col("mint").is_in(sorted(seen)))
         seen.update(df["mint"].to_list())
         nxt = frames[i + 1] if i + 1 < len(frames) else None
-        agg2 = new.select("mint", "first_iv", "fdv_max", "r", "vol_usd")
+        agg2 = new.select("mint", "first_iv", "fdv_max", "r", "pre_sampled", "pre_weight")
         if nxt is not None:
             n2 = nxt.select("mint", fdv2=pl.col("fdv_max"), r2=pl.col("r"))
             agg2 = (
@@ -199,7 +204,7 @@ def merge_into_tokens(cfg: Config) -> None:
     merged = pl.concat([tokens, conform(rows, TOKENS_SCHEMA, "tokens-ext")]).sort("launch_time_ms", "mint")
     merged.write_parquet(cfg.tokens_path)
     # screen fields for the prescreen, kept separately
-    ext.select("mint", "fdv_max", "r", "vol_usd").write_parquet(cfg.interim_dir / "bitquery_screen.parquet")
+    ext.select("mint", "fdv_max", "r", "pre_sampled", "pre_weight").write_parquet(cfg.interim_dir / "bitquery_screen.parquet")
     log.info("universe extension: +%d historical tokens (now %d)", rows.height, merged.height)
 
 

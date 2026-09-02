@@ -95,9 +95,13 @@ def run(cfg: Config) -> pl.DataFrame:
     need = needed_sol(cfg)
     screen_path = cfg.interim_dir / "bitquery_screen.parquet"
     if screen_path.exists():
-        bq = pl.read_parquet(screen_path).select("mint", bq_fdv=pl.col("fdv_max"), bq_r=pl.col("r"))
+        bq = pl.read_parquet(screen_path).select(
+            "mint", bq_fdv=pl.col("fdv_max"), bq_r=pl.col("r"), bq_pre=pl.col("pre_sampled"), bq_w=pl.col("pre_weight")
+        )
     else:
-        bq = pl.DataFrame(schema={"mint": pl.String, "bq_fdv": pl.Float64, "bq_r": pl.Float64})
+        bq = pl.DataFrame(
+            schema={"mint": pl.String, "bq_fdv": pl.Float64, "bq_r": pl.Float64, "bq_pre": pl.Boolean, "bq_w": pl.Float64}
+        )
     rates = {
         "candidate": 1.0,
         "unlikely_active": 1.0,
@@ -135,6 +139,16 @@ def run(cfg: Config) -> pl.DataFrame:
     ).with_columns(
         selected=(pl.col("u") < pl.col("rate")),
         weight=pl.when(pl.col("rate") > 0).then(1.0 / pl.col("rate")).otherwise(0.0),
+    )
+    # Pre-sampled historical sources (Dune) already applied the hist_rest sampling server-side:
+    # every present row is selected, with the measured weight it arrived with.
+    df = df.with_columns(
+        selected=pl.when(pl.col("stratum") == "hist_rest")
+        .then(pl.col("bq_pre").fill_null(False) | pl.col("selected"))
+        .otherwise(pl.col("selected")),
+        weight=pl.when((pl.col("stratum") == "hist_rest") & pl.col("bq_pre").fill_null(False))
+        .then(pl.col("bq_w"))
+        .otherwise(pl.col("weight")),
     )
     strata = df.select(
         "mint", "launch_day", "stratum", "max_real_sol", "n_marks", "selected", "weight", "replies_at_entry", "live_at_entry"
