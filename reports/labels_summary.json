@@ -1,20 +1,153 @@
 {
   "base_rate": {
-    "bound_check_unlikely_positives": 18,
-    "estimated_overall": 0.005857820528725324,
-    "estimated_positives": 748.8872076743603,
+    "bound_check_unlikely_positives": 23,
+    "estimated_overall": 0.0011380232346915715,
+    "estimated_positives": 892.4742373886404,
     "note": "positives per universe token. With strata: sum over strata of size * (positives / fetched) \u2014 unfetched coins are represented by their stratum's sampled rate",
     "per_day": [
       {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-05",
+        "positives": null,
+        "universe": 34673
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-06",
+        "positives": null,
+        "universe": 35555
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-07",
+        "positives": null,
+        "universe": 33201
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-08",
+        "positives": null,
+        "universe": 34348
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-09",
+        "positives": null,
+        "universe": 37316
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-10",
+        "positives": null,
+        "universe": 35355
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-11",
+        "positives": null,
+        "universe": 34151
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-12",
+        "positives": null,
+        "universe": 37253
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-13",
+        "positives": null,
+        "universe": 37029
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-14",
+        "positives": null,
+        "universe": 33436
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-15",
+        "positives": null,
+        "universe": 31104
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-16",
+        "positives": null,
+        "universe": 29941
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-17",
+        "positives": null,
+        "universe": 33114
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-18",
+        "positives": null,
+        "universe": 34840
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-19",
+        "positives": null,
+        "universe": 43096
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-20",
+        "positives": null,
+        "universe": 39386
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-21",
+        "positives": null,
+        "universe": 36858
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-22",
+        "positives": null,
+        "universe": 33050
+      },
+      {
+        "in_zone": null,
+        "labeled": null,
+        "launch_day": "2026-08-23",
+        "positives": null,
+        "universe": 2949
+      },
+      {
         "in_zone": 200,
-        "labeled": 938,
+        "labeled": 942,
         "launch_day": "2026-08-28",
         "positives": 57,
         "universe": 25336
       },
       {
         "in_zone": 933,
-        "labeled": 4251,
+        "labeled": 4253,
         "launch_day": "2026-08-29",
         "positives": 231,
         "universe": 40285
@@ -34,60 +167,67 @@
         "universe": 19539
       },
       {
-        "in_zone": 123,
-        "labeled": 453,
+        "in_zone": 412,
+        "labeled": 1724,
         "launch_day": "2026-09-01",
-        "positives": 30,
-        "universe": 5411
+        "positives": 114,
+        "universe": 17227
+      },
+      {
+        "in_zone": 184,
+        "labeled": 770,
+        "launch_day": "2026-09-02",
+        "positives": 57,
+        "universe": 7917
       }
     ],
     "per_stratum": [
       {
-        "fetched": 8625,
-        "labeled": 5235,
-        "positive_rate_per_fetched": 0.06875362318840579,
-        "positives": 593,
-        "size": 8643,
+        "fetched": 10218,
+        "labeled": 6188,
+        "positive_rate_per_fetched": 0.07134468584850265,
+        "positives": 729,
+        "size": 10239,
         "stratum": "candidate"
       },
       {
-        "fetched": 10465,
-        "labeled": 5393,
-        "positive_rate_per_fetched": 0.0016244624940277114,
-        "positives": 17,
-        "size": 10469,
+        "fetched": 12014,
+        "labeled": 6216,
+        "positive_rate_per_fetched": 0.001747960712502081,
+        "positives": 21,
+        "size": 12019,
         "stratum": "unlikely_active"
       },
       {
-        "fetched": 9987,
-        "labeled": 805,
-        "positive_rate_per_fetched": 0.00010013016921998598,
-        "positives": 1,
-        "size": 50324,
+        "fetched": 12025,
+        "labeled": 1072,
+        "positive_rate_per_fetched": 0.00016632016632016632,
+        "positives": 2,
+        "size": 60302,
         "stratum": "unlikely_quiet"
       },
       {
-        "fetched": 3052,
-        "labeled": 467,
-        "positive_rate_per_fetched": 0.007536041939711665,
+        "fetched": 3120,
+        "labeled": 471,
+        "positive_rate_per_fetched": 0.007371794871794872,
         "positives": 23,
-        "size": 17596,
+        "size": 17762,
         "stratum": "unknown"
       },
       {
-        "fetched": 0,
+        "fetched": 1,
         "labeled": 0,
         "positive_rate_per_fetched": 0.0,
         "positives": 0,
-        "size": 16532,
+        "size": 19569,
         "stratum": "no_inflow"
       },
       {
-        "fetched": 0,
+        "fetched": 3267,
         "labeled": 0,
         "positive_rate_per_fetched": 0.0,
         "positives": 0,
-        "size": 24280,
+        "size": 27686,
         "stratum": "mayhem"
       }
     ]
@@ -105,25 +245,25 @@
   "exit_reasons": [
     {
       "exit_reason": "sl",
-      "len": 1627
+      "len": 1899
     },
     {
       "exit_reason": "tp",
-      "len": 634
+      "len": 775
     },
     {
       "exit_reason": "vertical",
-      "len": 9626
+      "len": 11258
     },
     {
       "exit_reason": "vertical_no_trades",
-      "len": 13
+      "len": 15
     }
   ],
-  "labeled": 11900,
-  "median_entry_slippage": 0.03081753113383834,
-  "positive_rate_labeled": 0.05327731092436975,
-  "positive_rate_zone": 0.12857142857142856,
+  "labeled": 13947,
+  "median_entry_slippage": 0.030803700547577417,
+  "positive_rate_labeled": 0.05556750555675056,
+  "positive_rate_zone": 0.13309926587934887,
   "preset": null,
-  "zone_n": 2660
+  "zone_n": 3133
 }
