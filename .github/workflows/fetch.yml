@@ -7,8 +7,14 @@ on:
   workflow_dispatch:
     inputs:
       shards:
-        description: "number of parallel shards (each = one runner/IP)"
+        description: "number of parallel shards to run HERE (each = one runner/IP)"
         default: "1"
+      shard_base:
+        description: "first shard index this account runs (partition the queue across accounts)"
+        default: "0"
+      total_shards:
+        description: "total shards across ALL accounts (same everywhere)"
+        default: ""
       rps:
         description: "requests per second per shard"
         default: "2.0"
@@ -31,7 +37,8 @@ jobs:
       - id: m
         run: |
           n=${{ inputs.shards }}
-          echo "matrix=$(python3 -c "import json;print(json.dumps(list(range($n))))")" >> "$GITHUB_OUTPUT"
+          base=${{ inputs.shard_base }}
+          echo "matrix=$(python3 -c "import json;print(json.dumps(list(range($base, $base + $n))))")" >> "$GITHUB_OUTPUT"
 
   fetch:
     needs: plan
@@ -52,17 +59,19 @@ jobs:
         with:
           path: |
             data/raw/cache
-            data/raw/fetch_ledger.shard${{ matrix.shard }}of${{ inputs.shards }}.sqlite
-          key: fetch-shard-${{ matrix.shard }}of${{ inputs.shards }}-${{ github.run_id }}
+            data/raw/fetch_ledger.shard${{ matrix.shard }}of*.sqlite
+          key: fetch-shard-${{ matrix.shard }}-${{ github.run_id }}
           restore-keys: |
-            fetch-shard-${{ matrix.shard }}of${{ inputs.shards }}-
+            fetch-shard-${{ matrix.shard }}-
       - name: fetch
         run: |
           probe=${{ inputs.probe }}
           extra=""
           if [ "$probe" -gt 0 ]; then extra="--probe $probe"; fi
+          total="${{ inputs.total_shards }}"
+          if [ -z "$total" ]; then total=$(( ${{ inputs.shards }} + ${{ inputs.shard_base }} )); fi
           uv run pf fetch --host vps \
-            --shard ${{ matrix.shard }}/${{ inputs.shards }} \
+            --shard ${{ matrix.shard }}/$total \
             --rps ${{ inputs.rps }} \
             --max-minutes ${{ inputs.max_minutes }} \
             --queue data/queue/fetch_queue.parquet $extra
@@ -72,17 +81,17 @@ jobs:
         with:
           path: |
             data/raw/cache
-            data/raw/fetch_ledger.shard${{ matrix.shard }}of${{ inputs.shards }}.sqlite
-          key: fetch-shard-${{ matrix.shard }}of${{ inputs.shards }}-${{ github.run_id }}
+            data/raw/fetch_ledger.shard${{ matrix.shard }}of*.sqlite
+          key: fetch-shard-${{ matrix.shard }}-${{ github.run_id }}
       - name: upload
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: fetch-shard-${{ matrix.shard }}of${{ inputs.shards }}
+          name: fetch-shard-${{ matrix.shard }}
           retention-days: 7
           if-no-files-found: warn
           path: |
             data/raw/cache
-            data/raw/fetch_ledger.shard${{ matrix.shard }}of${{ inputs.shards }}.sqlite
+            data/raw/fetch_ledger.shard${{ matrix.shard }}of*.sqlite
             reports/fetch_runs.json
             reports/cost_probe.json

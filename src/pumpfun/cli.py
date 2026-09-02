@@ -36,6 +36,12 @@ def _parser() -> argparse.ArgumentParser:
     g = sub.add_parser("gh-pull", help="download fetch artifacts from GitHub Actions runs and merge them into the local cache")
     g.add_argument("--run-id", action="append", type=int, default=[], help="specific run id(s); default: recent successful runs")
     g.add_argument("--limit", type=int, default=10)
+    g.add_argument("--repo", help="pull from a fork, e.g. friendname/pumpfun-shape-classifier")
+
+    md = sub.add_parser(
+        "merge-dir", help="merge a folder of tapes+ledgers (e.g. a friend's zipped data/raw) into the local cache"
+    )
+    md.add_argument("path", type=Path)
 
     sub.add_parser("to-parquet", help="cached tapes -> data/raw/trades/{yyyy-mm}/*.parquet")
     sub.add_parser("history-merge", help="merge the pulled Bitquery days into tokens.parquet")
@@ -96,7 +102,12 @@ def main(argv: list[str] | None = None) -> int:
     elif args.cmd == "gh-pull":
         from pumpfun.ingest import gh_pull
 
-        gh_pull.run(cfg, run_ids=args.run_id, limit=args.limit)
+        gh_pull.run(cfg, run_ids=args.run_id, limit=args.limit, repo=args.repo)
+    elif args.cmd == "merge-dir":
+        from pumpfun.ingest import gh_pull
+
+        tapes, rows = gh_pull.merge_dir(cfg, args.path)
+        print(f"merged {tapes} tapes, {rows} ledger rows from {args.path}")
     elif args.cmd == "to-parquet":
         from pumpfun.ingest import to_parquet
 

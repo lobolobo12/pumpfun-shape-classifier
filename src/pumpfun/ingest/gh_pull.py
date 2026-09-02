@@ -28,8 +28,11 @@ def _gh(*args: str) -> str:
     return r.stdout
 
 
-def recent_run_ids(limit: int) -> list[int]:
-    out = _gh("run", "list", "--workflow", "fetch.yml", "--status", "success", "--limit", str(limit), "--json", "databaseId")
+def recent_run_ids(limit: int, repo: str | None = None) -> list[int]:
+    args = ["run", "list", "--workflow", "fetch.yml", "--status", "success", "--limit", str(limit), "--json", "databaseId"]
+    if repo:
+        args += ["-R", repo]
+    out = _gh(*args)
     return [int(r["databaseId"]) for r in json.loads(out)]
 
 
@@ -66,8 +69,8 @@ def merge_dir(cfg: Config, root: Path) -> tuple[int, int]:
     return tapes, rows
 
 
-def run(cfg: Config, run_ids: list[int], limit: int) -> None:
-    ids = run_ids or recent_run_ids(limit)
+def run(cfg: Config, run_ids: list[int], limit: int, repo: str | None = None) -> None:
+    ids = run_ids or recent_run_ids(limit, repo)
     if not ids:
         log.info("no successful fetch runs found")
         return
@@ -78,7 +81,10 @@ def run(cfg: Config, run_ids: list[int], limit: int) -> None:
             log.info("run %d already downloaded", rid)
         else:
             dst.mkdir(parents=True, exist_ok=True)
-            _gh("run", "download", str(rid), "-D", str(dst))
+            dl = ["run", "download", str(rid), "-D", str(dst)]
+            if repo:
+                dl += ["-R", repo]
+            _gh(*dl)
         tapes, rows = merge_dir(cfg, dst)
         log.info("run %d: merged %d tapes, %d ledger rows", rid, tapes, rows)
         for rep in dst.rglob("cost_probe.json"):
