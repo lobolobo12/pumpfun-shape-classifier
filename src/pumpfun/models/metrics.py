@@ -66,12 +66,13 @@ def evaluate(cfg: Config, df: pl.DataFrame, p: np.ndarray) -> dict:
             "pr_auc": float(average_precision_score(y, p, sample_weight=w)) if y.sum() and (1 - y).sum() else None,
             "precision_at": {str(f): weighted_precision_at(y, p, w, f) for f in cfg.metrics["top_fractions"]},
         }
-    for slice_col in ("in_zone", "active_at_entry"):
-        if slice_col in df.columns:
-            z = df[slice_col].fill_null(False).to_numpy().astype(bool)
-            if z.sum() >= 10 and y[z].sum() and (1 - y[z]).sum():
-                sliced = df.filter(pl.Series(z)).drop([c for c in ("in_zone", "active_at_entry") if c in df.columns])
-                out[f"slice_{slice_col}"] = evaluate(cfg, sliced, p[z])
+    slices = {c: df[c].fill_null(False).to_numpy().astype(bool) for c in ("in_zone", "active_at_entry") if c in df.columns}
+    if "creator_prior_launches" in df.columns:
+        slices["serial_launcher"] = df["creator_prior_launches"].fill_null(0).to_numpy() >= 3
+    for slice_name, z in slices.items():
+        if z.sum() >= 10 and y[z].sum() and (1 - y[z]).sum():
+            drop = [c for c in ("in_zone", "active_at_entry", "creator_prior_launches") if c in df.columns]
+            out[f"slice_{slice_name}"] = evaluate(cfg, df.filter(pl.Series(z)).drop(drop), p[z])
     return out
 
 

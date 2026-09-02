@@ -188,6 +188,9 @@ def run(cfg: Config) -> dict:
             "p_at_10pct": result["precision_at"]["0.1"]["precision"],
             "pnl_at_10pct": result["pnl_at"]["0.1"]["pnl_sol"],
             "pnl_ex_top3": result["pnl_at"]["0.1"]["pnl_ex_top3_sol"],
+            "weighted_pr_auc": (result.get("weighted") or {}).get("pr_auc"),
+            "weighted_base_rate": (result.get("weighted") or {}).get("base_rate"),
+            "serial_launcher": result.get("slice_serial_launcher", {}).get("pr_auc"),
             "train_n": tr.height,
         },
     )

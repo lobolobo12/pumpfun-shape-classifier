@@ -30,6 +30,9 @@ def assign(cfg: Config, df: pl.DataFrame) -> tuple[pl.DataFrame, dict[str, int]]
     df = df.filter(~((pl.col("split") == "val") & pl.col("creator").is_in(list(train_creators))))
     df = df.filter(~((pl.col("split") == "test") & pl.col("creator").is_in(list(train_creators | val_creators))))
     counts["creator_straddle_dropped"] = before - df.height
+    counts["test_serial_launcher_share"] = float(
+        (df.filter(pl.col("split") == "test")["creator_prior_launches"].fill_null(0) >= 3).mean() or 0.0
+    )
 
     train = df.filter(pl.col("split") == "train")
     pos = train.filter(pl.col("label") == 1)
