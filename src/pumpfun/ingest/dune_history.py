@@ -83,18 +83,28 @@ class DuneClient:
         STATE.write_text(str(qid))
         return qid
 
-    def run(self, sql: str, poll_s: float = 5.0, max_wait_s: float = 900.0) -> list[dict]:
-        r = self._http.patch(f"{API}/query/{self.query_id}", json={"query_sql": sql})
-        r.raise_for_status()
-        r = self._http.post(f"{API}/query/{self.query_id}/execute", json={})
-        r.raise_for_status()
+    def _req(self, method: str, url: str, **kw) -> httpx.Response:
+        """Free-tier politeness: on 429 sleep (Retry-After or 65 s) and retry, up to 10 times."""
+        for _ in range(10):
+            r = self._http.request(method, url, **kw)
+            if r.status_code != 429:
+                r.raise_for_status()
+                return r
+            wait = float(r.headers.get("retry-after") or 65)
+            log.info("dune 429 — sleeping %.0f s", wait)
+            time.sleep(wait + 2)
+        raise RuntimeError("dune: 429 retries exhausted")
+
+    def run(self, sql: str, poll_s: float = 10.0, max_wait_s: float = 1800.0) -> list[dict]:
+        self._req("PATCH", f"{API}/query/{self.query_id}", json={"query_sql": sql})
+        r = self._req("POST", f"{API}/query/{self.query_id}/execute", json={})
         ex = r.json()["execution_id"]
         t0 = time.monotonic()
         while True:
             time.sleep(poll_s)
             rows: list[dict] = []
             offset = 0
-            r = self._http.get(f"{API}/execution/{ex}/results?limit=30000&offset=0")
+            r = self._req("GET", f"{API}/execution/{ex}/results?limit=30000&offset=0")
             j = r.json()
             state = j.get("state")
             if state == "QUERY_STATE_FAILED":
@@ -104,7 +114,7 @@ class DuneClient:
                 total = j["result"]["metadata"]["total_row_count"]
                 while len(rows) < total:
                     offset += 30000
-                    rr = self._http.get(f"{API}/execution/{ex}/results?limit=30000&offset={offset}")
+                    rr = self._req("GET", f"{API}/execution/{ex}/results?limit=30000&offset={offset}")
                     rows.extend(rr.json()["result"]["rows"])
                 return rows
             if time.monotonic() - t0 > max_wait_s:
