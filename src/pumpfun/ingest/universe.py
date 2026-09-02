@@ -243,6 +243,13 @@ def run(cfg: Config, strict: bool = True) -> pl.DataFrame:
     tokens, counts = build_tokens(cfg, snap)
     cfg.tokens_path.parent.mkdir(parents=True, exist_ok=True)
     tokens.write_parquet(cfg.tokens_path)
+    # Historical (Bitquery) tokens live outside the collector's range; re-append them on every rebuild.
+    if any((cfg.raw_dir / "bitquery").glob("*.parquet")):
+        from pumpfun.ingest.bitquery_history import merge_into_tokens
+
+        merge_into_tokens(cfg)
+        tokens = pl.read_parquet(cfg.tokens_path)
+        counts["universe_bitquery_appended"] = tokens.height - counts["universe_tokens"]
     cov = coverage_check(cfg, snap, tokens)
     write_json(cfg.reports_dir / "universe_coverage.json", cov)
     update_counts(cfg.reports_dir, "universe", counts)

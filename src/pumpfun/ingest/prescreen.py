@@ -32,7 +32,7 @@ from pumpfun.ingest.universe import SNAPSHOT_NAME
 from pumpfun.reports import update_counts
 
 POLL_SLACK_MS = 20_000
-STRATA = ("candidate", "unlikely_active", "unlikely_quiet", "unknown")
+STRATA = ("candidate", "unlikely_active", "unlikely_quiet", "unknown", "hist_candidate", "hist_rest")
 
 
 def needed_sol(cfg: Config) -> float:
@@ -93,25 +93,42 @@ def run(cfg: Config) -> pl.DataFrame:
         },
     )
     need = needed_sol(cfg)
+    screen_path = cfg.interim_dir / "bitquery_screen.parquet"
+    if screen_path.exists():
+        bq = pl.read_parquet(screen_path).select("mint", bq_fdv=pl.col("fdv_max"), bq_r=pl.col("r"))
+    else:
+        bq = pl.DataFrame(schema={"mint": pl.String, "bq_fdv": pl.Float64, "bq_r": pl.Float64})
     rates = {
         "candidate": 1.0,
         "unlikely_active": 1.0,
         "unlikely_quiet": cfg.prescreen.sample_rate_unlikely_quiet,
         "unknown": cfg.prescreen.sample_rate_unknown,
+        "hist_candidate": 1.0,
+        "hist_rest": cfg.prescreen.sample_rate_hist,
     }
-    df = tokens.join(marks, on="mint", how="left").with_columns(
-        stratum=pl.when(pl.col("mayhem").fill_null(False))
-        .then(pl.lit("mayhem"))
-        .when(pl.col("n_marks") == 0)
-        .then(pl.lit("unknown"))
-        .when(pl.col("max_real_sol") <= 0)
-        .then(pl.lit("no_inflow"))
-        .when(pl.col("completed") | (pl.col("max_real_sol") >= need))
-        .then(pl.lit("candidate"))
-        .when(pl.col("distinct_after") >= 2)
-        .then(pl.lit("unlikely_active"))
-        .otherwise(pl.lit("unlikely_quiet")),
-        u=pl.col("mint").map_elements(unit_hash, return_dtype=pl.Float64),
+    df = (
+        tokens.join(marks, on="mint", how="left")
+        .join(bq, on="mint", how="left")
+        .with_columns(
+            stratum=pl.when(pl.col("source") == "bitquery")
+            .then(
+                pl.when((pl.col("bq_fdv") >= cfg.prescreen.fdv_candidate_usd) & (pl.col("bq_r") >= 1 + cfg.tp))
+                .then(pl.lit("hist_candidate"))
+                .otherwise(pl.lit("hist_rest"))
+            )
+            .when(pl.col("mayhem").fill_null(False))
+            .then(pl.lit("mayhem"))
+            .when(pl.col("n_marks") == 0)
+            .then(pl.lit("unknown"))
+            .when(pl.col("max_real_sol") <= 0)
+            .then(pl.lit("no_inflow"))
+            .when(pl.col("completed") | (pl.col("max_real_sol") >= need))
+            .then(pl.lit("candidate"))
+            .when(pl.col("distinct_after") >= 2)
+            .then(pl.lit("unlikely_active"))
+            .otherwise(pl.lit("unlikely_quiet")),
+            u=pl.col("mint").map_elements(unit_hash, return_dtype=pl.Float64),
+        )
     )
     df = df.with_columns(
         rate=pl.col("stratum").replace_strict(rates, default=0.0),
@@ -126,9 +143,19 @@ def run(cfg: Config) -> pl.DataFrame:
     strata.write_parquet(cfg.interim_dir / "strata.parquet")
 
     until = cfg.tape_until_seconds * 1000
+    hour_slack = 3_600_000  # bitquery launch times are hour-floored; walk one extra hour of tape
     queue = (
         df.filter(pl.col("selected"))
-        .select("mint", "launch_time_ms", "launch_day", "stratum", "weight", until_ms=pl.col("launch_time_ms") + until)
+        .select(
+            "mint",
+            "launch_time_ms",
+            "launch_day",
+            "stratum",
+            "weight",
+            until_ms=pl.col("launch_time_ms")
+            + until
+            + pl.when(pl.col("stratum").str.starts_with("hist_")).then(hour_slack).otherwise(0),
+        )
         .sort("launch_time_ms")
     )
     queue.write_parquet(cfg.interim_dir / "fetch_queue.parquet")

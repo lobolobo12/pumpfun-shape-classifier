@@ -80,8 +80,8 @@ def tape_rows(cfg: Config, tf: TradeFile, launch_ms: int) -> list[dict]:
 
 
 def run(cfg: Config) -> dict[str, dict[str, int]]:
-    queue = pl.read_parquet(cfg.interim_dir / "fetch_queue.parquet")
-    meta = {m: (int(ms), day) for m, ms, day in queue.select("mint", "launch_time_ms", "launch_day").iter_rows()}
+    tokens = pl.read_parquet(cfg.tokens_path)
+    meta = {m: (int(ms), day) for m, ms, day in tokens.select("mint", "launch_time_ms", "launch_day").iter_rows()}
     ledger = Ledger(cfg.ledger_path)
     mints = ledger.ok_mints()
     ledger.close()

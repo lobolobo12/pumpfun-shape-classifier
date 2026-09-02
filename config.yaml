@@ -83,6 +83,10 @@ prescreen:
   # Sampled strata carry weight 1 / rate into every base rate and metric.
   sample_rate_unlikely_quiet: 0.2
   sample_rate_unknown: 0.2
+  # Historical (source=bitquery) tokens have no curve polls; the screen is FDV >= fdv_candidate_usd
+  # AND day high/low >= 1+tp over the first two days. Non-candidates are sampled.
+  fdv_candidate_usd: 8000
+  sample_rate_hist: 0.05
 
 # --- benchmark ------------------------------------------------------------
 bench:

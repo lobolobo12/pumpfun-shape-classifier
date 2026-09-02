@@ -24,32 +24,38 @@
     "updated_at": 1788278482
   },
   "prescreen": {
-    "fetch_queue": 37729,
+    "fetch_queue": 143663,
     "needed_sol_for_tp": 12.426,
     "prescreen_mayhem_dropped": 27686,
     "prescreen_no_inflow_dropped": 19569,
     "queued": {
       "candidate": 10239,
+      "hist_candidate": 78268,
+      "hist_rest": 27666,
       "unknown": 3488,
       "unlikely_active": 12019,
       "unlikely_quiet": 11983
     },
     "sample_rates": {
       "candidate": 1.0,
+      "hist_candidate": 1.0,
+      "hist_rest": 0.05,
       "unknown": 0.2,
       "unlikely_active": 1.0,
       "unlikely_quiet": 0.2
     },
     "strata": {
       "candidate": 10239,
+      "hist_candidate": 78268,
+      "hist_rest": 558387,
       "mayhem": 27686,
       "no_inflow": 19569,
       "unknown": 17762,
       "unlikely_active": 12019,
       "unlikely_quiet": 60302
     },
-    "universe_tokens": 147577,
-    "updated_at": 1788373984
+    "universe_tokens": 784232,
+    "updated_at": 1788375904
   },
   "universe": {
     "attention_meta_total": 167859,

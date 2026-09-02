@@ -38,6 +38,8 @@ def _parser() -> argparse.ArgumentParser:
     g.add_argument("--limit", type=int, default=10)
 
     sub.add_parser("to-parquet", help="cached tapes -> data/raw/trades/{yyyy-mm}/*.parquet")
+    sub.add_parser("history-merge", help="merge the pulled Bitquery days into tokens.parquet")
+    sub.add_parser("fix-launch-times", help="correct hour-floored historical launch times from fetched tapes")
     sub.add_parser("curve-params", help="derive curve constants from the tapes and assert stability")
     sub.add_parser("label", help="triple-barrier labels on realized exits")
     sub.add_parser("features", help="tabular + sequence features, splits")
@@ -99,6 +101,14 @@ def main(argv: list[str] | None = None) -> int:
         from pumpfun.ingest import to_parquet
 
         to_parquet.run(cfg)
+    elif args.cmd == "history-merge":
+        from pumpfun.ingest import bitquery_history
+
+        bitquery_history.merge_into_tokens(cfg)
+    elif args.cmd == "fix-launch-times":
+        from pumpfun.ingest import bitquery_history
+
+        bitquery_history.fix_launch_times(cfg)
     elif args.cmd == "curve-params":
         from pumpfun.label import curve_params
 
