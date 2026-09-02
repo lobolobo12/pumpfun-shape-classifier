@@ -18,7 +18,7 @@ from torch import nn
 from pumpfun.config import Config
 from pumpfun.features.tabular import CREATOR, HOLDERS, SHAPE
 from pumpfun.models import metrics
-from pumpfun.reports import write_json
+from pumpfun.reports import append_history, write_json
 
 log = logging.getLogger(__name__)
 
@@ -174,6 +174,23 @@ def run(cfg: Config) -> dict:
     result["n_params"] = int(n_params)
     report = {"results": {name: result}, "config": cfg.cnn, "preset": cfg.preset}
     write_json(cfg.reports_dir / f"m5_{name}.json", report)
+    append_history(
+        cfg.reports_dir,
+        {
+            "model": name,
+            "mode": cfg.decision_mode,
+            "splits": {"train_end": cfg.split_train_end, "val_end": cfg.split_val_end},
+            "test_n": result["n"],
+            "test_pos": result["positives"],
+            "base_rate": result["base_rate"],
+            "pr_auc": result["pr_auc"],
+            "roc_auc": result["roc_auc"],
+            "p_at_10pct": result["precision_at"]["0.1"]["precision"],
+            "pnl_at_10pct": result["pnl_at"]["0.1"]["pnl_sol"],
+            "pnl_ex_top3": result["pnl_at"]["0.1"]["pnl_ex_top3_sol"],
+            "train_n": tr.height,
+        },
+    )
     md = [f"# Milestone 5 — {name} ({n_params:,} params)\n", metrics.comparison_table(cfg, {name: result}), ""]
     (cfg.reports_dir / f"m5_{name}.md").write_text("\n".join(md) + "\n")
     log.info(

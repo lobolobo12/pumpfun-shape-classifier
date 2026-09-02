@@ -25,3 +25,11 @@ def update_counts(reports_dir: Path, stage: str, counts: dict[str, Any]) -> None
     cur = read_json(path, {}) or {}
     cur[stage] = {**counts, "updated_at": int(time.time())}
     write_json(path, cur)
+
+
+def append_history(reports_dir: Path, record: dict[str, Any]) -> None:
+    """One line per model evaluation, forever — reports/model_history.jsonl is append-only."""
+    path = reports_dir / "model_history.jsonl"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a") as f:
+        f.write(json.dumps({"at": int(time.time()), **record}, sort_keys=True, default=str) + "\n")

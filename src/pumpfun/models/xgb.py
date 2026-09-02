@@ -18,7 +18,7 @@ from sklearn.preprocessing import StandardScaler
 from pumpfun.config import Config
 from pumpfun.features.tabular import CONTEXT, CREATOR, HOLDERS, SHAPE
 from pumpfun.models import metrics
-from pumpfun.reports import write_json
+from pumpfun.reports import append_history, write_json
 
 log = logging.getLogger(__name__)
 
@@ -129,6 +129,24 @@ def run(cfg: Config) -> dict:
         "preset": cfg.preset,
     }
     write_json(cfg.reports_dir / "m4_xgb.json", report)
+    for name, r in results.items():
+        append_history(
+            cfg.reports_dir,
+            {
+                "model": name,
+                "mode": cfg.decision_mode,
+                "splits": {"train_end": cfg.split_train_end, "val_end": cfg.split_val_end},
+                "test_n": r["n"],
+                "test_pos": r["positives"],
+                "base_rate": r["base_rate"],
+                "pr_auc": r["pr_auc"],
+                "roc_auc": r["roc_auc"],
+                "p_at_10pct": r["precision_at"]["0.1"]["precision"],
+                "pnl_at_10pct": r["pnl_at"]["0.1"]["pnl_sol"],
+                "pnl_ex_top3": r["pnl_at"]["0.1"]["pnl_ex_top3_sol"],
+                "train_n": train.height,
+            },
+        )
     md = ["# Milestone 4 — XGBoost baseline\n", metrics.comparison_table(cfg, results), ""]
     for name, imp in importances.items():
         md.append(f"\n## {name}: top gain features\n")

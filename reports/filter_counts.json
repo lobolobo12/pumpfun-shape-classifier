@@ -24,15 +24,15 @@
     "updated_at": 1788278482
   },
   "prescreen": {
-    "fetch_queue": 32556,
+    "fetch_queue": 37729,
     "needed_sol_for_tp": 12.426,
-    "prescreen_mayhem_dropped": 24280,
-    "prescreen_no_inflow_dropped": 16532,
+    "prescreen_mayhem_dropped": 27686,
+    "prescreen_no_inflow_dropped": 19569,
     "queued": {
-      "candidate": 8643,
-      "unknown": 3457,
-      "unlikely_active": 10469,
-      "unlikely_quiet": 9987
+      "candidate": 10239,
+      "unknown": 3488,
+      "unlikely_active": 12019,
+      "unlikely_quiet": 11983
     },
     "sample_rates": {
       "candidate": 1.0,
@@ -41,26 +41,26 @@
       "unlikely_quiet": 0.2
     },
     "strata": {
-      "candidate": 8643,
-      "mayhem": 24280,
-      "no_inflow": 16532,
-      "unknown": 17596,
-      "unlikely_active": 10469,
-      "unlikely_quiet": 50324
+      "candidate": 10239,
+      "mayhem": 27686,
+      "no_inflow": 19569,
+      "unknown": 17762,
+      "unlikely_active": 12019,
+      "unlikely_quiet": 60302
     },
-    "universe_tokens": 127844,
-    "updated_at": 1788275293
+    "universe_tokens": 147577,
+    "updated_at": 1788373984
   },
   "universe": {
-    "attention_meta_total": 141590,
-    "in_date_range": 114207,
-    "pumpportal_frames_in_range": 118262,
-    "universe_added_from_frames": 23577,
-    "universe_mayhem_flagged": 24280,
-    "universe_mayhem_unknown": 9582,
+    "attention_meta_total": 167859,
+    "in_date_range": 137229,
+    "pumpportal_frames_in_range": 134537,
+    "universe_added_from_frames": 24030,
+    "universe_mayhem_flagged": 27686,
+    "universe_mayhem_unknown": 13040,
     "universe_no_creator": 0,
-    "universe_seen_late_dropped": 9940,
-    "universe_tokens": 127844,
-    "updated_at": 1788275290
+    "universe_seen_late_dropped": 13682,
+    "universe_tokens": 147577,
+    "updated_at": 1788373972
   }
 }
