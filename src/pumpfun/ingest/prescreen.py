@@ -107,7 +107,7 @@ def run(cfg: Config) -> pl.DataFrame:
         "unlikely_active": 1.0,
         "unlikely_quiet": cfg.prescreen.sample_rate_unlikely_quiet,
         "unknown": cfg.prescreen.sample_rate_unknown,
-        "hist_candidate": 1.0,
+        "hist_candidate": cfg.prescreen.sample_rate_hist_candidate,
         "hist_rest": cfg.prescreen.sample_rate_hist,
     }
     df = (

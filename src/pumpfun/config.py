@@ -73,6 +73,7 @@ class Prescreen:
     sample_rate_unlikely_quiet: float
     sample_rate_unknown: float
     fdv_candidate_usd: float
+    sample_rate_hist_candidate: float
     sample_rate_hist: float
 
 
@@ -295,6 +296,7 @@ def _build(d: dict[str, Any], preset: str | None) -> Config:
             sample_rate_unlikely_quiet=float(ps["sample_rate_unlikely_quiet"]),
             sample_rate_unknown=float(ps["sample_rate_unknown"]),
             fdv_candidate_usd=float(ps["fdv_candidate_usd"]),
+            sample_rate_hist_candidate=float(ps["sample_rate_hist_candidate"]),
             sample_rate_hist=float(ps["sample_rate_hist"]),
         ),
         bench=Bench(

@@ -86,6 +86,7 @@ prescreen:
   # Historical (source=bitquery) tokens have no curve polls; the screen is FDV >= fdv_candidate_usd
   # AND day high/low >= 1+tp over the first two days. Non-candidates are sampled.
   fdv_candidate_usd: 8000
+  sample_rate_hist_candidate: 0.35  # historical candidates are plentiful (311k); a weighted sample is enough
   sample_rate_hist: 0.05
 
 # --- benchmark ------------------------------------------------------------

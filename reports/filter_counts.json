@@ -26,13 +26,13 @@
     "updated_at": 1788380416
   },
   "prescreen": {
-    "fetch_queue": 495661,
+    "fetch_queue": 293312,
     "needed_sol_for_tp": 12.426,
     "prescreen_mayhem_dropped": 28459,
     "prescreen_no_inflow_dropped": 20182,
     "queued": {
       "candidate": 10518,
-      "hist_candidate": 311279,
+      "hist_candidate": 108930,
       "hist_rest": 145833,
       "unknown": 3492,
       "unlikely_active": 12267,
@@ -40,7 +40,7 @@
     },
     "sample_rates": {
       "candidate": 1.0,
-      "hist_candidate": 1.0,
+      "hist_candidate": 0.35,
       "hist_rest": 0.05,
       "unknown": 0.2,
       "unlikely_active": 1.0,
@@ -57,7 +57,7 @@
       "unlikely_quiet": 61827
     },
     "universe_tokens": 1163046,
-    "updated_at": 1788380582
+    "updated_at": 1788380676
   },
   "universe": {
     "attention_meta_total": 172060,
