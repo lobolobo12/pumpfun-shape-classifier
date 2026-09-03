@@ -2,89 +2,91 @@
 
 | model | n | PR-AUC | ROC-AUC | P@1% | P@5% | P@10% | PnL@10% (SOL) | ex-top-3 |
 |---|---|---|---|---|---|---|---|---|
-| xgb_shape | 103 | 0.274 | 0.628 | 0.00 | 0.40 | 0.30 | 0.26 | -1.42 |
-| xgb_holders | 103 | 0.361 | 0.660 | 1.00 | 0.60 | 0.40 | 11.16 | -0.80 |
-| xgb_shape+holders | 103 | 0.337 | 0.693 | 1.00 | 0.20 | 0.40 | 0.97 | -0.78 |
-| xgb_all | 103 | 0.306 | 0.681 | 1.00 | 0.20 | 0.20 | 10.09 | -1.44 |
-| xgb_context | 103 | 0.182 | 0.526 | 0.00 | 0.20 | 0.20 | -0.46 | -1.43 |
-| logistic_repo_recipe | 103 | 0.295 | 0.577 | 0.00 | 0.60 | 0.30 | 10.55 | -1.42 |
+| xgb_shape | 103 | 0.335 | 0.704 | 0.00 | 0.40 | 0.40 | 1.34 | -0.42 |
+| xgb_holders | 103 | 0.473 | 0.771 | 1.00 | 0.40 | 0.60 | 12.73 | 0.72 |
+| xgb_shape+holders | 103 | 0.391 | 0.724 | 0.00 | 0.60 | 0.60 | 12.82 | 0.74 |
+| xgb_all | 103 | 0.342 | 0.637 | 1.00 | 0.40 | 0.40 | 11.54 | -0.22 |
+| xgb_context | 103 | 0.283 | 0.574 | 1.00 | 0.60 | 0.30 | 0.52 | -1.14 |
+| logistic_repo_recipe | 103 | 0.262 | 0.560 | 0.00 | 0.40 | 0.30 | 0.51 | -1.41 |
 | human (M0) | — | not yet recorded: run `pf bench label` | | | | | | |
 
 
 ## xgb_shape: top gain features
 
-- last_trade_t: 12.369
-- lows: 11.658
-- sol_last60: 11.428
-- n_slots: 11.189
-- bundle_slots: 11.013
-- n_buyers: 10.996
-- max_drawdown: 10.887
-- sell_share_sol: 10.782
-- step_gini: 10.336
-- gini_buy_size: 10.108
-- buy_size_cv: 9.868
-- iti_median: 9.849
-- buy_ratio_sol: 9.765
-- buy_ratio_count: 9.709
-- price_slope: 9.679
+- sol_last60: 5.728
+- buy_ratio_count: 5.397
+- max_drawdown: 5.061
+- sellers_last60: 4.897
+- iti_cv: 4.882
+- bundle_slots: 4.831
+- n_trades: 4.831
+- sell_share_sol: 4.818
+- price_slope: 4.656
+- n_sellers: 4.513
+- lows: 4.5
+- trades_last60: 4.476
+- lows_per_min: 4.466
+- volume_slope: 4.434
+- run_from_low: 4.418
 
 ## xgb_holders: top gain features
 
-- dev_share: 24.471
-- dev_sold: 15.0
-- holders_n: 12.144
-- launch_bundle_share: 11.949
-- top3_share: 10.143
-- top1_share: 10.036
-- top10_share: 9.562
-- first_slot_share: 9.483
-- tokens_out_pct: 9.47
-- buyers_n: 8.824
-- exited_share: 8.406
-- gini_hold: 8.148
-- same_size_share: 7.649
+- exited_share: 6.553
+- launch_bundle_share: 6.356
+- dev_share: 6.151
+- holders_n: 6.012
+- top3_share: 5.88
+- top10_share: 5.81
+- first_slot_share: 5.693
+- top1_share: 5.447
+- tokens_out_pct: 5.214
+- buyers_n: 5.0
+- gini_hold: 4.858
+- dev_sold: 4.706
+- same_size_share: 4.226
 
 ## xgb_shape+holders: top gain features
 
-- dev_share: 34.452
-- sell_share_sol: 25.175
-- dev_sold: 21.966
-- last_trade_t: 19.282
-- sol_last60: 17.0
-- iti_median: 16.92
-- holders_n: 15.925
-- run_from_low: 15.537
-- buy_ratio_count: 15.171
-- top3_share: 14.914
-- first_trade_t: 14.913
-- launch_bundle_share: 14.732
-- top1_share: 14.488
-- first_slot_share: 14.01
-- buy_size_cv: 13.957
+- sol_last60: 7.232
+- exited_share: 7.097
+- launch_bundle_share: 6.363
+- dev_share: 6.115
+- holders_n: 5.995
+- sell_share_sol: 5.946
+- buy_ratio_count: 5.916
+- top1_share: 5.844
+- top3_share: 5.803
+- gini_buy_size: 5.791
+- buy_size_cv: 5.784
+- top10_share: 5.671
+- max_drawdown: 5.652
+- gini_hold: 5.544
+- n_trades: 5.496
 
 ## xgb_all: top gain features
 
-- is_native_launch: 51.551
-- replies_at_entry: 35.696
-- creator_prior_resolved: 31.041
-- live_at_entry: 19.844
-- last_trade_t: 18.616
-- creator_prior_launches: 16.151
-- sol_last60: 16.032
-- launch_bundle_share: 15.866
-- exited_share: 15.478
-- bundle_slots: 14.608
-- dev_share: 13.561
-- top3_share: 13.237
-- iti_median: 13.151
-- top1_share: 12.974
-- holders_n: 12.348
+- sol_last60: 7.858
+- dev_share: 6.988
+- launch_bundle_share: 6.737
+- is_native_launch: 6.611
+- exited_share: 6.589
+- top3_share: 6.223
+- replies_at_entry: 6.156
+- first_slot_share: 6.108
+- top1_share: 6.091
+- bundle_slots: 6.008
+- n_trades: 5.841
+- max_drawdown: 5.794
+- creator_prior_tp_rate: 5.786
+- creator_prior_launches: 5.669
+- gini_buy_size: 5.649
 
 ## xgb_context: top gain features
 
-- is_native_launch: 20.385
-- replies_at_entry: 9.875
-- live_at_entry: 4.88
-- hour_cos: 3.142
-- hour_sin: 2.995
+- is_native_launch: 3.955
+- market_recent_n: 3.642
+- market_recent_tp_rate: 3.602
+- hour_sin: 3.367
+- hour_cos: 3.204
+- replies_at_entry: 2.955
+- live_at_entry: 2.826

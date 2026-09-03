@@ -5,7 +5,9 @@
       "hour_sin",
       "hour_cos",
       "replies_at_entry",
-      "live_at_entry"
+      "live_at_entry",
+      "market_recent_tp_rate",
+      "market_recent_n"
     ],
     "creator": [
       "creator_prior_launches",
@@ -70,7 +72,7 @@
     "curve_fill"
   ],
   "sequence_shape": [
-    8405,
+    10645,
     300,
     6
   ],
@@ -84,9 +86,9 @@
     "test_n": 410,
     "test_pos": 24,
     "test_serial_launcher_share": 0.15365853658536585,
-    "train_n": 7060,
-    "train_negatives_dropped": 14836,
-    "train_pos": 1412,
+    "train_n": 9300,
+    "train_negatives_dropped": 15964,
+    "train_pos": 1860,
     "val_n": 935,
     "val_pos": 67
   },
@@ -99,7 +101,7 @@
     "curve_fill"
   ],
   "trade_shape": [
-    8405,
+    10645,
     256,
     6
   ]
