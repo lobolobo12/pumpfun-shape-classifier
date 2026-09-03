@@ -132,6 +132,16 @@ cnn:
   # After the main fit over all training data, fine-tune on the most recent N days at lr/5.
   # 0 disables. Only matters once historical data is in the training set.
   finetune_days: 4
+  # Load the self-supervised trunk from `pf cnn-pretrain` (data/processed/cnn_pretrained_<encoding>.pt) when
+  # true and the file exists; the classifier head always starts random.
+  pretrained: false
+  pretrain:
+    horizon_s: 60          # regress log(curve SOL at cut+horizon / at cut)
+    max_mints: 60000       # cap on tapes used (memory: 60k x 256 x 6 float32 ~ 370 MB)
+    epochs: 15
+ensemble:
+  # rank-average of these models' saved test scores (trained in the same run: same split and mode)
+  members: ["xgb_holders", "cnn_trades+side"]
 metrics:
   top_fractions: [0.01, 0.05, 0.10]
   active_silence_max: 60   # "active at entry" slice: last window trade within this many seconds of the decision

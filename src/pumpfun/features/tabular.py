@@ -17,6 +17,7 @@ import numpy as np
 import polars as pl
 
 from pumpfun.config import Config
+from pumpfun.features.wallets import WALLETS, wallet_features
 from pumpfun.ingest.to_parquet import curve_params
 
 SHAPE = [
@@ -77,9 +78,11 @@ CONTEXT = [
     "live_at_entry",
     "market_recent_tp_rate",
     "market_recent_n",
+    "market_launch_rate",
+    "market_candidate_rate",
 ]
 SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]
-GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR, "context": CONTEXT}
+GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR, "context": CONTEXT, "wallets": WALLETS}
 NATIVE_HOSTS = {"ipfs.io", "pump.mypinata.cloud"}
 
 
@@ -352,6 +355,87 @@ def market_heat(cfg: Config, labels: pl.DataFrame, tokens: pl.DataFrame) -> pl.D
     )
 
 
+UNQUEUED_STRATA = {"no_inflow", "mayhem"}
+
+
+def market_state(cfg: Config, labels: pl.DataFrame, tokens: pl.DataFrame) -> pl.DataFrame:
+    """Two more dials on the trenches, measured the same way in every era:
+    market_launch_rate     launches per hour in the window ending at this coin's entry moment, over the
+                           whole universe; Dune days were sampled server-side, so those rows carry their
+                           pre-sampling weight (bitquery_screen.pre_weight), everything else weight 1
+    market_candidate_rate  weighted share of fetched launches whose tape reached cross_level_sol, over
+                           launches old enough (window + horizon before the entry) for the whole tape to
+                           be in the past; weights are the pre-screen selection weights (strata.weight)
+    """
+    import numpy as np
+
+    from pumpfun.ingest.to_parquet import read_trades
+
+    screen_path = cfg.interim_dir / "bitquery_screen.parquet"
+    pre = (
+        pl.read_parquet(screen_path).filter(pl.col("pre_sampled").fill_null(False)).select("mint", pre_w=pl.col("pre_weight"))
+        if screen_path.exists()
+        else pl.DataFrame(schema={"mint": pl.String, "pre_w": pl.Float64})
+    )
+    uni = (
+        tokens.select("mint", "launch_time")
+        .join(pre, on="mint", how="left")
+        .with_columns(wgt=pl.col("pre_w").fill_null(1.0))
+        .sort("launch_time")
+    )
+    l_abs = uni["launch_time"].to_numpy().astype(np.float64)
+    cw = np.concatenate([[0.0], np.cumsum(uni["wgt"].to_numpy())])
+
+    strata_path = cfg.interim_dir / "strata.parquet"
+    # Fetched, pre-screen-selected launches carry their selection weight; launches in strata that are never
+    # queued (no inflow, mayhem) count as "never reached" with weight 1. Selected-but-not-yet-fetched
+    # launches are left out of both numerator and denominator, so fetch progress cannot bias the rate.
+    if strata_path.exists():
+        st = pl.read_parquet(strata_path).select("mint", "stratum", "selected", "weight")
+        sel = st.filter(pl.col("selected")).select("mint", "weight")
+        unqueued = st.filter(~pl.col("selected") & pl.col("stratum").is_in(sorted(UNQUEUED_STRATA))).select("mint")
+    else:
+        sel = tokens.select("mint").with_columns(weight=pl.lit(1.0))
+        unqueued = tokens.head(0).select("mint")
+    level = float(cfg.raw.get("cross_level_sol", 0.0) or 0.0)
+    peaks = read_trades(cfg).group_by("mint").agg(peak=pl.col("curve_sol_after").max()).collect()
+    fetched = (
+        pl.concat(
+            [
+                peaks.join(sel, on="mint", how="inner")
+                .with_columns(
+                    reached=(pl.col("peak") >= level).fill_null(False).cast(pl.Float64),
+                    weight=pl.col("weight").fill_null(1.0).fill_nan(1.0),
+                )
+                .select("mint", "weight", "reached"),
+                unqueued.with_columns(weight=pl.lit(1.0), reached=pl.lit(0.0)),
+            ]
+        )
+        .join(tokens.select("mint", "launch_time"), on="mint", how="left")
+        .sort("launch_time")
+    )
+    f_abs = fetched["launch_time"].to_numpy().astype(np.float64)
+    fw = np.concatenate([[0.0], np.cumsum(fetched["weight"].to_numpy())])
+    fwr = np.concatenate([[0.0], np.cumsum((fetched["weight"] * fetched["reached"]).to_numpy())])
+
+    win = cfg.market_heat_window_hours * 3600
+    known_lag = float(cfg.window_seconds + cfg.horizon_seconds)
+    df = labels.select("mint", "entry_t").join(tokens.select("mint", "launch_time"), on="mint", how="left")
+    rate, cand = [], []
+    for e in (df["launch_time"] + df["entry_t"]).to_numpy():
+        hi = np.searchsorted(l_abs, e, side="left")
+        lo = np.searchsorted(l_abs, e - win, side="left")
+        rate.append(float((cw[hi] - cw[lo]) / cfg.market_heat_window_hours))
+        khi = np.searchsorted(f_abs, e - known_lag, side="left")
+        klo = np.searchsorted(f_abs, e - known_lag - win, side="left")
+        n = fw[khi] - fw[klo]
+        cand.append(float((fwr[khi] - fwr[klo]) / n) if n > 0 else None)
+    return df.select("mint").with_columns(
+        market_launch_rate=pl.Series(rate, dtype=pl.Float64),
+        market_candidate_rate=pl.Series(cand, dtype=pl.Float64),
+    )
+
+
 def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFrame) -> pl.DataFrame:
     meta = {
         m: (c, s, e, t)
@@ -370,6 +454,8 @@ def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFr
         .join(creator_history(cfg, tokens, labels), on="mint", how="left")
         .join(context_features(cfg, tokens), on="mint", how="left")
         .join(market_heat(cfg, labels, tokens), on="mint", how="left")
+        .join(market_state(cfg, labels, tokens), on="mint", how="left")
+        .join(wallet_features(cfg, wt, labels, tokens), on="mint", how="left")
     )
     df = df.with_columns(
         active_at_entry=(pl.col("last_trade_t") >= pl.col("entry_t_") - float(cfg.metrics["active_silence_max"]))

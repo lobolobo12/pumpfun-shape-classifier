@@ -18,6 +18,7 @@ from sklearn.preprocessing import StandardScaler
 
 from pumpfun.config import Config
 from pumpfun.features.tabular import CONTEXT, CREATOR, HOLDERS, SHAPE
+from pumpfun.features.wallets import WALLETS
 from pumpfun.models import metrics
 from pumpfun.reports import append_history, write_json
 
@@ -29,6 +30,9 @@ VARIANTS = {
     "xgb_shape+holders": SHAPE + HOLDERS,
     "xgb_all": SHAPE + HOLDERS + CREATOR + CONTEXT,
     "xgb_context": CONTEXT,
+    "xgb_wallets": WALLETS,
+    "xgb_holders+wallets": HOLDERS + WALLETS,
+    "xgb_all+wallets": SHAPE + HOLDERS + CREATOR + CONTEXT + WALLETS,
 }
 # analyse.ts MODEL_FEATURES, translated to our names (sameSlotShare and ageS have no counterpart here).
 LOGISTIC_FEATURES = [
@@ -124,6 +128,7 @@ def run(cfg: Config) -> dict:
         model = fit_xgb(cfg, train, val, cols)
         p = model.predict_proba(_xy(test, cols)[0])[:, 1]
         results[name] = metrics.evaluate(cfg, test, p)
+        metrics.save_predictions(cfg, name, test, p)
         results[name]["best_iteration"] = int(model.best_iteration)
         results[name]["val_pr_auc"] = metrics.evaluate(cfg, val, model.predict_proba(_xy(val, cols)[0])[:, 1])["pr_auc"]
         gain = model.get_booster().get_score(importance_type="gain")

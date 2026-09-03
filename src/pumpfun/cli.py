@@ -60,6 +60,8 @@ def _parser() -> argparse.ArgumentParser:
 
     sub.add_parser("xgb", help="milestone 4")
     sub.add_parser("cnn", help="milestone 5")
+    sub.add_parser("cnn-pretrain", help="self-supervised trunk pretraining on every tape (labels untouched)")
+    sub.add_parser("ensemble", help="rank-average the saved test scores of ensemble.members")
     return p
 
 
@@ -168,6 +170,14 @@ def main(argv: list[str] | None = None) -> int:
         from pumpfun.models import cnn
 
         cnn.run(cfg)
+    elif args.cmd == "cnn-pretrain":
+        from pumpfun.models import cnn
+
+        cnn.pretrain(cfg)
+    elif args.cmd == "ensemble":
+        from pumpfun.models import ensemble
+
+        ensemble.run(cfg)
     return 0
 
 

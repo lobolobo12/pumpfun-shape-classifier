@@ -17,3 +17,12 @@ mv -f "reports/m5_cnn_trades+side.md" "reports/${TAG}_m5_cnn_trades_${MODE}.md"
 "${PF[@]}" --set cnn.encoding=trades --set cnn.side=false cnn 2>&1 | grep -E "test PR-AUC"
 mv -f "reports/m5_cnn_trades.json" "reports/${TAG}_m5_cnn_trades_seqonly_${MODE}.json"
 mv -f "reports/m5_cnn_trades.md" "reports/${TAG}_m5_cnn_trades_seqonly_${MODE}.md"
+# pretrained trunk (only when `pf cnn-pretrain` has produced it), then the rank-average ensemble
+if [[ -f data/processed/cnn_pretrained_trades.pt ]]; then
+  "${PF[@]}" --set cnn.encoding=trades --set cnn.pretrained=true cnn 2>&1 | grep -E "test PR-AUC"
+  mv -f "reports/m5_cnn_trades+side+pre.json" "reports/${TAG}_m5_cnn_trades_pre_${MODE}.json"
+  mv -f "reports/m5_cnn_trades+side+pre.md" "reports/${TAG}_m5_cnn_trades_pre_${MODE}.md"
+fi
+"${PF[@]}" ensemble 2>&1 | grep -E "test PR-AUC"
+mv -f reports/m6_ensemble.json "reports/${TAG}_m6_ensemble_${MODE}.json"
+mv -f reports/m6_ensemble.md "reports/${TAG}_m6_ensemble_${MODE}.md"

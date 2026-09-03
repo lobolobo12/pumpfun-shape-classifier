@@ -7,7 +7,9 @@
       "replies_at_entry",
       "live_at_entry",
       "market_recent_tp_rate",
-      "market_recent_n"
+      "market_recent_n",
+      "market_launch_rate",
+      "market_candidate_rate"
     ],
     "creator": [
       "creator_prior_launches",
@@ -61,6 +63,15 @@
       "n_slots",
       "first_trade_t",
       "last_trade_t"
+    ],
+    "wallets": [
+      "w_repeat_share",
+      "w_serial_share",
+      "w_log_prior_mean",
+      "w_hit_rate_mean",
+      "w_hit_rate_max",
+      "w_hit_rate_sol",
+      "w_scored_share"
     ]
   },
   "sequence_channels": [

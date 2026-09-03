@@ -44,6 +44,13 @@ def weighted_precision_at(y: np.ndarray, p: np.ndarray, w: np.ndarray, frac: flo
     return {"k": k, "precision": float((w[idx] * y[idx]).sum() / w[idx].sum())}
 
 
+def save_predictions(cfg: Config, name: str, df: pl.DataFrame, p: np.ndarray) -> None:
+    """Test-set scores per model, so an ensemble can be evaluated without refitting anything."""
+    out = cfg.processed_dir / "preds"
+    out.mkdir(parents=True, exist_ok=True)
+    df.select("mint").with_columns(p=pl.Series(np.asarray(p, dtype=np.float64))).write_parquet(out / f"{name}.parquet")
+
+
 def evaluate(cfg: Config, df: pl.DataFrame, p: np.ndarray) -> dict:
     """df must carry label, entry_cost_sol, exit_net_sol (and in_zone for the slice, sample_weight for strata)."""
     y = df["label"].to_numpy().astype(int)

@@ -10,6 +10,12 @@
     "kernel": 5,
     "lr": 0.001,
     "patience": 6,
+    "pretrain": {
+      "epochs": 15,
+      "horizon_s": 60,
+      "max_mints": 60000
+    },
+    "pretrained": false,
     "seeds": 5,
     "side": false,
     "trade_steps": 256
