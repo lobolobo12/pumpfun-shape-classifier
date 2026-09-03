@@ -133,3 +133,22 @@ def test_trade_encoding_right_aligned_with_dt():
     assert x[0, 7, 1] == pytest.approx(np.log1p(1.0))
     assert x[0, 5, 4] == 1.0 and x[0, 7, 4] == 0.0  # w1 new at first trade, not at its second
     assert x[0, 7, 0] == pytest.approx(np.log(2.5e-8 / 2e-8))
+
+
+def test_market_heat_uses_only_resolved_outcomes():
+    tokens = pl.DataFrame({"mint": ["a", "b", "c"], "creator": ["x", "y", "z"], "launch_time": [0, 10_000, 20_000]})
+    labels = pl.DataFrame(
+        {
+            "mint": ["a", "b", "c"],
+            "entry_t": [300.0, 300.0, 300.0],
+            "exit_t": [400.0, 20_500.0, 400.0],
+            "label": [1, 0, 0],
+        }
+    )
+    h = tabular.market_heat(load_config(overrides=["market_heat_window_hours=24"]), labels, tokens).sort("mint")
+    # a: nothing resolved before its entry. b: a resolved at 400 < 10300 -> rate 1.
+    # c: a resolved (1); b has NOT resolved yet (30500 > 20300), so it must not count.
+    assert h["market_recent_tp_rate"].to_list()[0] is None
+    assert h["market_recent_tp_rate"].to_list()[1] == 1.0
+    assert h["market_recent_tp_rate"].to_list()[2] == 1.0
+    assert h["market_recent_n"].to_list() == [0.0, 1.0, 1.0]

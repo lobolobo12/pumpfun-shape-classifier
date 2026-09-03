@@ -95,6 +95,7 @@ bench:
   image_px: [640, 360]
 
 # --- models ---------------------------------------------------------------
+market_heat_window_hours: 6   # market_recent_tp_rate: TP rate of coins whose outcome resolved in this window before the entry
 train:
   # How much a training example counts, by age relative to split_train_end:
   # weight = 0.5 ** (age_days / recency_half_life_days). 0 disables (all equal).

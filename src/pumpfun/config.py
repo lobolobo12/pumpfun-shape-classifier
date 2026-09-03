@@ -117,6 +117,7 @@ class Config:
     universe: Universe
     prescreen: Prescreen
     bench: Bench
+    market_heat_window_hours: float
     train: dict[str, Any]
     xgb: dict[str, Any]
     cnn: dict[str, Any]
@@ -304,6 +305,7 @@ def _build(d: dict[str, Any], preset: str | None) -> Config:
             n_per_class=int(be["n_per_class"]),
             image_px=(int(be["image_px"][0]), int(be["image_px"][1])),
         ),
+        market_heat_window_hours=float(d["market_heat_window_hours"]),
         train=dict(d["train"]),
         xgb=dict(d["xgb"]),
         cnn=dict(d["cnn"]),

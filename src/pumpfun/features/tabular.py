@@ -69,7 +69,15 @@ HOLDERS = [
 ]
 CREATOR = ["creator_prior_launches", "creator_prior_resolved", "creator_prior_tp_rate"]
 # v1.5: causal context that is not the meme itself (spec §7 keeps name/image out of v1).
-CONTEXT = ["is_native_launch", "hour_sin", "hour_cos", "replies_at_entry", "live_at_entry"]
+CONTEXT = [
+    "is_native_launch",
+    "hour_sin",
+    "hour_cos",
+    "replies_at_entry",
+    "live_at_entry",
+    "market_recent_tp_rate",
+    "market_recent_n",
+]
 SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]
 GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR, "context": CONTEXT}
 NATIVE_HOSTS = {"ipfs.io", "pump.mypinata.cloud"}
@@ -303,6 +311,47 @@ def context_features(cfg: Config, tokens: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def market_heat(cfg: Config, labels: pl.DataFrame, tokens: pl.DataFrame) -> pl.DataFrame:
+    """The trenches dial: weighted TP rate of decisions whose outcome RESOLVED inside the window
+    ending at this coin's entry moment. Deployment-causal: those outcomes are known by then."""
+    strata_path = cfg.interim_dir / "strata.parquet"
+    w = (
+        pl.read_parquet(strata_path).select("mint", "weight")
+        if strata_path.exists()
+        else labels.select("mint").with_columns(weight=pl.lit(1.0))
+    )
+    df = (
+        labels.select("mint", "entry_t", "exit_t", "label")
+        .join(tokens.select("mint", "launch_time"), on="mint", how="left")
+        .join(w, on="mint", how="left")
+        .with_columns(
+            entry_abs=pl.col("launch_time") + pl.col("entry_t"),
+            resolved_abs=pl.col("launch_time") + pl.col("exit_t"),
+            wgt=pl.col("weight").fill_null(1.0),
+        )
+    )
+    win = cfg.market_heat_window_hours * 3600
+    resolved = df.sort("resolved_abs")
+    r_abs = resolved["resolved_abs"].to_numpy()
+    r_w = resolved["wgt"].to_numpy()
+    r_wy = (resolved["wgt"] * resolved["label"]).to_numpy()
+    import numpy as np
+
+    cw = np.concatenate([[0.0], np.cumsum(r_w)])
+    cwy = np.concatenate([[0.0], np.cumsum(r_wy)])
+    out_rate, out_n = [], []
+    for e in df["entry_abs"].to_numpy():
+        hi = np.searchsorted(r_abs, e, side="left")
+        lo = np.searchsorted(r_abs, e - win, side="left")
+        wsum = cw[hi] - cw[lo]
+        out_rate.append(float((cwy[hi] - cwy[lo]) / wsum) if wsum > 0 else None)
+        out_n.append(float(hi - lo))
+    return df.select("mint").with_columns(
+        market_recent_tp_rate=pl.Series(out_rate, dtype=pl.Float64),
+        market_recent_n=pl.Series(out_n, dtype=pl.Float64),
+    )
+
+
 def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFrame) -> pl.DataFrame:
     meta = {
         m: (c, s, e, t)
@@ -320,6 +369,7 @@ def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFr
         pl.DataFrame(rows)
         .join(creator_history(cfg, tokens, labels), on="mint", how="left")
         .join(context_features(cfg, tokens), on="mint", how="left")
+        .join(market_heat(cfg, labels, tokens), on="mint", how="left")
     )
     df = df.with_columns(
         active_at_entry=(pl.col("last_trade_t") >= pl.col("entry_t_") - float(cfg.metrics["active_silence_max"]))
