@@ -70,7 +70,7 @@
     "curve_fill"
   ],
   "sequence_shape": [
-    6465,
+    8405,
     300,
     6
   ],
@@ -84,9 +84,9 @@
     "test_n": 410,
     "test_pos": 24,
     "test_serial_launcher_share": 0.15365853658536585,
-    "train_n": 5120,
-    "train_negatives_dropped": 12220,
-    "train_pos": 1024,
+    "train_n": 7060,
+    "train_negatives_dropped": 14836,
+    "train_pos": 1412,
     "val_n": 935,
     "val_pos": 67
   },
@@ -99,7 +99,7 @@
     "curve_fill"
   ],
   "trade_shape": [
-    6465,
+    8405,
     256,
     6
   ]
