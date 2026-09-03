@@ -136,9 +136,10 @@ cnn:
   # true and the file exists; the classifier head always starts random.
   pretrained: false
   pretrain:
-    horizon_s: 60          # regress log(curve SOL at cut+horizon / at cut)
-    max_mints: 60000       # cap on tapes used (memory: 60k x 256 x 6 float32 ~ 370 MB)
-    epochs: 15
+    horizons_s: [60, 600]  # regress log(curve SOL at cut+h / at cut) for each horizon
+    cuts_per_tape: 3       # random decision moments per tape
+    max_mints: 200000      # cap on tapes used (memory: cuts x 256 x 6 float32; 225k cuts ~ 1.4 GB)
+    epochs: 20
 ensemble:
   # rank-average of these models' saved test scores (trained in the same run: same split and mode)
   members: ["xgb_holders", "cnn_trades+side"]

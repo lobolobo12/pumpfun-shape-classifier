@@ -62,6 +62,7 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("cnn", help="milestone 5")
     sub.add_parser("cnn-pretrain", help="self-supervised trunk pretraining on every tape (labels untouched)")
     sub.add_parser("ensemble", help="rank-average the saved test scores of ensemble.members")
+    sub.add_parser("ledger", help="average every model over its held-out days from reports/model_history.jsonl")
     return p
 
 
@@ -178,6 +179,10 @@ def main(argv: list[str] | None = None) -> int:
         from pumpfun.models import ensemble
 
         ensemble.run(cfg)
+    elif args.cmd == "ledger":
+        from pumpfun.models import ledger
+
+        ledger.run(cfg)
     return 0
 
 

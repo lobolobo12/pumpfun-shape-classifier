@@ -204,10 +204,11 @@ def pretrained_path(cfg: Config):
 def pretrain(cfg: Config) -> dict:
     """Self-supervised pretraining of the trunk on every tape, labels never touched.
 
-    Each tape gets one random cut in [cross_min_age, window] seconds; the trunk sees the trades before the
-    cut (same encoding as the classifier) and regresses the log change of curve SOL over the next
-    `cnn.pretrain.horizon_s` seconds. Tapes launched on or after split_train_end are excluded, so nothing
-    from a validation or test day is ever seen. Saves stem + blocks only; the head stays random.
+    Each tape gets `cnn.pretrain.cuts_per_tape` random cuts in [cross_min_age, window] seconds; the trunk
+    sees the trades before a cut (same encoding as the classifier) and regresses, for every horizon in
+    `cnn.pretrain.horizons_s`, the log change of curve SOL from the cut to cut+horizon. Tapes launched on
+    or after split_train_end are excluded, so nothing from a validation or test day is ever seen. Saves
+    stem + blocks only; the classifier head always starts random.
     """
     from pumpfun.features import sequence
     from pumpfun.ingest.to_parquet import read_trades
@@ -216,8 +217,9 @@ def pretrain(cfg: Config) -> dict:
     enc = str(cfg.cnn.get("encoding", "steps"))
     if enc != "trades":
         raise SystemExit("pretraining is implemented for cnn.encoding=trades")
-    horizon = float(pc.get("horizon_s", 60))
+    horizons = [float(h) for h in (pc.get("horizons_s") or [pc.get("horizon_s", 60)])]
     max_mints = int(pc.get("max_mints", 60000))
+    cuts_per = max(1, int(pc.get("cuts_per_tape", 1)))
     rng = np.random.default_rng(cfg.seed)
     tokens = pl.read_parquet(cfg.tokens_path).select("mint", "launch_day", "mayhem")
     trades = read_trades(cfg)
@@ -231,9 +233,18 @@ def pretrain(cfg: Config) -> dict:
     if mints.height > max_mints:
         mints = mints.sample(max_mints, seed=cfg.seed)
     lo, hi = float(cfg.raw.get("cross_min_age_seconds", 10)), float(cfg.window_seconds)
-    cuts = mints.select("mint").with_columns(entry_t=pl.Series(rng.uniform(lo, hi, mints.height)))
+    # one pseudo-coin per (tape, cut): "mint#k" so the shared window/encoder code keys on it unchanged
+    cuts = pl.concat(
+        [
+            mints.select(pl.col("mint").alias("src")).with_columns(
+                entry_t=pl.Series(rng.uniform(lo, hi, mints.height)), k=pl.lit(k)
+            )
+            for k in range(cuts_per)
+        ]
+    ).with_columns(mint=pl.col("src") + "#" + pl.col("k").cast(pl.String))
     t = (
-        trades.join(cuts.lazy(), on="mint", how="inner")
+        trades.rename({"mint": "src"})
+        .join(cuts.lazy(), on="src", how="inner")
         .sort("mint", "slot", "slot_index")
         .with_columns(rank=pl.int_range(pl.len()).over("mint"))
     )
@@ -241,30 +252,37 @@ def pretrain(cfg: Config) -> dict:
     last_before = before.group_by("mint").agg(
         n_visible=pl.len(), entry_price=pl.col("price_sol").last(), sol_at=pl.col("curve_sol_after").last()
     )
-    last_after = (
-        t.filter(pl.col("seconds_since_launch") < pl.col("entry_t") + horizon)
-        .group_by("mint")
-        .agg(sol_after=pl.col("curve_sol_after").last())
+    pseudo = cuts.lazy().join(last_before, on="mint", how="inner")
+    tcols = []
+    for h in horizons:
+        col = f"target_{int(h)}"
+        after = (
+            t.filter(pl.col("seconds_since_launch") < pl.col("entry_t") + h)
+            .group_by("mint")
+            .agg(pl.col("curve_sol_after").last().alias(f"sol_after_{int(h)}"))
+        )
+        pseudo = pseudo.join(after, on="mint", how="inner").with_columns(
+            (pl.col(f"sol_after_{int(h)}") / pl.col("sol_at")).log().clip(-1.0, 2.0).alias(col)
+        )
+        tcols.append(col)
+    pseudo = pseudo.filter((pl.col("n_visible") >= 5) & (pl.col("entry_price") > 0) & (pl.col("sol_at") > 0)).collect()
+    log.info(
+        "pretrain set: %d cuts over %d tapes; %s",
+        pseudo.height,
+        pseudo["src"].n_unique(),
+        ", ".join(f"{c}: mean {pseudo[c].mean():.3f} std {pseudo[c].std():.3f}" for c in tcols),
     )
-    pseudo = (
-        cuts.lazy()
-        .join(last_before, on="mint", how="inner")
-        .join(last_after, on="mint", how="inner")
-        .filter((pl.col("n_visible") >= 5) & (pl.col("entry_price") > 0) & (pl.col("sol_at") > 0))
-        .with_columns(target=(pl.col("sol_after") / pl.col("sol_at")).log().clip(-1.0, 2.0))
-        .collect()
-    )
-    log.info("pretrain set: %d tapes, target mean %.3f std %.3f", pseudo.height, pseudo["target"].mean(), pseudo["target"].std())
-    wt = sequence.window_trades(cfg, trades, pseudo)
+    wt = sequence.window_trades(cfg, t.drop("src", "k").select(trades.collect_schema().names()), pseudo)
     x, order = sequence.encode_trades(cfg, wt, pseudo, int(cfg.cnn["trade_steps"]))
-    y = pseudo.select("mint", "target").join(pl.DataFrame({"mint": order}), on="mint", how="right")["target"].to_numpy()
+    y = pl.DataFrame({"mint": order}).join(pseudo.select("mint", *tcols), on="mint", how="left").select(tcols).to_numpy()
     xs = torch.tensor(_prep_seq(x, enc))
     ys = torch.tensor(y.astype(np.float32))
-    ys = (ys - ys.mean()) / (ys.std() + 1e-6)
+    ys = (ys - ys.mean(dim=0)) / (ys.std(dim=0) + 1e-6)
     dev = _device()
     c = cfg.cnn
     torch.manual_seed(cfg.seed)
     model = ShapeNet(xs.shape[1], 0, c["channels"], c["blocks"], c["kernel"], c["dropout"]).to(dev)
+    model.head[-1] = nn.Linear(c["channels"], len(tcols)).to(dev)  # one output per horizon
     opt = torch.optim.AdamW(model.parameters(), lr=c["lr"], weight_decay=1e-4)
     n_val = max(500, int(0.05 * len(ys)))
     perm = torch.randperm(len(ys))
@@ -293,10 +311,17 @@ def pretrain(cfg: Config) -> dict:
                 break
     out = cfg.processed_dir / PRETRAIN_FILE.format(enc=enc)
     torch.save(best_state, out)
-    summary = {"n_tapes": int(len(ys)), "val_mse": best, "horizon_s": horizon, "path": str(out)}
+    summary = {
+        "n_cuts": int(len(ys)),
+        "n_tapes": int(pseudo["src"].n_unique()),
+        "val_mse": best,
+        "horizons_s": horizons,
+        "cuts_per_tape": cuts_per,
+        "path": str(out),
+    }
     write_json(cfg.reports_dir / "cnn_pretrain.json", summary)
-    log.info("pretrained trunk -> %s (val mse %.4f, unit-variance target)", out, best)
-    return {"n_tapes": int(len(ys)), "val_mse": best}
+    log.info("pretrained trunk -> %s (val mse %.4f, unit-variance targets)", out, best)
+    return summary
 
 
 def predict(model, seq_rows: np.ndarray, side: np.ndarray | None, dev: torch.device, encoding: str = "steps") -> np.ndarray:
