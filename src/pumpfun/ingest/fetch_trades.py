@@ -190,7 +190,8 @@ def run(  # noqa: PLR0913
     done_file = cfg.data_dir / "queue" / "done.parquet"
     if done_file.exists():
         done |= set(pl.read_parquet(done_file)["mint"].to_list())
-    todo = queue.filter(~pl.col("mint").is_in(list(done)))
+    # Newest launches first: the most decision-relevant data lands before the deep history.
+    todo = queue.filter(~pl.col("mint").is_in(list(done))).sort("launch_time_ms", descending=True)
     if probe_n:
         rnd = random.Random(cfg.seed)
         idx = sorted(rnd.sample(range(todo.height), min(probe_n, todo.height)))

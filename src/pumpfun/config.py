@@ -106,6 +106,7 @@ class Config:
     split_timezone: str
     fee_protocol_bps: int
     fee_creator_bps: int
+    fee_schedule: list[dict[str, Any]]
     pool_fee_bps: FeeBps
     router_fee_pct: float
     tx_fee_sol: float
@@ -156,6 +157,14 @@ class Config:
     @property
     def ledger_path(self) -> Path:
         return self.raw_dir / "fetch_ledger.sqlite"
+
+    def curve_fees_for(self, launch_day: str) -> tuple[int, int]:
+        """(protocol_bps, creator_bps) in force on a launch day, from fee_schedule; defaults to the current."""
+        proto, creator = self.fee_protocol_bps, self.fee_creator_bps
+        for row in sorted(self.fee_schedule, key=lambda r: str(r["from"])):
+            if launch_day >= str(row["from"]):
+                proto, creator = int(row["protocol_bps"]), int(row["creator_bps"])
+        return proto, creator
 
     @property
     def position_lamports(self) -> int:
@@ -258,6 +267,7 @@ def _build(d: dict[str, Any], preset: str | None) -> Config:
         split_timezone=str(d["split_timezone"]),
         fee_protocol_bps=int(d["fee_protocol_bps"]),
         fee_creator_bps=int(d["fee_creator_bps"]),
+        fee_schedule=list(d.get("fee_schedule", [])),
         pool_fee_bps=FeeBps(lp=int(pf["lp"]), protocol=int(pf["protocol"]), creator=int(pf["creator"])),
         router_fee_pct=float(d["router_fee_pct"]),
         tx_fee_sol=float(d["tx_fee_sol"]),

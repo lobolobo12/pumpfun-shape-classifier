@@ -34,6 +34,15 @@ split_timezone: "Europe/Ljubljana"
 # --- costs (verified on mainnet, see nn-side-project-handoff.md and axiom-holy-sol/docs/pre-graduation.md)
 fee_protocol_bps: 95         # curve: FeeConfig tier from zero mcap = protocol 95 + creator 30 = 125 bps/side
 fee_creator_bps: 30
+# Earlier eras (used by launch date; the current values above apply from the last entry onward).
+# 2024: 1.00 % protocol, no creator fee. Approximate for pre-2025 coins — documented in the write-up.
+fee_schedule:
+  - from: "2024-01-01"
+    protocol_bps: 100
+    creator_bps: 0
+  - from: "2025-05-01"
+    protocol_bps: 95
+    creator_bps: 30
 pool_fee_bps:                # PumpSwap GlobalConfig; canonical pools may have mcap tiers (validated vs fillPriceSol)
   lp: 20
   protocol: 5

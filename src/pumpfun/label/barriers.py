@@ -78,10 +78,11 @@ def _router_fee(lamports: int, pct: float) -> int:
     return round(lamports * pct)
 
 
-def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
+def label_tape(cfg: Config, mint: str, trades: list[TapeTrade], launch_day: str | None = None) -> LabelRow:
     p = curve_params(cfg)
     raw_per = p.raw_per_token
-    fees = cs.CurveFees(cfg.fee_protocol_bps, cfg.fee_creator_bps)
+    proto_bps, creator_bps = cfg.curve_fees_for(launch_day) if launch_day else (cfg.fee_protocol_bps, cfg.fee_creator_bps)
+    fees = cs.CurveFees(proto_bps, creator_bps)
     pfees = ps.PoolFees(cfg.pool_fee_bps.lp, cfg.pool_fee_bps.protocol, cfg.pool_fee_bps.creator)
 
     def replay_check(upto: int) -> tuple[cs.CurveReserves, float]:
@@ -183,6 +184,11 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade]) -> LabelRow:
                 graduated = True
             pool = ps.apply_tape_trade(pool, t.is_buy, lam, raw)
             net = net_pool(pool)
+        elif pool is None and curve.complete:
+            # Pre-PumpSwap era: liquidity went to a venue we do not simulate -> exit at graduation.
+            label, reason = (1 if exit_net >= cost * (1 + cfg.tp) else 0), "graduated_other_venue"
+            graduated = True
+            break
         else:
             continue
         ratio = net / cost
@@ -235,6 +241,7 @@ COVERAGE_START = {"bitquery": "2026-05-03"}  # source -> first fully-enumerated 
 
 def run(cfg: Config) -> pl.DataFrame:
     tokens = pl.read_parquet(cfg.tokens_path).select("mint", "launch_day", "creator", "mayhem", "source")
+    day_of = dict(tokens.select("mint", "launch_day").iter_rows())
     mayhem = set(tokens.filter(pl.col("mayhem").fill_null(False))["mint"].to_list())
     # Revived old coins: their corrected launch predates their source's coverage; their cohort was
     # never enumerated, so they are a biased sliver -> out of the labeled population, counted.
@@ -253,7 +260,7 @@ def run(cfg: Config) -> pl.DataFrame:
             drops["out_of_coverage"] += 1
             continue
         try:
-            rows.append(asdict(label_tape(cfg, str(mint), tape_from_frame(df))))
+            rows.append(asdict(label_tape(cfg, str(mint), tape_from_frame(df), day_of.get(str(mint)))))
         except Drop as d:
             drops[d.reason] += 1
     labels = pl.DataFrame(rows).join(tokens, on="mint", how="left")

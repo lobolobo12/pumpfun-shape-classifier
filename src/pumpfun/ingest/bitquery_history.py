@@ -159,12 +159,24 @@ def universe_extension(cfg: Config) -> pl.DataFrame:
                 r=pl.col("px_high") / pl.when(pl.col("px_low") > 0).then(pl.col("px_low")).otherwise(None)
             )
         )
+    from datetime import date
+
+    days = [date.fromisoformat(f.stem) for f in files]
+    # A day is warm-up when it is among the first WARMUP_DAYS of a contiguous block (gap > 1 day starts a block).
+    warm: set[int] = set()
+    block_start = 0
+    for i in range(len(days)):
+        if i > 0 and (days[i] - days[i - 1]).days > 1:
+            block_start = i
+        if i - block_start < WARMUP_DAYS:
+            warm.add(i)
     seen: set[str] = set()
-    for df in frames[:WARMUP_DAYS]:
-        seen.update(df["mint"].to_list())
     out = []
-    for i in range(WARMUP_DAYS, len(frames)):
+    for i in range(len(frames)):
         df = frames[i]
+        if i in warm:
+            seen.update(df["mint"].to_list())
+            continue
         new = df.filter(~pl.col("mint").is_in(sorted(seen)))
         seen.update(df["mint"].to_list())
         nxt = frames[i + 1] if i + 1 < len(frames) else None

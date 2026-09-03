@@ -106,3 +106,10 @@ def test_cross_mode_enters_at_the_level_crossing():
     assert row.label == 1 and row.exit_reason == "tp"
     with pytest.raises(Drop, match="never_crossed_level"):
         label_tape(cfg, "m", _tape([(10, 1.0), (20, 1.0), (400, 1.0)]))
+
+
+def test_fee_schedule_by_launch_day():
+    cfg = load_config()
+    assert cfg.curve_fees_for("2024-11-15") == (100, 0)
+    assert cfg.curve_fees_for("2026-08-30") == (95, 30)
+    assert cfg.curve_fees_for("2025-05-01") == (95, 30)
