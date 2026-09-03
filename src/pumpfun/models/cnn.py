@@ -86,6 +86,16 @@ def _load(cfg: Config, enc: str) -> tuple[pl.DataFrame, np.ndarray]:
     return feats, seq
 
 
+def _recent(cfg: Config, tr: pl.DataFrame) -> pl.DataFrame:
+    from datetime import date, timedelta
+
+    days = int(cfg.cnn.get("finetune_days", 0) or 0)
+    if days <= 0:
+        return tr.head(0)
+    cut = (date.fromisoformat(cfg.split_train_end) - timedelta(days=days)).isoformat()
+    return tr.filter(pl.col("launch_day") >= cut)
+
+
 def train_one(
     cfg: Config, seed: int, tr: pl.DataFrame, va: pl.DataFrame, seq: np.ndarray, side_stats, use_side: bool, dev: torch.device
 ):
@@ -133,6 +143,35 @@ def train_one(
                 break
         log.info("seed %d epoch %d val PR-AUC %.4f (best %.4f)", seed, epoch, ap, best)
     model.load_state_dict(best_state)
+    # Fine-tune on the most recent slice at a low learning rate; keep only if validation improves.
+    ft = _recent(cfg, tr)
+    if ft.height > 50 and ft.height < tr.height:
+        idx = pl.Series(range(tr.height)).filter(tr["launch_day"].is_in(ft["launch_day"].implode()))
+        xf = xs[idx.to_list()]
+        yf = ys[idx.to_list()]
+        sf = None if ss is None else ss[idx.to_list()]
+        opt = torch.optim.AdamW(model.parameters(), lr=c["lr"] / 5, weight_decay=1e-4)
+        pre_best = best
+        for _ in range(5):
+            model.train()
+            perm = torch.randperm(len(yf))
+            for i in range(0, len(yf), bs):
+                b = perm[i : i + bs]
+                opt.zero_grad()
+                out = model(xf[b].to(dev), None if sf is None else sf[b].to(dev))
+                loss_fn(out, yf[b].to(dev)).backward()
+                opt.step()
+            model.eval()
+            with torch.no_grad():
+                pv = torch.sigmoid(model(xv.to(dev), None if sv is None else sv.to(dev))).cpu().numpy()
+            from sklearn.metrics import average_precision_score
+
+            ap = average_precision_score(yv.numpy(), pv)
+            if ap > best:
+                best = ap
+                best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
+        model.load_state_dict(best_state)
+        log.info("seed %d fine-tune: val %.4f -> %.4f", seed, pre_best, best)
     return model, best, n_params
 
 

@@ -95,6 +95,10 @@ bench:
   image_px: [640, 360]
 
 # --- models ---------------------------------------------------------------
+train:
+  # How much a training example counts, by age relative to split_train_end:
+  # weight = 0.5 ** (age_days / recency_half_life_days). 0 disables (all equal).
+  recency_half_life_days: 7
 xgb:
   n_estimators: 600
   max_depth: 4
@@ -115,6 +119,9 @@ cnn:
   lr: 0.001
   patience: 6
   seeds: 5
+  # After the main fit over all training data, fine-tune on the most recent N days at lr/5.
+  # 0 disables. Only matters once historical data is in the training set.
+  finetune_days: 4
 metrics:
   top_fractions: [0.01, 0.05, 0.10]
   active_silence_max: 60   # "active at entry" slice: last window trade within this many seconds of the decision

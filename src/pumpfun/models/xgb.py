@@ -8,6 +8,7 @@ Early stopping on the validation split; the test split is touched once per varia
 from __future__ import annotations
 
 import logging
+from datetime import date
 
 import numpy as np
 import polars as pl
@@ -56,6 +57,16 @@ def _xy(df: pl.DataFrame, cols: list[str]) -> tuple[np.ndarray, np.ndarray]:
     return x, df["label"].to_numpy().astype(int)
 
 
+def recency_weights(cfg: Config, df: pl.DataFrame) -> np.ndarray | None:
+    """0.5 ** (age_days / half_life), age measured back from split_train_end. None when disabled."""
+    hl = float(cfg.train.get("recency_half_life_days", 0) or 0)
+    if hl <= 0:
+        return None
+    anchor = date.fromisoformat(cfg.split_train_end).toordinal()
+    days = np.array([anchor - date.fromisoformat(d).toordinal() for d in df["launch_day"]], dtype=float)
+    return (0.5 ** (np.clip(days, 0, None) / hl)).astype(np.float32)
+
+
 def fit_xgb(cfg: Config, train: pl.DataFrame, val: pl.DataFrame, cols: list[str]) -> xgb.XGBClassifier:
     xt, yt = _xy(train, cols)
     xv, yv = _xy(val, cols)
@@ -73,7 +84,8 @@ def fit_xgb(cfg: Config, train: pl.DataFrame, val: pl.DataFrame, cols: list[str]
         random_state=cfg.seed,
         n_jobs=4,
     )
-    model.fit(xt, yt, eval_set=[(xv, yv)], verbose=False)
+    w = recency_weights(cfg, train)
+    model.fit(xt, yt, sample_weight=w, eval_set=[(xv, yv)], verbose=False)
     return model
 
 

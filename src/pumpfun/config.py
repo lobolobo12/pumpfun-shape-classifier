@@ -117,6 +117,7 @@ class Config:
     universe: Universe
     prescreen: Prescreen
     bench: Bench
+    train: dict[str, Any]
     xgb: dict[str, Any]
     cnn: dict[str, Any]
     metrics: dict[str, Any]
@@ -303,6 +304,7 @@ def _build(d: dict[str, Any], preset: str | None) -> Config:
             n_per_class=int(be["n_per_class"]),
             image_px=(int(be["image_px"][0]), int(be["image_px"][1])),
         ),
+        train=dict(d["train"]),
         xgb=dict(d["xgb"]),
         cnn=dict(d["cnn"]),
         metrics=dict(d["metrics"]),
