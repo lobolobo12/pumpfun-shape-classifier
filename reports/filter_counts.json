@@ -1,15 +1,15 @@
 {
   "features": {
     "creator_straddle_dropped": 1149,
-    "features_out": 4365,
-    "labeled_in": 13947,
+    "features_out": 6465,
+    "labeled_in": 19834,
     "test_n": 410,
     "test_pos": 24,
     "test_serial_launcher_share": 0.15365853658536585,
-    "train_n": 3020,
-    "train_negatives_dropped": 8433,
-    "train_pos": 604,
-    "updated_at": 1788380440,
+    "train_n": 5120,
+    "train_negatives_dropped": 12220,
+    "train_pos": 1024,
+    "updated_at": 1788401782,
     "val_n": 935,
     "val_pos": 67
   },
@@ -23,7 +23,7 @@
     "dropped_non_standard_curve": 9242,
     "labeled": 19834,
     "tokens_with_tape": 72555,
-    "updated_at": 1788401514
+    "updated_at": 1788401759
   },
   "prescreen": {
     "fetch_queue": 293312,

@@ -250,7 +250,18 @@ def creator_history(cfg: Config, tokens: pl.DataFrame, labels: pl.DataFrame) -> 
     import bisect
 
     for mint, creator, launch in lab.select("mint", "creator", "launch_time").iter_rows():
-        c = creator if isinstance(creator, str) else creator[0]
+        c = creator if isinstance(creator, str) else (creator[0] if creator else None)
+        if c is None:
+            # Historical sources carry no creator: history is unknown, not zero.
+            out.append(
+                {
+                    "mint": mint,
+                    "creator_prior_launches": None,
+                    "creator_prior_resolved": None,
+                    "creator_prior_tp_rate": None,
+                }
+            )
+            continue
         launches = by_creator_launch.get(c) or by_creator_launch.get((c,)) or []
         prior = bisect.bisect_left(launches, launch)
         res = by_creator_res.get(c) or by_creator_res.get((c,)) or []
