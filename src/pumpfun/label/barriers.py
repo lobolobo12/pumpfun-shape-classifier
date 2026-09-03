@@ -230,16 +230,27 @@ def tape_from_frame(df: pl.DataFrame) -> list[TapeTrade]:
     ]
 
 
+COVERAGE_START = {"bitquery": "2026-05-03"}  # source -> first fully-enumerated launch day (after warmup)
+
+
 def run(cfg: Config) -> pl.DataFrame:
-    tokens = pl.read_parquet(cfg.tokens_path).select("mint", "launch_day", "creator", "mayhem")
+    tokens = pl.read_parquet(cfg.tokens_path).select("mint", "launch_day", "creator", "mayhem", "source")
     mayhem = set(tokens.filter(pl.col("mayhem").fill_null(False))["mint"].to_list())
-    tokens = tokens.drop("mayhem")
+    # Revived old coins: their corrected launch predates their source's coverage; their cohort was
+    # never enumerated, so they are a biased sliver -> out of the labeled population, counted.
+    out_of_cov = set(
+        tokens.filter((pl.col("source") == "bitquery") & (pl.col("launch_day") < COVERAGE_START["bitquery"]))["mint"].to_list()
+    )
+    tokens = tokens.drop("mayhem", "source")
     trades = read_trades(cfg).sort("mint", "slot", "slot_index").collect()
     rows: list[dict] = []
     drops: Counter[str] = Counter()
     for (mint,), df in trades.group_by("mint", maintain_order=True):
         if mint in mayhem:
             drops["mayhem_mode"] += 1
+            continue
+        if mint in out_of_cov:
+            drops["out_of_coverage"] += 1
             continue
         try:
             rows.append(asdict(label_tape(cfg, str(mint), tape_from_frame(df))))
