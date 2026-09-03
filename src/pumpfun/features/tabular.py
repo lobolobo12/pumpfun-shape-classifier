@@ -52,7 +52,17 @@ SHAPE = [
     "n_slots",
     "first_trade_t",
     "last_trade_t",
+    # v1.6: speed, composition and the decision moment itself
+    "decision_age_s",  # seconds from launch to the decision (cross mode: how fast the level was reached)
+    "curve_sol_in",  # real SOL in the curve at the decision, as a model input
+    "sol_per_s_window",  # net SOL inflow per second over the whole visible window
+    "inflow_accel",  # net inflow rate over the last 30 s divided by the window rate
+    "round_size_share",  # share of buys at a preset size (0.05/0.1/0.2/0.25/0.5/1/2 SOL): bots and buttons
+    "flip_latency_med",  # median seconds from a wallet's first buy to its first sell (window cap if none)
+    "flipper_share",  # share of buyers that sold anything inside the window
+    "dev_buy_sol",  # the creator's total buy size in SOL
 ]
+ROUND_SIZES = {50, 100, 200, 250, 500, 1000, 2000}  # in thousandths of a SOL
 HOLDERS = [
     "holders_n",
     "buyers_n",
@@ -80,6 +90,25 @@ CONTEXT = [
     "market_recent_n",
     "market_launch_rate",
     "market_candidate_rate",
+    # create metadata, non-semantic (null for historical tokens without a sweep record)
+    "has_twitter",
+    "has_telegram",
+    "has_website",
+    "twitter_is_status",
+    "description_len",
+    "name_dup_24h",
+    "image_dup_24h",
+    "dow_sin",
+    "dow_cos",
+]
+META_COLS = [
+    "has_twitter",
+    "has_telegram",
+    "has_website",
+    "twitter_is_status",
+    "description_len",
+    "name_dup_24h",
+    "image_dup_24h",
 ]
 SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]
 GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR, "context": CONTEXT, "wallets": WALLETS}
@@ -202,6 +231,32 @@ def shape_and_holders(
         "first_trade_t": rows[0][0],
         "last_trade_t": t_end,
     }
+    # --- speed, composition, decision moment
+    net_window = buy_sol - sell_sol
+    last30 = [r for r in rows if w - r[0] <= 30]
+    net_30 = sum(r[3] if r[2] else -r[3] for r in last30)
+    rate_w = net_window / w
+    first_buy_t: dict[str, float] = {}
+    first_sell_t: dict[str, float] = {}
+    for r in rows:
+        if r[2]:
+            first_buy_t.setdefault(r[5], r[0])
+        elif r[5] in first_buy_t:
+            first_sell_t.setdefault(r[5], r[0])
+    flips = [first_sell_t[tr] - first_buy_t[tr] for tr in first_sell_t]
+    shape.update(
+        {
+            "decision_age_s": float(w),
+            "curve_sol_in": float(curve_sol_at_entry),
+            "sol_per_s_window": rate_w,
+            # bounded: quiet windows explode the ratio
+            "inflow_accel": max(-20.0, min(20.0, (net_30 / 30.0) / max(rate_w, 0.005))),
+            "round_size_share": (sum(1 for r in buys if round(r[3] * 1000) in ROUND_SIZES) / len(buys)) if buys else 0.0,
+            "flip_latency_med": float(np.median(flips)) if flips else float(w),
+            "flipper_share": len(first_sell_t) / len(first_buy_t) if first_buy_t else 0.0,
+            "dev_buy_sol": sum(r[3] for r in buys if r[5] == creator),
+        }
+    )
     # --- holders (per-wallet net balances inside the window)
     bal: dict[str, float] = defaultdict(float)
     peak_bal: dict[str, float] = defaultdict(float)
@@ -297,20 +352,41 @@ def context_features(cfg: Config, tokens: pl.DataFrame) -> pl.DataFrame:
         if strata_path.exists() and "replies_at_entry" in pl.read_parquet_schema(strata_path)
         else pl.DataFrame(schema={"mint": pl.String, "replies_at_entry": pl.Int64, "live_at_entry": pl.Boolean})
     )
+    meta_path = cfg.raw_dir / "token_meta.parquet"
+    meta = (
+        pl.read_parquet(meta_path).select("mint", *META_COLS)
+        if meta_path.exists()
+        else pl.DataFrame(schema={"mint": pl.String, **{c: pl.Float64 for c in META_COLS}})
+    )
     two_pi = 2 * math.pi
+    local = pl.from_epoch("launch_time").dt.replace_time_zone("UTC").dt.convert_time_zone(cfg.split_timezone)
     return (
         tokens.select("mint", "launch_time", "meta_host")
         .with_columns(
             is_native_launch=pl.col("meta_host").is_in(sorted(NATIVE_HOSTS)).cast(pl.Float64),
-            hour=(pl.from_epoch("launch_time").dt.replace_time_zone("UTC").dt.convert_time_zone(cfg.split_timezone).dt.hour()),
+            hour=local.dt.hour(),
+            dow=local.dt.weekday(),
         )
         .with_columns(
             hour_sin=(pl.col("hour") * two_pi / 24).sin(),
             hour_cos=(pl.col("hour") * two_pi / 24).cos(),
+            dow_sin=(pl.col("dow") * two_pi / 7).sin(),
+            dow_cos=(pl.col("dow") * two_pi / 7).cos(),
         )
         .join(att, on="mint", how="left")
+        .join(meta, on="mint", how="left")
         .with_columns(live_at_entry=pl.col("live_at_entry").cast(pl.Float64))
-        .select("mint", "is_native_launch", "hour_sin", "hour_cos", "replies_at_entry", "live_at_entry")
+        .select(
+            "mint",
+            "is_native_launch",
+            "hour_sin",
+            "hour_cos",
+            "dow_sin",
+            "dow_cos",
+            "replies_at_entry",
+            "live_at_entry",
+            *META_COLS,
+        )
     )
 
 

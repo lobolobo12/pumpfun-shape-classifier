@@ -24,6 +24,7 @@ from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 
+import numpy as np
 import polars as pl
 
 from pumpfun.checks.schema import TOKENS_SCHEMA, conform
@@ -238,11 +239,57 @@ def coverage_check(cfg: Config, snapshot: Path, tokens: pl.DataFrame) -> dict:
     }
 
 
+TOKEN_META_NAME = "token_meta.parquet"
+
+
+def write_token_meta(cfg: Config, snapshot: Path) -> pl.DataFrame:
+    """Non-semantic create metadata per mint (spec §7 keeps the meme itself out): social links present,
+    description length, and how many launches in the prior 24 h reused the same name or image.
+    Everything here is fixed at creation, so it is known at any decision moment."""
+    con = sqlite3.connect(f"file:{snapshot}?mode=ro", uri=True)
+    try:
+        rows = con.execute(
+            "select mint, created_timestamp, name, image_uri, description_len, twitter, telegram, website,"
+            " twitter_is_status from attention_meta where created_timestamp is not null"
+        ).fetchall()
+    finally:
+        con.close()
+    df = pl.DataFrame(
+        {
+            "mint": [r[0] for r in rows],
+            "created_ms": [int(r[1]) for r in rows],
+            "name": [(r[2] or "").strip().lower() for r in rows],
+            "image_uri": [(r[3] or "").strip() for r in rows],
+            "description_len": [None if r[4] is None else float(r[4]) for r in rows],
+            "has_twitter": [1.0 if r[5] else 0.0 for r in rows],
+            "has_telegram": [1.0 if r[6] else 0.0 for r in rows],
+            "has_website": [1.0 if r[7] else 0.0 for r in rows],
+            "twitter_is_status": [None if r[8] is None else float(bool(r[8])) for r in rows],
+        }
+    ).sort("created_ms")
+
+    def dup_count(key: str) -> pl.Series:
+        out = np.zeros(df.height, dtype=np.float64)
+        for (_k,), g in df.with_row_index("i").filter(pl.col(key) != "").select("i", key, "created_ms").group_by(key):
+            ts = g["created_ms"].to_numpy()
+            idx = g["i"].to_numpy()
+            starts = np.searchsorted(ts, ts - 86_400_000, side="left")
+            out[idx] = np.arange(len(ts)) - starts
+        return pl.Series(out)
+
+    df = df.with_columns(name_dup_24h=dup_count("name"), image_dup_24h=dup_count("image_uri")).drop(
+        "name", "image_uri", "created_ms"
+    )
+    df.write_parquet(cfg.raw_dir / TOKEN_META_NAME)
+    return df
+
+
 def run(cfg: Config, strict: bool = True) -> pl.DataFrame:
     snap = snapshot_attention_db(cfg.sources.attention_db, cfg.raw_dir / SNAPSHOT_NAME)
     tokens, counts = build_tokens(cfg, snap)
     cfg.tokens_path.parent.mkdir(parents=True, exist_ok=True)
     tokens.write_parquet(cfg.tokens_path)
+    write_token_meta(cfg, snap)
     # Historical (Bitquery) tokens live outside the collector's range; re-append them on every rebuild.
     if any((cfg.raw_dir / "bitquery").glob("*.parquet")):
         from pumpfun.ingest.bitquery_history import merge_into_tokens
