@@ -77,7 +77,8 @@ def run(cfg: Config) -> dict:
     lab_sw = labels.with_columns(pl.col("mint").replace_strict(remap)).select(
         "mint", "entry_t", "entry_price", "n_visible", "curve_sol_at_entry", "in_zone", "launch_day", "label"
     )
-    lab_sw = lab_sw.join(labels.select("mint", "label").rename({"label": "true_label"}), on="mint")
+    # the outcome (label, exit_t) stays with the coin, since market heat is built from resolved outcomes
+    lab_sw = lab_sw.join(labels.select("mint", "label", "exit_t").rename({"label": "true_label"}), on="mint")
     perm_feats = tabular.build(cfg, swapped, lab_sw.drop("label").rename({"true_label": "label"}), tokens)
     y = perm_feats["label"].to_numpy()
     corrs = {c: _corr(perm_feats[c].to_numpy(), y) for c in window_cols}
