@@ -236,7 +236,15 @@ def tape_from_frame(df: pl.DataFrame) -> list[TapeTrade]:
     ]
 
 
-COVERAGE_START = {"bitquery": "2026-05-03"}  # source -> first fully-enumerated launch day (after warmup)
+# Fully-enumerated launch-day ranges per historical source (after each block's warm-up).
+COVERAGE = {"bitquery": [("2024-09-03", "2025-01-31"), ("2026-05-03", "2099-12-31")]}
+
+
+def _in_coverage(source: str, day: str) -> bool:
+    ranges = COVERAGE.get(source)
+    if ranges is None:
+        return True
+    return any(lo <= day <= hi for lo, hi in ranges)
 
 
 def run(cfg: Config) -> pl.DataFrame:
@@ -245,9 +253,7 @@ def run(cfg: Config) -> pl.DataFrame:
     mayhem = set(tokens.filter(pl.col("mayhem").fill_null(False))["mint"].to_list())
     # Revived old coins: their corrected launch predates their source's coverage; their cohort was
     # never enumerated, so they are a biased sliver -> out of the labeled population, counted.
-    out_of_cov = set(
-        tokens.filter((pl.col("source") == "bitquery") & (pl.col("launch_day") < COVERAGE_START["bitquery"]))["mint"].to_list()
-    )
+    out_of_cov = {m for m, src, day in tokens.select("mint", "source", "launch_day").iter_rows() if not _in_coverage(src, day)}
     tokens = tokens.drop("mayhem", "source")
     trades = read_trades(cfg).sort("mint", "slot", "slot_index").collect()
     rows: list[dict] = []
