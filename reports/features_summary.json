@@ -9,7 +9,16 @@
       "market_recent_tp_rate",
       "market_recent_n",
       "market_launch_rate",
-      "market_candidate_rate"
+      "market_candidate_rate",
+      "has_twitter",
+      "has_telegram",
+      "has_website",
+      "twitter_is_status",
+      "description_len",
+      "name_dup_24h",
+      "image_dup_24h",
+      "dow_sin",
+      "dow_cos"
     ],
     "creator": [
       "creator_prior_launches",
@@ -62,7 +71,15 @@
       "sell_share_sol",
       "n_slots",
       "first_trade_t",
-      "last_trade_t"
+      "last_trade_t",
+      "decision_age_s",
+      "curve_sol_in",
+      "sol_per_s_window",
+      "inflow_accel",
+      "round_size_share",
+      "flip_latency_med",
+      "flipper_share",
+      "dev_buy_sol"
     ],
     "wallets": [
       "w_repeat_share",

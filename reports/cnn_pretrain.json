@@ -1,6 +1,11 @@
 {
-  "horizon_s": 60.0,
-  "n_tapes": 43864,
+  "cuts_per_tape": 3,
+  "horizons_s": [
+    60.0,
+    600.0
+  ],
+  "n_cuts": 241311,
+  "n_tapes": 83909,
   "path": "/Users/lovrobor/memecoin-net/data/processed/cnn_pretrained_trades.pt",
-  "val_mse": 0.9422182440757751
+  "val_mse": 0.8315625786781311
 }
