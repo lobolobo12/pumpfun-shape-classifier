@@ -26,17 +26,17 @@
     "updated_at": 1788422843
   },
   "prescreen": {
-    "fetch_queue": 293312,
+    "fetch_queue": 305799,
     "needed_sol_for_tp": 12.426,
-    "prescreen_mayhem_dropped": 28459,
-    "prescreen_no_inflow_dropped": 20182,
+    "prescreen_mayhem_dropped": 33752,
+    "prescreen_no_inflow_dropped": 22000,
     "queued": {
-      "candidate": 10518,
-      "hist_candidate": 108930,
-      "hist_rest": 145833,
-      "unknown": 3492,
-      "unlikely_active": 12267,
-      "unlikely_quiet": 12272
+      "candidate": 12091,
+      "hist_candidate": 112640,
+      "hist_rest": 149664,
+      "unknown": 3495,
+      "unlikely_active": 14139,
+      "unlikely_quiet": 13770
     },
     "sample_rates": {
       "candidate": 1.0,
@@ -47,29 +47,29 @@
       "unlikely_quiet": 0.2
     },
     "strata": {
-      "candidate": 10518,
-      "hist_candidate": 311279,
-      "hist_rest": 700732,
-      "mayhem": 28459,
-      "no_inflow": 20182,
-      "unknown": 17782,
-      "unlikely_active": 12267,
-      "unlikely_quiet": 61827
+      "candidate": 12091,
+      "hist_candidate": 322062,
+      "hist_rest": 704326,
+      "mayhem": 33752,
+      "no_inflow": 22000,
+      "unknown": 17812,
+      "unlikely_active": 14139,
+      "unlikely_quiet": 69312
     },
-    "universe_tokens": 1163046,
-    "updated_at": 1788380676
+    "universe_tokens": 1195494,
+    "updated_at": 1788431498
   },
   "universe": {
-    "attention_meta_total": 172060,
-    "in_date_range": 140961,
-    "pumpportal_frames_in_range": 137773,
-    "universe_added_from_frames": 24081,
-    "universe_bitquery_appended": 1012011,
-    "universe_mayhem_flagged": 28459,
-    "universe_mayhem_unknown": 13262,
+    "attention_meta_total": 195855,
+    "in_date_range": 159967,
+    "pumpportal_frames_in_range": 154220,
+    "universe_added_from_frames": 24313,
+    "universe_bitquery_appended": 1026388,
+    "universe_mayhem_flagged": 33752,
+    "universe_mayhem_unknown": 14886,
     "universe_no_creator": 0,
-    "universe_seen_late_dropped": 14007,
-    "universe_tokens": 151035,
-    "updated_at": 1788380574
+    "universe_seen_late_dropped": 15174,
+    "universe_tokens": 169106,
+    "updated_at": 1788431490
   }
 }
