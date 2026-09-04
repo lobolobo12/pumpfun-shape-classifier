@@ -7,8 +7,10 @@ Early stopping on the validation split; the test split is touched once per varia
 
 from __future__ import annotations
 
+import json
 import logging
 from datetime import date
+from pathlib import Path
 
 import numpy as np
 import polars as pl
@@ -17,7 +19,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 from pumpfun.config import Config
-from pumpfun.features.tabular import CONTEXT, CREATOR, HOLDERS, SHAPE
+from pumpfun.features.tabular import BOTLIVE, CONTEXT, CREATOR, HOLDERS, SHAPE
 from pumpfun.features.wallets import WALLETS
 from pumpfun.models import metrics
 from pumpfun.reports import append_history, write_json
@@ -33,6 +35,7 @@ VARIANTS = {
     "xgb_wallets": WALLETS,
     "xgb_holders+wallets": HOLDERS + WALLETS,
     "xgb_all+wallets": SHAPE + HOLDERS + CREATOR + CONTEXT + WALLETS,
+    "xgb_botlive": BOTLIVE,
 }
 # analyse.ts MODEL_FEATURES, translated to our names (sameSlotShare and ageS have no counterpart here).
 LOGISTIC_FEATURES = [
@@ -93,6 +96,28 @@ def fit_xgb(cfg: Config, train: pl.DataFrame, val: pl.DataFrame, cols: list[str]
     return model
 
 
+def model_dir(cfg: Config) -> Path:
+    return cfg.processed_dir / "models" / cfg.decision_mode
+
+
+def save_model(cfg: Config, name: str, model: xgb.XGBClassifier, cols: list[str], test_scores: np.ndarray) -> None:
+    """Booster + feature list + the held-out score distribution (for live percentiles), per decision mode."""
+    d = model_dir(cfg)
+    d.mkdir(parents=True, exist_ok=True)
+    model.get_booster().save_model(str(d / f"{name}.ubj"))
+    (d / f"{name}.json").write_text(
+        json.dumps(
+            {
+                "model": name,
+                "mode": cfg.decision_mode,
+                "features": cols,
+                "splits": {"train_end": cfg.split_train_end, "val_end": cfg.split_val_end},
+                "test_scores": [float(s) for s in np.sort(test_scores)],
+            }
+        )
+    )
+
+
 def fit_logistic(train: pl.DataFrame, cols: list[str]) -> tuple[StandardScaler, LogisticRegression]:
     xt, yt = _xy(train, cols)
     xt = np.log1p(np.clip(xt, 0, None))
@@ -129,6 +154,7 @@ def run(cfg: Config) -> dict:
         p = model.predict_proba(_xy(test, cols)[0])[:, 1]
         results[name] = metrics.evaluate(cfg, test, p)
         metrics.save_predictions(cfg, name, test, p)
+        save_model(cfg, name, model, cols, p)
         results[name]["best_iteration"] = int(model.best_iteration)
         results[name]["val_pr_auc"] = metrics.evaluate(cfg, val, model.predict_proba(_xy(val, cols)[0])[:, 1])["pr_auc"]
         gain = model.get_booster().get_score(importance_type="gain")

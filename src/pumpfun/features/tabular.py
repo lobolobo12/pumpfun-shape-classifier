@@ -110,6 +110,26 @@ META_COLS = [
     "name_dup_24h",
     "image_dup_24h",
 ]
+# What the paper bot can compute live at a crossing without a per-trade tape: reserve-series shape,
+# speed, the decision moment, and its own holder pull. Served as model "xgb_botlive" (v0 book).
+BOTLIVE = [
+    "price_slope",
+    "max_drawdown",
+    "lows",
+    "lows_per_min",
+    "run_from_low",
+    "from_peak",
+    "log_ret_window",
+    "sol_per_s_window",
+    "inflow_accel",
+    "sol_last60",
+    "trades_last60",
+    "decision_age_s",
+    "curve_sol_in",
+    "top10_share",
+    "dev_share",
+    "holders_n",
+]
 SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]
 GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR, "context": CONTEXT, "wallets": WALLETS}
 NATIVE_HOSTS = {"ipfs.io", "pump.mypinata.cloud"}

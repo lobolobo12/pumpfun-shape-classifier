@@ -63,6 +63,10 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("cnn-pretrain", help="self-supervised trunk pretraining on every tape (labels untouched)")
     sub.add_parser("ensemble", help="rank-average the saved test scores of ensemble.members")
     sub.add_parser("ledger", help="average every model over its held-out days from reports/model_history.jsonl")
+    sv = sub.add_parser("serve", help="local scoring endpoint for the paper bot (POST /score)")
+    sv.add_argument("--host", default="127.0.0.1")
+    sv.add_argument("--port", type=int, default=8791)
+    sv.add_argument("--model", default="xgb_shape+holders")
     return p
 
 
@@ -183,6 +187,10 @@ def main(argv: list[str] | None = None) -> int:
         from pumpfun.models import ledger
 
         ledger.run(cfg)
+    elif args.cmd == "serve":
+        from pumpfun.serve import serve
+
+        serve(cfg, args.host, args.port, args.model)
     return 0
 
 

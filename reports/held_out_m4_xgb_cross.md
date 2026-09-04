@@ -10,6 +10,7 @@
 | xgb_wallets | 460 | 0.204 | 0.553 | 0.00 | 0.26 | 0.22 | -0.82 | -2.55 |
 | xgb_holders+wallets | 460 | 0.260 | 0.614 | 0.40 | 0.26 | 0.30 | 1.99 | -0.13 |
 | xgb_all+wallets | 460 | 0.342 | 0.632 | 0.80 | 0.52 | 0.46 | 7.03 | 4.86 |
+| xgb_botlive | 460 | 0.261 | 0.577 | 0.60 | 0.26 | 0.30 | 2.00 | -0.17 |
 | logistic_repo_recipe | 460 | 0.233 | 0.548 | 0.60 | 0.22 | 0.22 | -2.09 | -3.78 |
 | human (M0) | — | not yet recorded: run `pf bench label` | | | | | | |
 
@@ -147,3 +148,21 @@
 - iti_std: 4.456
 - exited_share: 4.431
 - dev_buy_sol: 4.43
+
+## xgb_botlive: top gain features
+
+- dev_share: 10.943
+- holders_n: 6.502
+- sol_last60: 5.935
+- max_drawdown: 4.805
+- run_from_low: 4.759
+- log_ret_window: 4.661
+- price_slope: 4.573
+- lows_per_min: 4.563
+- decision_age_s: 4.554
+- curve_sol_in: 4.283
+- top10_share: 4.226
+- trades_last60: 4.051
+- inflow_accel: 3.997
+- sol_per_s_window: 3.991
+- lows: 3.74
