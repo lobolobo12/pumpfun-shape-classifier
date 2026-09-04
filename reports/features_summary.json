@@ -100,7 +100,7 @@
     "curve_fill"
   ],
   "sequence_shape": [
-    20640,
+    6605,
     300,
     6
   ],
@@ -110,15 +110,15 @@
     "active_at_entry"
   ],
   "splits": {
-    "creator_straddle_dropped": 3174,
-    "test_n": 2772,
-    "test_pos": 115,
-    "test_serial_launcher_share": 0.27056277056277056,
-    "train_n": 17060,
-    "train_negatives_dropped": 21996,
-    "train_pos": 3412,
-    "val_n": 808,
-    "val_pos": 49
+    "creator_straddle_dropped": 453,
+    "test_n": 612,
+    "test_pos": 110,
+    "test_serial_launcher_share": 0.36764705882352944,
+    "train_n": 5803,
+    "train_negatives_dropped": 0,
+    "train_pos": 2299,
+    "val_n": 190,
+    "val_pos": 39
   },
   "trade_channels": [
     "log_price",
@@ -129,7 +129,7 @@
     "curve_fill"
   ],
   "trade_shape": [
-    20640,
+    6605,
     256,
     6
   ]
