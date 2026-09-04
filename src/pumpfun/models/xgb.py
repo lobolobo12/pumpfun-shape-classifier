@@ -38,6 +38,13 @@ VARIANTS = {
     "xgb_botlive": BOTLIVE,
     "xgb_botlive+context": BOTLIVE + CONTEXT,
 }
+# Trained for money rather than for the label: regress the realized log exit multiple (fees included),
+# then rank by the prediction. Same features as the strongest tabular models.
+PNL_VARIANTS = {
+    "xgb_pnl:all+wallets": SHAPE + HOLDERS + CREATOR + CONTEXT + WALLETS,
+    "xgb_pnl:botlive+context": BOTLIVE + CONTEXT,
+}
+PNL_CLIP = (-1.5, 1.5)
 # analyse.ts MODEL_FEATURES, translated to our names (sameSlotShare and ageS have no counterpart here).
 LOGISTIC_FEATURES = [
     "top10_share",
@@ -97,6 +104,31 @@ def fit_xgb(cfg: Config, train: pl.DataFrame, val: pl.DataFrame, cols: list[str]
     return model
 
 
+def _pnl_target(df: pl.DataFrame) -> np.ndarray:
+    m = (df["exit_net_sol"] / df["entry_cost_sol"]).to_numpy().astype(np.float64)
+    return np.clip(np.log(np.clip(m, 1e-3, None)), *PNL_CLIP).astype(np.float32)
+
+
+def fit_xgb_reg(cfg: Config, train: pl.DataFrame, val: pl.DataFrame, cols: list[str]) -> xgb.XGBRegressor:
+    xt, _ = _xy(train, cols)
+    xv, _ = _xy(val, cols)
+    p = cfg.xgb
+    model = xgb.XGBRegressor(
+        n_estimators=p["n_estimators"],
+        max_depth=p["max_depth"],
+        learning_rate=p["learning_rate"],
+        subsample=p["subsample"],
+        colsample_bytree=p["colsample_bytree"],
+        objective="reg:squarederror",
+        eval_metric="rmse",
+        early_stopping_rounds=p["early_stopping_rounds"],
+        random_state=cfg.seed,
+        n_jobs=4,
+    )
+    model.fit(xt, _pnl_target(train), sample_weight=recency_weights(cfg, train), eval_set=[(xv, _pnl_target(val))], verbose=False)
+    return model
+
+
 def model_dir(cfg: Config) -> Path:
     return cfg.processed_dir / "models" / cfg.decision_mode
 
@@ -107,7 +139,7 @@ def replace_seed(cfg: Config, seed: int) -> Config:
     return dataclasses.replace(cfg, seed=seed)
 
 
-def save_model(cfg: Config, name: str, bag: list[xgb.XGBClassifier], cols: list[str], test_scores: np.ndarray) -> None:
+def save_model(cfg: Config, name: str, bag: list, cols: list[str], test_scores: np.ndarray) -> None:
     """Boosters (one file per seed) + feature list + the held-out score distribution (for live percentiles)."""
     d = model_dir(cfg)
     d.mkdir(parents=True, exist_ok=True)
@@ -160,21 +192,26 @@ def run(cfg: Config) -> dict:
 
     results: dict[str, dict] = {}
     importances: dict[str, dict[str, float]] = {}
-    for name, cols in VARIANTS.items():
-        model = fit_xgb(cfg, train, val, cols)
-        p = model.predict_proba(_xy(test, cols)[0])[:, 1]
-        bag: list[xgb.XGBClassifier] = [model]
-        if name.startswith("xgb_botlive"):
-            # served models: a bag of seeds, since early stopping on one small validation day is noisy
-            for k in range(1, int(cfg.xgb.get("serve_bag_seeds", 5))):
-                c2 = replace_seed(cfg, cfg.seed + k)
-                bag.append(fit_xgb(c2, train, val, cols))
-            p = np.mean([m.predict_proba(_xy(test, cols)[0])[:, 1] for m in bag], axis=0)
+    n_bag = int(cfg.xgb.get("bag_seeds", 1) or 1)
+    for name, cols in {**VARIANTS, **PNL_VARIANTS}.items():
+        is_pnl = name in PNL_VARIANTS
+        fit = fit_xgb_reg if is_pnl else fit_xgb
+        # bag of seeds: early stopping on one small validation day is noisy; served models always >= 5
+        k_bag = max(n_bag, 5) if name.startswith("xgb_botlive") else n_bag
+        bag = [fit(replace_seed(cfg, cfg.seed + k), train, val, cols) for k in range(k_bag)]
+        model = bag[0]
+
+        def score(df: pl.DataFrame, cols=cols, is_pnl=is_pnl, bag=bag) -> np.ndarray:
+            x = _xy(df, cols)[0]
+            return np.mean([m.predict(x) if is_pnl else m.predict_proba(x)[:, 1] for m in bag], axis=0)
+
+        p = score(test)
         results[name] = metrics.evaluate(cfg, test, p)
         metrics.save_predictions(cfg, name, test, p)
         save_model(cfg, name, bag, cols, p)
         results[name]["best_iteration"] = int(model.best_iteration)
-        results[name]["val_pr_auc"] = metrics.evaluate(cfg, val, model.predict_proba(_xy(val, cols)[0])[:, 1])["pr_auc"]
+        results[name]["bag"] = k_bag
+        results[name]["val_pr_auc"] = metrics.evaluate(cfg, val, score(val))["pr_auc"]
         gain = model.get_booster().get_score(importance_type="gain")
         importances[name] = {cols[int(k[1:])]: round(v, 3) for k, v in sorted(gain.items(), key=lambda kv: -kv[1])[:15]}
         log.info("%s: test PR-AUC %.3f (base %.3f)", name, results[name]["pr_auc"], results[name]["base_rate"])

@@ -116,6 +116,7 @@ xgb:
   subsample: 0.8
   colsample_bytree: 0.8
   early_stopping_rounds: 50
+  bag_seeds: 1             # seeds averaged per variant (served xgb_botlive* always >= 5)
 cnn:
   side: true               # feed the standardised tabular features next to the sequence; false = sequence only
   encoding: "steps"        # "steps" (spec: fixed 1 s bins) or "trades" (one step per trade, right-aligned)
