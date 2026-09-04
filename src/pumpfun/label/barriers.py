@@ -26,6 +26,7 @@ from pumpfun.config import Config
 from pumpfun.ingest.to_parquet import CURVE_PROGRAM, POOL_PROGRAMS, curve_params, read_trades
 from pumpfun.label import curve_sim as cs
 from pumpfun.label import pool_sim as ps
+from pumpfun.label.first_sight import entry_level
 from pumpfun.reports import update_counts, write_json
 
 log = logging.getLogger(__name__)
@@ -78,7 +79,9 @@ def _router_fee(lamports: int, pct: float) -> int:
     return round(lamports * pct)
 
 
-def label_tape(cfg: Config, mint: str, trades: list[TapeTrade], launch_day: str | None = None) -> LabelRow:
+def label_tape(
+    cfg: Config, mint: str, trades: list[TapeTrade], launch_day: str | None = None, level_sol: float | None = None
+) -> LabelRow:
     p = curve_params(cfg)
     raw_per = p.raw_per_token
     proto_bps, creator_bps = cfg.curve_fees_for(launch_day) if launch_day else (cfg.fee_protocol_bps, cfg.fee_creator_bps)
@@ -109,7 +112,7 @@ def label_tape(cfg: Config, mint: str, trades: list[TapeTrade], launch_day: str 
             raise Drop("lt_min_trades")
         curve, residual = replay_check(entry_idx)
     elif cfg.decision_mode == "cross":
-        level = cs.sol_to_lamports(cfg.cross_level_sol)
+        level = cs.sol_to_lamports(level_sol if level_sol is not None else cfg.cross_level_sol)
         c = cs.initial_reserves(p)
         cross_i: int | None = None
         for i, t in enumerate(trades):
@@ -266,7 +269,9 @@ def run(cfg: Config) -> pl.DataFrame:
             drops["out_of_coverage"] += 1
             continue
         try:
-            rows.append(asdict(label_tape(cfg, str(mint), tape_from_frame(df), day_of.get(str(mint)))))
+            rows.append(
+                asdict(label_tape(cfg, str(mint), tape_from_frame(df), day_of.get(str(mint)), entry_level(cfg, str(mint))))
+            )
         except Drop as d:
             drops[d.reason] += 1
     labels = pl.DataFrame(rows).join(tokens, on="mint", how="left")

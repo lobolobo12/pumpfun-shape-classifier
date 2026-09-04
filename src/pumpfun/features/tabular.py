@@ -20,6 +20,7 @@ from pumpfun.config import Config
 from pumpfun.features.wallets import WALLETS, wallet_features
 from pumpfun.ingest.to_parquet import curve_params
 from pumpfun.label import curve_sim as cs
+from pumpfun.label.first_sight import first_seen_level
 
 SHAPE = [
     "n_trades",
@@ -136,29 +137,6 @@ BOTLIVE_NAMES = [
     "first_seen_sol",  # real SOL in the curve when the bot first sighted it (its own key)
 ]
 BOTLIVE = [f"bl_{n}" for n in BOTLIVE_NAMES]
-
-
-def first_seen_level(cfg: Config, mint: str) -> float:
-    """Deterministic per-coin sample of the bot's first-sight level. `botlive.first_seen_sol` is either
-    [lo, hi] (uniform) or a mixture [[lo, hi, weight], ...] (e.g. scanner-seen 3-8 SOL vs band-first
-    8.6-10 SOL), until the empirical distribution from the bot's nn_scores replaces it."""
-    import zlib
-
-    spec = (cfg.raw.get("botlive") or {}).get("first_seen_sol", [3.0, 6.0])
-    h = zlib.crc32(mint.encode())
-    u = (h % 10_000) / 10_000.0
-    if spec and isinstance(spec[0], (list, tuple)):
-        w = (h // 10_000 % 10_000) / 10_000.0
-        acc = 0.0
-        total = sum(float(c[2]) for c in spec)
-        for lo, hi, wt in spec:
-            acc += float(wt) / total
-            if w <= acc:
-                return float(lo) + (float(hi) - float(lo)) * u
-        lo, hi, _ = spec[-1]
-        return float(lo) + (float(hi) - float(lo)) * u
-    lo, hi = spec
-    return float(lo) + (float(hi) - float(lo)) * u
 
 
 def botlive_series(rows: list[tuple], curve_sol: list[float], level: float, p0: float) -> list[tuple[float, float, float]]:

@@ -144,7 +144,11 @@ cnn:
 botlive:
   # bot first-sight level sampled per coin for the truncated training view: scanner-seen coins (3-8 SOL)
   # and band-first coins (first sample at or after the 8.6 SOL crossing, cap 10), half each
-  first_seen_sol: [[3.0, 8.0, 0.5], [8.6, 10.0, 0.5]]
+  # empirical from the bot's nn_scores (252 crossings, 4-5 Sep): [lo, hi, count]
+  first_seen_sol: [[3.0, 5.0, 5], [5.0, 6.0, 4], [6.0, 8.0, 2], [8.0, 8.6, 3], [8.6, 10.0, 95], [10.0, 12.0, 27], [12.0, 20.0, 64], [20.0, 40.0, 52]]
+  # when true, a coin first seen above the crossing is labeled from its first-sight level (the bot's
+  # actual decision moment) instead of from the 8.6 SOL crossing
+  entry_at_first_sight: false
 ensemble:
   # rank-average of these models' saved test scores (trained in the same run: same split and mode)
   members: ["xgb_botlive+context", "cnn_trades+side+pre", "xgb_all+wallets"]
