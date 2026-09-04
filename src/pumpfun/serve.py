@@ -53,7 +53,7 @@ class Scorer:
         self.min_age = float(cfg.raw.get("cross_min_age_seconds", 0) or 0)
         self.silence = float(cfg.metrics["active_silence_max"])
         log.info("loaded %s (%d features, trained to %s)", name, len(self.features), self.splits["train_end"])
-        self.n_bag = 0
+        self.stats = {"requests": 0, "scored": 0, "skipped": 0, "errors": 0, "fired_pct95": 0, "last_request_at": None}
 
     def score(self, req: dict) -> dict:
         t0 = time.perf_counter()
@@ -157,6 +157,7 @@ def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
                         "n_features": len(scorer.features),
                         "features": scorer.request_names,
                         "truncated_training": scorer.truncated,
+                        "stats": scorer.stats,
                         "bag": len(scorer.boosters),
                     },
                 )
@@ -168,10 +169,18 @@ def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
                 self._send(404, {"error": "unknown path"})
                 return
             n = int(self.headers.get("content-length") or 0)
+            st = scorer.stats
+            st["requests"] += 1
+            st["last_request_at"] = int(time.time())
             try:
                 req = json.loads(self.rfile.read(n) or b"{}")
-                self._send(200, scorer.score(req))
+                out = scorer.score(req)
+                st["scored" if "score" in out else "skipped"] += 1
+                if out.get("pct", 0) >= 95:
+                    st["fired_pct95"] += 1
+                self._send(200, out)
             except Exception as e:  # noqa: BLE001 — report, keep serving
+                st["errors"] += 1
                 log.exception("score failed")
                 self._send(400, {"error": f"{e.__class__.__name__}: {e}"})
 
