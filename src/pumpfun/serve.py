@@ -59,7 +59,15 @@ class Scorer:
         t0 = time.perf_counter()
         if isinstance(req.get("features"), dict):
             # bot-live path: the caller computed the features itself (model xgb_botlive)
-            return self._score_features(req["features"], t0, {"source": "features"})
+            f = req["features"]
+            # the launch bundle crosses the level inside the first seconds; training never sees those coins
+            cross_age = f.get("cross_age_s")
+            if cross_age is not None and float(cross_age) < self.min_age:
+                return {"skip": "crossed_too_young", "cross_age_s": float(cross_age)}
+            share = f.get("top10_share")
+            if share is not None and float(share) > 1.0:
+                return {"skip": "top10_share_out_of_range", "top10_share": float(share)}
+            return self._score_features(f, t0, {"source": "features"})
         mint = str(req["mint"])
         creator = str(req.get("creator") or "")
         launch_ms = int(req["launch_time_ms"])
