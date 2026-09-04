@@ -1,43 +1,43 @@
 {
   "features": {
-    "creator_straddle_dropped": 1690,
-    "features_out": 13378,
-    "labeled_in": 32340,
-    "test_n": 1168,
-    "test_pos": 73,
-    "test_serial_launcher_share": 0.2405821917808219,
-    "train_n": 11275,
-    "train_negatives_dropped": 17272,
-    "train_pos": 2255,
-    "updated_at": 1788473716,
-    "val_n": 935,
-    "val_pos": 67
+    "creator_straddle_dropped": 968,
+    "features_out": 14971,
+    "labeled_in": 35970,
+    "test_n": 491,
+    "test_pos": 27,
+    "test_serial_launcher_share": 0.2505091649694501,
+    "train_n": 13870,
+    "train_negatives_dropped": 20031,
+    "train_pos": 2774,
+    "updated_at": 1788496472,
+    "val_n": 610,
+    "val_pos": 40
   },
   "label": {
     "dropped_entry_completes_curve": 2,
-    "dropped_entry_zero_tokens": 30,
-    "dropped_graduated_before_entry": 2519,
-    "dropped_lifetime_lt_window": 58349,
-    "dropped_lt_min_trades": 15566,
+    "dropped_entry_zero_tokens": 34,
+    "dropped_graduated_before_entry": 3329,
+    "dropped_lifetime_lt_window": 65382,
+    "dropped_lt_min_trades": 17503,
     "dropped_mayhem_mode": 3267,
-    "dropped_non_standard_curve": 21677,
-    "dropped_out_of_coverage": 6194,
-    "labeled": 32340,
-    "tokens_with_tape": 139944,
-    "updated_at": 1788473667
+    "dropped_non_standard_curve": 25212,
+    "dropped_out_of_coverage": 6931,
+    "labeled": 35970,
+    "tokens_with_tape": 157630,
+    "updated_at": 1788496414
   },
   "prescreen": {
-    "fetch_queue": 305799,
+    "fetch_queue": 310724,
     "needed_sol_for_tp": 12.426,
-    "prescreen_mayhem_dropped": 33752,
-    "prescreen_no_inflow_dropped": 22000,
+    "prescreen_mayhem_dropped": 38588,
+    "prescreen_no_inflow_dropped": 23778,
     "queued": {
-      "candidate": 12091,
+      "candidate": 13500,
       "hist_candidate": 112640,
       "hist_rest": 149664,
-      "unknown": 3495,
-      "unlikely_active": 14139,
-      "unlikely_quiet": 13770
+      "unknown": 3510,
+      "unlikely_active": 15940,
+      "unlikely_quiet": 15470
     },
     "sample_rates": {
       "candidate": 1.0,
@@ -48,29 +48,29 @@
       "unlikely_quiet": 0.2
     },
     "strata": {
-      "candidate": 12091,
+      "candidate": 13500,
       "hist_candidate": 322062,
-      "hist_rest": 704326,
-      "mayhem": 33752,
-      "no_inflow": 22000,
-      "unknown": 17812,
-      "unlikely_active": 14139,
-      "unlikely_quiet": 69312
+      "hist_rest": 704325,
+      "mayhem": 38588,
+      "no_inflow": 23778,
+      "unknown": 17895,
+      "unlikely_active": 15940,
+      "unlikely_quiet": 77435
     },
-    "universe_tokens": 1195494,
-    "updated_at": 1788431498
+    "universe_tokens": 1213523,
+    "updated_at": 1788493715
   },
   "universe": {
-    "attention_meta_total": 195855,
-    "in_date_range": 159967,
-    "pumpportal_frames_in_range": 154220,
-    "universe_added_from_frames": 24313,
-    "universe_bitquery_appended": 1026388,
-    "universe_mayhem_flagged": 33752,
-    "universe_mayhem_unknown": 14886,
+    "attention_meta_total": 226989,
+    "in_date_range": 178529,
+    "pumpportal_frames_in_range": 171428,
+    "universe_added_from_frames": 24570,
+    "universe_bitquery_appended": 1026387,
+    "universe_mayhem_flagged": 38588,
+    "universe_mayhem_unknown": 15708,
     "universe_no_creator": 0,
-    "universe_seen_late_dropped": 15174,
-    "universe_tokens": 169106,
-    "updated_at": 1788431490
+    "universe_seen_late_dropped": 15963,
+    "universe_tokens": 187136,
+    "updated_at": 1788493706
   }
 }

@@ -2,148 +2,148 @@
 
 | model | n | PR-AUC | ROC-AUC | P@1% | P@5% | P@10% | PnL@10% (SOL) | ex-top-3 |
 |---|---|---|---|---|---|---|---|---|
-| xgb_shape | 298 | 0.317 | 0.690 | 0.00 | 0.27 | 0.43 | 13.90 | 1.81 |
-| xgb_holders | 298 | 0.269 | 0.586 | 0.67 | 0.20 | 0.17 | 7.93 | -4.03 |
-| xgb_shape+holders | 298 | 0.329 | 0.672 | 0.33 | 0.33 | 0.40 | 13.52 | 1.22 |
-| xgb_all | 298 | 0.323 | 0.622 | 0.67 | 0.53 | 0.37 | 13.10 | 0.80 |
-| xgb_context | 298 | 0.248 | 0.575 | 0.00 | 0.40 | 0.27 | 0.73 | -1.07 |
-| xgb_wallets | 298 | 0.287 | 0.597 | 0.67 | 0.47 | 0.33 | 12.80 | 1.17 |
-| xgb_holders+wallets | 298 | 0.297 | 0.635 | 0.33 | 0.33 | 0.33 | 2.33 | 0.04 |
-| xgb_all+wallets | 298 | 0.358 | 0.654 | 1.00 | 0.47 | 0.37 | 13.42 | 1.12 |
-| logistic_repo_recipe | 298 | 0.272 | 0.565 | 0.67 | 0.40 | 0.27 | 0.39 | -1.53 |
+| xgb_shape | 127 | 0.341 | 0.680 | 0.00 | 0.50 | 0.38 | 1.32 | -0.60 |
+| xgb_holders | 127 | 0.365 | 0.636 | 1.00 | 0.50 | 0.38 | 1.31 | -0.62 |
+| xgb_shape+holders | 127 | 0.335 | 0.631 | 0.00 | 0.50 | 0.38 | 1.26 | -0.66 |
+| xgb_all | 127 | 0.417 | 0.636 | 1.00 | 0.83 | 0.38 | 1.44 | -0.51 |
+| xgb_context | 127 | 0.353 | 0.612 | 1.00 | 0.83 | 0.38 | 0.96 | -0.61 |
+| xgb_wallets | 127 | 0.356 | 0.587 | 1.00 | 0.50 | 0.31 | 0.50 | -1.05 |
+| xgb_holders+wallets | 127 | 0.424 | 0.679 | 1.00 | 0.67 | 0.46 | 2.05 | 0.10 |
+| xgb_all+wallets | 127 | 0.408 | 0.648 | 1.00 | 0.83 | 0.38 | 1.50 | -0.45 |
+| logistic_repo_recipe | 127 | 0.365 | 0.572 | 1.00 | 0.50 | 0.31 | 0.20 | -1.34 |
 | human (M0) | — | not yet recorded: run `pf bench label` | | | | | | |
 
 
 ## xgb_shape: top gain features
 
-- sol_last60: 8.361
-- flipper_share: 7.939
-- dev_buy_sol: 7.69
-- lows: 7.619
-- n_sellers: 6.929
-- max_drawdown: 6.653
-- first_trade_t: 6.513
-- iti_cv: 6.385
-- n_buyers: 6.255
-- buy_ratio_count: 6.118
-- decision_age_s: 6.105
-- sell_share_sol: 6.088
-- n_trades: 6.084
-- buy_size_cv: 5.898
-- last_trade_t: 5.864
+- dev_buy_sol: 7.384
+- sol_last60: 6.13
+- lows: 5.878
+- bundle_slots: 5.531
+- flipper_share: 5.37
+- max_drawdown: 5.171
+- decision_age_s: 5.17
+- buy_size_cv: 5.038
+- n_trades: 5.003
+- buyers_last60: 5.001
+- buy_ratio_count: 4.892
+- buy_ratio_sol: 4.874
+- sell_share_sol: 4.732
+- iti_cv: 4.665
+- first_trade_t: 4.554
 
 ## xgb_holders: top gain features
 
-- dev_share: 8.219
-- dev_sold: 6.838
-- holders_n: 6.675
-- launch_bundle_share: 6.511
-- top3_share: 6.483
-- exited_share: 5.72
-- first_slot_share: 5.635
-- top1_share: 5.524
-- gini_hold: 5.196
-- tokens_out_pct: 5.129
-- top10_share: 5.116
-- buyers_n: 4.787
-- same_size_share: 4.501
+- dev_share: 8.377
+- dev_sold: 7.735
+- top3_share: 5.872
+- top1_share: 5.258
+- launch_bundle_share: 5.14
+- holders_n: 5.013
+- top10_share: 4.724
+- first_slot_share: 4.643
+- tokens_out_pct: 4.179
+- gini_hold: 4.176
+- exited_share: 4.113
+- buyers_n: 3.721
+- same_size_share: 3.6
 
 ## xgb_shape+holders: top gain features
 
-- bundle_slots: 10.575
-- dev_sold: 10.024
-- dev_share: 9.937
-- sol_last60: 9.601
-- exited_share: 9.142
-- dev_buy_sol: 9.03
-- buyers_last60: 8.859
-- holders_n: 8.678
-- flipper_share: 8.492
-- top3_share: 8.453
-- launch_bundle_share: 8.11
-- max_drawdown: 7.667
-- last_trade_t: 7.431
-- gini_buy_size: 7.392
-- buy_size_cv: 7.25
+- dev_sold: 13.964
+- dev_share: 10.465
+- dev_buy_sol: 9.64
+- top3_share: 8.397
+- bundle_slots: 8.088
+- top1_share: 7.601
+- buy_size_cv: 7.534
+- holders_n: 7.52
+- decision_age_s: 7.249
+- exited_share: 7.168
+- launch_bundle_share: 7.014
+- max_drawdown: 6.865
+- lows: 6.843
+- sol_last60: 6.826
+- top10_share: 6.679
 
 ## xgb_all: top gain features
 
-- is_native_launch: 17.87
-- replies_at_entry: 13.481
-- exited_share: 11.999
-- sol_last60: 11.685
-- creator_prior_resolved: 11.563
-- creator_prior_launches: 10.938
-- top3_share: 10.494
-- dev_share: 10.314
-- holders_n: 10.239
-- market_recent_n: 10.22
-- bundle_slots: 9.699
-- buyers_n: 9.687
-- gini_buy_size: 9.624
-- launch_bundle_share: 9.391
-- market_candidate_rate: 9.385
+- is_native_launch: 16.219
+- creator_prior_resolved: 9.895
+- creator_prior_launches: 9.446
+- sol_last60: 9.191
+- dev_share: 8.934
+- buy_size_cv: 8.674
+- exited_share: 8.128
+- top3_share: 8.081
+- launch_bundle_share: 7.868
+- top1_share: 7.771
+- max_drawdown: 7.745
+- market_recent_n: 7.642
+- round_size_share: 7.388
+- sell_share_sol: 7.225
+- bundle_slots: 7.17
 
 ## xgb_context: top gain features
 
-- is_native_launch: 10.358
-- replies_at_entry: 9.521
-- live_at_entry: 5.996
-- twitter_is_status: 5.545
-- market_recent_n: 5.395
-- market_candidate_rate: 4.974
-- name_dup_24h: 4.591
-- has_twitter: 4.577
-- image_dup_24h: 4.494
-- market_recent_tp_rate: 4.305
-- description_len: 3.927
-- hour_cos: 3.791
-- market_launch_rate: 3.734
-- hour_sin: 3.711
-- has_website: 3.391
+- is_native_launch: 13.069
+- replies_at_entry: 8.688
+- live_at_entry: 6.129
+- market_recent_n: 5.746
+- has_twitter: 5.199
+- name_dup_24h: 4.79
+- image_dup_24h: 4.43
+- description_len: 4.331
+- market_candidate_rate: 4.141
+- hour_cos: 4.091
+- market_launch_rate: 3.99
+- market_recent_tp_rate: 3.967
+- dow_sin: 3.89
+- hour_sin: 3.871
+- twitter_is_status: 3.495
 
 ## xgb_wallets: top gain features
 
-- w_repeat_share: 4.844
-- w_scored_share: 4.185
-- w_hit_rate_sol: 4.066
-- w_serial_share: 4.0
-- w_hit_rate_mean: 3.853
-- w_log_prior_mean: 3.731
-- w_hit_rate_max: 3.659
+- w_hit_rate_sol: 4.0
+- w_log_prior_mean: 3.698
+- w_repeat_share: 3.665
+- w_scored_share: 3.364
+- w_hit_rate_max: 3.345
+- w_serial_share: 3.313
+- w_hit_rate_mean: 3.305
 
 ## xgb_holders+wallets: top gain features
 
-- dev_share: 9.787
-- dev_sold: 8.579
-- holders_n: 7.75
-- top3_share: 7.645
-- launch_bundle_share: 7.595
-- exited_share: 7.162
-- top1_share: 7.012
-- w_repeat_share: 6.851
-- w_hit_rate_max: 6.83
-- w_scored_share: 6.684
-- w_serial_share: 6.632
-- top10_share: 6.499
-- buyers_n: 6.334
-- w_hit_rate_mean: 6.265
-- gini_hold: 6.209
+- dev_sold: 9.003
+- dev_share: 8.478
+- top3_share: 6.547
+- top1_share: 6.299
+- holders_n: 5.621
+- launch_bundle_share: 5.594
+- w_repeat_share: 5.313
+- first_slot_share: 5.209
+- top10_share: 5.101
+- exited_share: 5.09
+- gini_hold: 5.039
+- tokens_out_pct: 4.987
+- w_hit_rate_sol: 4.94
+- w_serial_share: 4.928
+- w_hit_rate_max: 4.91
 
 ## xgb_all+wallets: top gain features
 
-- is_native_launch: 16.162
-- twitter_is_status: 10.711
-- creator_prior_resolved: 10.7
-- bundle_slots: 10.428
-- exited_share: 10.424
-- replies_at_entry: 10.223
-- holders_n: 10.074
-- market_candidate_rate: 9.916
-- sol_last60: 9.897
-- buyers_n: 9.691
-- n_sellers: 9.446
-- dev_share: 9.361
-- launch_bundle_share: 9.242
-- top3_share: 8.771
-- decision_age_s: 8.507
+- is_native_launch: 20.335
+- creator_prior_launches: 12.538
+- creator_prior_resolved: 12.243
+- n_slots: 12.062
+- buy_size_cv: 11.087
+- dev_share: 11.004
+- top3_share: 10.259
+- exited_share: 10.188
+- buy_ratio_count: 9.975
+- replies_at_entry: 9.593
+- sol_last60: 9.311
+- max_drawdown: 9.126
+- dow_cos: 9.104
+- bundle_slots: 8.972
+- live_at_entry: 8.902

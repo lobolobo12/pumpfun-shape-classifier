@@ -1,8 +1,8 @@
 {
   "coverage_min": 0.99,
-  "coverage_while_polling": 0.9674264432029795,
-  "frames_while_polling": 134250,
-  "in_universe_while_polling": 129877,
+  "coverage_while_polling": 0.9266582518144525,
+  "frames_while_polling": 158450,
+  "in_universe_while_polling": 146829,
   "per_day": {
     "2026-08-27": {
       "frames": 21665,
@@ -19,7 +19,7 @@
     "2026-08-29": {
       "frames": 37979,
       "frames_while_polling": 37979,
-      "in_meta_but_seen_late": 1157,
+      "in_meta_but_seen_late": 1160,
       "in_universe_while_polling": 35841
     },
     "2026-08-30": {
@@ -31,27 +31,33 @@
     "2026-08-31": {
       "frames": 13996,
       "frames_while_polling": 13982,
-      "in_meta_but_seen_late": 323,
+      "in_meta_but_seen_late": 325,
       "in_universe_while_not_polling": 12,
       "in_universe_while_polling": 13410
     },
     "2026-09-01": {
       "frames": 14312,
       "frames_while_polling": 14312,
-      "in_meta_but_seen_late": 248,
+      "in_meta_but_seen_late": 252,
       "in_universe_while_polling": 13854
     },
     "2026-09-02": {
       "frames": 14214,
       "frames_while_polling": 14212,
-      "in_meta_but_seen_late": 199,
+      "in_meta_but_seen_late": 201,
       "in_universe_while_polling": 13950
     },
     "2026-09-03": {
-      "frames": 10424,
-      "frames_while_polling": 10424,
-      "in_meta_but_seen_late": 126,
-      "in_universe_while_polling": 10271
+      "frames": 30915,
+      "frames_while_polling": 30915,
+      "in_meta_but_seen_late": 3574,
+      "in_universe_while_polling": 27223
+    },
+    "2026-09-04": {
+      "frames": 3714,
+      "frames_while_polling": 3709,
+      "in_meta_but_seen_late": 3700,
+      "in_universe_while_polling": 0
     }
   }
 }
