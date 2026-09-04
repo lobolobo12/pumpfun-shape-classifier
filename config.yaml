@@ -142,7 +142,9 @@ cnn:
     max_mints: 200000      # cap on tapes used (memory: cuts x 256 x 6 float32; 225k cuts ~ 1.4 GB)
     epochs: 20
 botlive:
-  first_seen_sol: [3.0, 6.0]   # bot first-sight level sampled per coin for the truncated training view
+  # bot first-sight level sampled per coin for the truncated training view: scanner-seen coins (3-8 SOL)
+  # and band-first coins (first sample at or after the 8.6 SOL crossing, cap 10), half each
+  first_seen_sol: [[3.0, 8.0, 0.5], [8.6, 10.0, 0.5]]
 ensemble:
   # rank-average of these models' saved test scores (trained in the same run: same split and mode)
   members: ["xgb_botlive+context", "cnn_trades+side+pre", "xgb_all+wallets"]
