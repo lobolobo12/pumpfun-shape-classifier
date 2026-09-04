@@ -41,12 +41,16 @@ class Scorer:
         self.features: list[str] = meta["features"]
         self.splits = meta["splits"]
         self.test_scores: list[float] = meta["test_scores"]
-        self.booster = xgb.Booster()
-        self.booster.load_model(str(d / f"{name}.ubj"))
+        self.boosters: list[xgb.Booster] = []
+        for path in [d / f"{name}.ubj", *sorted(d.glob(f"{name}.*.ubj"))]:
+            b = xgb.Booster()
+            b.load_model(str(path))
+            self.boosters.append(b)
         self.level = float(cfg.raw.get("cross_level_sol", 0.0) or 0.0)
         self.min_age = float(cfg.raw.get("cross_min_age_seconds", 0) or 0)
         self.silence = float(cfg.metrics["active_silence_max"])
         log.info("loaded %s (%d features, trained to %s)", name, len(self.features), self.splits["train_end"])
+        self.n_bag = 0
 
     def score(self, req: dict) -> dict:
         t0 = time.perf_counter()
@@ -97,7 +101,8 @@ class Scorer:
     def _score_features(self, feats: dict, t0: float, decision: dict) -> dict:
         missing = [c for c in self.features if c not in feats]
         x = np.array([[float(feats.get(c) if feats.get(c) is not None else np.nan) for c in self.features]], dtype=np.float32)
-        s = float(self.booster.predict(xgb.DMatrix(x))[0])
+        dm = xgb.DMatrix(x)
+        s = float(np.mean([b.predict(dm)[0] for b in self.boosters]))
         pct = 100.0 * bisect_left(self.test_scores, s) / max(1, len(self.test_scores))
         out = {
             "score": s,
@@ -131,7 +136,17 @@ def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
 
         def do_GET(self):  # noqa: N802
             if self.path == "/health":
-                self._send(200, {"ok": True, "model": scorer.name, "splits": scorer.splits, "n_features": len(scorer.features)})
+                self._send(
+                    200,
+                    {
+                        "ok": True,
+                        "model": scorer.name,
+                        "splits": scorer.splits,
+                        "n_features": len(scorer.features),
+                        "features": scorer.features,
+                        "bag": len(scorer.boosters),
+                    },
+                )
             else:
                 self._send(404, {"error": "unknown path"})
 

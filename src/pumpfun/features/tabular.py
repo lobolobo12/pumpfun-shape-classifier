@@ -127,7 +127,7 @@ BOTLIVE = [
     "decision_age_s",
     "curve_sol_in",
     "top10_share",
-    "dev_share",
+    "dev_buy_sol",  # creator's launch buy in SOL: exact live and in the tape; dev_share is pre-dump here, post-dump live
     "holders_n",
 ]
 SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]

@@ -101,17 +101,27 @@ def model_dir(cfg: Config) -> Path:
     return cfg.processed_dir / "models" / cfg.decision_mode
 
 
-def save_model(cfg: Config, name: str, model: xgb.XGBClassifier, cols: list[str], test_scores: np.ndarray) -> None:
-    """Booster + feature list + the held-out score distribution (for live percentiles), per decision mode."""
+def replace_seed(cfg: Config, seed: int) -> Config:
+    import dataclasses
+
+    return dataclasses.replace(cfg, seed=seed)
+
+
+def save_model(cfg: Config, name: str, bag: list[xgb.XGBClassifier], cols: list[str], test_scores: np.ndarray) -> None:
+    """Boosters (one file per seed) + feature list + the held-out score distribution (for live percentiles)."""
     d = model_dir(cfg)
     d.mkdir(parents=True, exist_ok=True)
-    model.get_booster().save_model(str(d / f"{name}.ubj"))
+    for old in d.glob(f"{name}.*.ubj"):
+        old.unlink()
+    for k, m in enumerate(bag):
+        m.get_booster().save_model(str(d / (f"{name}.ubj" if k == 0 else f"{name}.{k}.ubj")))
     (d / f"{name}.json").write_text(
         json.dumps(
             {
                 "model": name,
                 "mode": cfg.decision_mode,
                 "features": cols,
+                "bag": len(bag),
                 "splits": {"train_end": cfg.split_train_end, "val_end": cfg.split_val_end},
                 "test_scores": [float(s) for s in np.sort(test_scores)],
             }
@@ -153,9 +163,16 @@ def run(cfg: Config) -> dict:
     for name, cols in VARIANTS.items():
         model = fit_xgb(cfg, train, val, cols)
         p = model.predict_proba(_xy(test, cols)[0])[:, 1]
+        bag: list[xgb.XGBClassifier] = [model]
+        if name.startswith("xgb_botlive"):
+            # served models: a bag of seeds, since early stopping on one small validation day is noisy
+            for k in range(1, int(cfg.xgb.get("serve_bag_seeds", 5))):
+                c2 = replace_seed(cfg, cfg.seed + k)
+                bag.append(fit_xgb(c2, train, val, cols))
+            p = np.mean([m.predict_proba(_xy(test, cols)[0])[:, 1] for m in bag], axis=0)
         results[name] = metrics.evaluate(cfg, test, p)
         metrics.save_predictions(cfg, name, test, p)
-        save_model(cfg, name, model, cols, p)
+        save_model(cfg, name, bag, cols, p)
         results[name]["best_iteration"] = int(model.best_iteration)
         results[name]["val_pr_auc"] = metrics.evaluate(cfg, val, model.predict_proba(_xy(val, cols)[0])[:, 1])["pr_auc"]
         gain = model.get_booster().get_score(importance_type="gain")
