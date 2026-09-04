@@ -1,29 +1,29 @@
 {
   "features": {
-    "creator_straddle_dropped": 453,
-    "features_out": 6605,
-    "labeled_in": 7058,
-    "test_n": 612,
-    "test_pos": 110,
-    "test_serial_launcher_share": 0.36764705882352944,
-    "train_n": 5803,
+    "creator_straddle_dropped": 454,
+    "features_out": 9163,
+    "labeled_in": 9617,
+    "test_n": 617,
+    "test_pos": 113,
+    "test_serial_launcher_share": 0.32901134521880065,
+    "train_n": 8340,
     "train_negatives_dropped": 0,
-    "train_pos": 2299,
-    "updated_at": 1788558293,
-    "val_n": 190,
-    "val_pos": 39
+    "train_pos": 2871,
+    "updated_at": 1788559135,
+    "val_n": 206,
+    "val_pos": 52
   },
   "label": {
-    "dropped_crossed_too_young": 55211,
-    "dropped_graduated_before_entry": 3,
-    "dropped_lt_min_trades": 755,
+    "dropped_crossed_too_young": 38777,
+    "dropped_graduated_before_entry": 7,
+    "dropped_lt_min_trades": 482,
     "dropped_mayhem_mode": 3267,
-    "dropped_never_crossed_level": 114219,
-    "dropped_non_standard_curve": 6134,
+    "dropped_never_crossed_level": 128876,
+    "dropped_non_standard_curve": 5621,
     "dropped_out_of_coverage": 8230,
-    "labeled": 7058,
+    "labeled": 9617,
     "tokens_with_tape": 194877,
-    "updated_at": 1788557990
+    "updated_at": 1788559103
   },
   "prescreen": {
     "fetch_queue": 318644,

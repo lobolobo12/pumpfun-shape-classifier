@@ -19,3 +19,6 @@ else
   gh workflow run fetch.yml -f shards="${SHARDS:-20}" -f rps="${RPS:-0.28}" -f probe=0 -f max_minutes="${MAX_MINUTES:-300}"
   echo "dispatched fetch (${SHARDS:-20} shards)"
 fi
+# Served bot-live models: retrain on the bot's task (entry at first sight) with yesterday as the held-out day, restart the scorer.
+TODAY=$(date +%F); YDAY=$(date -v-1d +%F 2>/dev/null || date -d "yesterday" +%F)
+scripts/serve_refresh.sh "$YDAY" "$TODAY" 2>&1 | tail -3 || echo "serve refresh failed"
