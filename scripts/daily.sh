@@ -4,8 +4,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 uv run pf gh-pull --limit 20 2>&1 | grep -E "merged|no successful" || true
-uv run pf fix-launch-times 2>&1 | tail -1 || true
 uv run pf universe --no-strict | tail -4
+# after the universe: the rebuild re-merges history with hour-floored launch times, so correct them afterwards
+uv run pf fix-launch-times 2>&1 | tail -1 || true
 uv run pf prescreen | tail -2
 if ! git diff --quiet -- data/queue/ || [ -n "$(git status --porcelain data/queue/)" ]; then
   git add data/queue/

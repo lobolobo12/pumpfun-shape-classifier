@@ -97,6 +97,14 @@ def run(cfg: Config) -> dict[str, dict[str, int]]:
         launch_ms, day = meta[mint]
         by_day[day].extend(tape_rows(cfg, tf, launch_ms))
     counts: dict[str, dict[str, int]] = {}
+    # A token's launch day can move between runs (launch-time corrections, universe rebuilds); a day file
+    # from a previous run that is not rewritten now would hold the same tape under a stale launch base.
+    written = {cfg.trades_dir / day[:7] / f"{day}.parquet" for day in by_day}
+    stale = [p for p in cfg.trades_dir.glob("*/*.parquet") if p not in written]
+    for p in stale:
+        p.unlink()
+    if stale:
+        log.info("removed %d stale day files", len(stale))
     for day, rows in sorted(by_day.items()):
         df = pl.DataFrame(rows, schema=TRADES_SCHEMA).unique(subset=["signature"], keep="first")
         df = conform(df.sort("mint", "slot", "slot_index"), TRADES_SCHEMA, "trades")
