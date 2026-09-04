@@ -1,8 +1,8 @@
 {
   "base_rate": {
     "bound_check_unlikely_positives": 25,
-    "estimated_overall": 0.0010158754797850698,
-    "estimated_positives": 1252.4342757587808,
+    "estimated_overall": 0.0010465891636076798,
+    "estimated_positives": 1299.8386230608116,
     "note": "positives per universe token. With strata: sum over strata of size * (positives / fetched) \u2014 unfetched coins are represented by their stratum's sampled rate",
     "per_day": [
       {
@@ -150,21 +150,21 @@
         "labeled": null,
         "launch_day": "2025-04-02",
         "positives": null,
-        "universe": 22
+        "universe": 24
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-03",
         "positives": null,
-        "universe": 7
+        "universe": 8
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-04",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -178,7 +178,7 @@
         "labeled": null,
         "launch_day": "2025-04-06",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
@@ -192,7 +192,7 @@
         "labeled": null,
         "launch_day": "2025-04-08",
         "positives": null,
-        "universe": 12
+        "universe": 14
       },
       {
         "in_zone": null,
@@ -206,7 +206,7 @@
         "labeled": null,
         "launch_day": "2025-04-10",
         "positives": null,
-        "universe": 12
+        "universe": 13
       },
       {
         "in_zone": null,
@@ -220,28 +220,28 @@
         "labeled": null,
         "launch_day": "2025-04-12",
         "positives": null,
-        "universe": 14
+        "universe": 15
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-13",
         "positives": null,
-        "universe": 12
+        "universe": 13
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-14",
         "positives": null,
-        "universe": 6
+        "universe": 9
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-15",
         "positives": null,
-        "universe": 12
+        "universe": 13
       },
       {
         "in_zone": null,
@@ -255,63 +255,63 @@
         "labeled": null,
         "launch_day": "2025-04-17",
         "positives": null,
-        "universe": 17
+        "universe": 19
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-18",
         "positives": null,
-        "universe": 22
+        "universe": 24
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-19",
         "positives": null,
-        "universe": 10
+        "universe": 11
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-20",
         "positives": null,
-        "universe": 6
+        "universe": 8
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-21",
         "positives": null,
-        "universe": 27
+        "universe": 28
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-22",
         "positives": null,
-        "universe": 21
+        "universe": 22
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-23",
         "positives": null,
-        "universe": 17
+        "universe": 20
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-24",
         "positives": null,
-        "universe": 14
+        "universe": 16
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-25",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -332,35 +332,35 @@
         "labeled": null,
         "launch_day": "2025-04-28",
         "positives": null,
-        "universe": 15
+        "universe": 17
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-29",
         "positives": null,
-        "universe": 13
+        "universe": 15
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-04-30",
         "positives": null,
-        "universe": 9
+        "universe": 13
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-05-01",
         "positives": null,
-        "universe": 15
+        "universe": 16
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-05-02",
         "positives": null,
-        "universe": 12
+        "universe": 13
       },
       {
         "in_zone": null,
@@ -374,14 +374,14 @@
         "labeled": null,
         "launch_day": "2025-05-04",
         "positives": null,
-        "universe": 4
+        "universe": 6
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-05-05",
         "positives": null,
-        "universe": 13
+        "universe": 15
       },
       {
         "in_zone": null,
@@ -395,14 +395,14 @@
         "labeled": null,
         "launch_day": "2025-05-07",
         "positives": null,
-        "universe": 11
+        "universe": 15
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-05-08",
         "positives": null,
-        "universe": 16
+        "universe": 17
       },
       {
         "in_zone": null,
@@ -416,7 +416,7 @@
         "labeled": null,
         "launch_day": "2025-05-10",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -437,14 +437,14 @@
         "labeled": null,
         "launch_day": "2025-05-13",
         "positives": null,
-        "universe": 5
+        "universe": 6
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-05-14",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
@@ -465,7 +465,7 @@
         "labeled": null,
         "launch_day": "2025-05-17",
         "positives": null,
-        "universe": 5
+        "universe": 7
       },
       {
         "in_zone": null,
@@ -500,14 +500,14 @@
         "labeled": null,
         "launch_day": "2025-05-22",
         "positives": null,
-        "universe": 7
+        "universe": 8
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-05-23",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -521,7 +521,7 @@
         "labeled": null,
         "launch_day": "2025-05-25",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
@@ -535,7 +535,7 @@
         "labeled": null,
         "launch_day": "2025-05-27",
         "positives": null,
-        "universe": 20
+        "universe": 21
       },
       {
         "in_zone": null,
@@ -549,14 +549,14 @@
         "labeled": null,
         "launch_day": "2025-05-29",
         "positives": null,
-        "universe": 15
+        "universe": 16
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-05-30",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -577,35 +577,35 @@
         "labeled": null,
         "launch_day": "2025-06-02",
         "positives": null,
-        "universe": 11
+        "universe": 13
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-03",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-04",
         "positives": null,
-        "universe": 10
+        "universe": 11
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-05",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-06",
         "positives": null,
-        "universe": 8
+        "universe": 10
       },
       {
         "in_zone": null,
@@ -619,28 +619,28 @@
         "labeled": null,
         "launch_day": "2025-06-08",
         "positives": null,
-        "universe": 12
+        "universe": 13
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-09",
         "positives": null,
-        "universe": 14
+        "universe": 16
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-10",
         "positives": null,
-        "universe": 5
+        "universe": 6
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-11",
         "positives": null,
-        "universe": 18
+        "universe": 19
       },
       {
         "in_zone": null,
@@ -654,14 +654,14 @@
         "labeled": null,
         "launch_day": "2025-06-13",
         "positives": null,
-        "universe": 13
+        "universe": 15
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-14",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
@@ -675,7 +675,7 @@
         "labeled": null,
         "launch_day": "2025-06-16",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
@@ -689,7 +689,7 @@
         "labeled": null,
         "launch_day": "2025-06-18",
         "positives": null,
-        "universe": 13
+        "universe": 14
       },
       {
         "in_zone": null,
@@ -710,77 +710,77 @@
         "labeled": null,
         "launch_day": "2025-06-21",
         "positives": null,
-        "universe": 4
+        "universe": 5
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-22",
         "positives": null,
-        "universe": 9
+        "universe": 11
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-23",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-24",
         "positives": null,
-        "universe": 5
+        "universe": 8
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-25",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-26",
         "positives": null,
-        "universe": 13
+        "universe": 16
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-27",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-28",
         "positives": null,
-        "universe": 11
+        "universe": 13
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-29",
         "positives": null,
-        "universe": 7
+        "universe": 9
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-06-30",
         "positives": null,
-        "universe": 4
+        "universe": 5
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-07-01",
         "positives": null,
-        "universe": 15
+        "universe": 16
       },
       {
         "in_zone": null,
@@ -794,14 +794,14 @@
         "labeled": null,
         "launch_day": "2025-07-03",
         "positives": null,
-        "universe": 12
+        "universe": 13
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-07-04",
         "positives": null,
-        "universe": 10
+        "universe": 11
       },
       {
         "in_zone": null,
@@ -815,7 +815,7 @@
         "labeled": null,
         "launch_day": "2025-07-06",
         "positives": null,
-        "universe": 3
+        "universe": 4
       },
       {
         "in_zone": null,
@@ -829,7 +829,7 @@
         "labeled": null,
         "launch_day": "2025-07-08",
         "positives": null,
-        "universe": 5
+        "universe": 6
       },
       {
         "in_zone": null,
@@ -843,7 +843,7 @@
         "labeled": null,
         "launch_day": "2025-07-10",
         "positives": null,
-        "universe": 5
+        "universe": 8
       },
       {
         "in_zone": null,
@@ -878,21 +878,21 @@
         "labeled": null,
         "launch_day": "2025-07-15",
         "positives": null,
-        "universe": 8
+        "universe": 13
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-07-16",
         "positives": null,
-        "universe": 3
+        "universe": 4
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-07-17",
         "positives": null,
-        "universe": 6
+        "universe": 7
       },
       {
         "in_zone": null,
@@ -934,7 +934,7 @@
         "labeled": null,
         "launch_day": "2025-07-23",
         "positives": null,
-        "universe": 6
+        "universe": 7
       },
       {
         "in_zone": null,
@@ -955,7 +955,7 @@
         "labeled": null,
         "launch_day": "2025-07-26",
         "positives": null,
-        "universe": 3
+        "universe": 4
       },
       {
         "in_zone": null,
@@ -1004,7 +1004,7 @@
         "labeled": null,
         "launch_day": "2025-08-02",
         "positives": null,
-        "universe": 3
+        "universe": 4
       },
       {
         "in_zone": null,
@@ -1032,7 +1032,7 @@
         "labeled": null,
         "launch_day": "2025-08-06",
         "positives": null,
-        "universe": 13
+        "universe": 14
       },
       {
         "in_zone": null,
@@ -1074,7 +1074,7 @@
         "labeled": null,
         "launch_day": "2025-08-12",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
@@ -1088,14 +1088,14 @@
         "labeled": null,
         "launch_day": "2025-08-14",
         "positives": null,
-        "universe": 10
+        "universe": 12
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-08-15",
         "positives": null,
-        "universe": 12
+        "universe": 13
       },
       {
         "in_zone": null,
@@ -1109,7 +1109,7 @@
         "labeled": null,
         "launch_day": "2025-08-17",
         "positives": null,
-        "universe": 7
+        "universe": 8
       },
       {
         "in_zone": null,
@@ -1130,7 +1130,7 @@
         "labeled": null,
         "launch_day": "2025-08-20",
         "positives": null,
-        "universe": 6
+        "universe": 7
       },
       {
         "in_zone": null,
@@ -1144,7 +1144,7 @@
         "labeled": null,
         "launch_day": "2025-08-22",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
@@ -1172,35 +1172,35 @@
         "labeled": null,
         "launch_day": "2025-08-26",
         "positives": null,
-        "universe": 13
+        "universe": 14
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-08-27",
         "positives": null,
-        "universe": 8
+        "universe": 11
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-08-28",
         "positives": null,
-        "universe": 12
+        "universe": 14
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-08-29",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-08-30",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
@@ -1214,7 +1214,7 @@
         "labeled": null,
         "launch_day": "2025-09-01",
         "positives": null,
-        "universe": 5
+        "universe": 7
       },
       {
         "in_zone": null,
@@ -1228,42 +1228,42 @@
         "labeled": null,
         "launch_day": "2025-09-03",
         "positives": null,
-        "universe": 11
+        "universe": 13
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-09-04",
         "positives": null,
-        "universe": 15
+        "universe": 16
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-09-05",
         "positives": null,
-        "universe": 10
+        "universe": 12
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-09-06",
         "positives": null,
-        "universe": 10
+        "universe": 11
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-09-07",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-09-08",
         "positives": null,
-        "universe": 9
+        "universe": 11
       },
       {
         "in_zone": null,
@@ -1298,14 +1298,14 @@
         "labeled": null,
         "launch_day": "2025-09-13",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-09-14",
         "positives": null,
-        "universe": 6
+        "universe": 7
       },
       {
         "in_zone": null,
@@ -1319,7 +1319,7 @@
         "labeled": null,
         "launch_day": "2025-09-16",
         "positives": null,
-        "universe": 21
+        "universe": 23
       },
       {
         "in_zone": null,
@@ -1333,7 +1333,7 @@
         "labeled": null,
         "launch_day": "2025-09-18",
         "positives": null,
-        "universe": 16
+        "universe": 17
       },
       {
         "in_zone": null,
@@ -1354,7 +1354,7 @@
         "labeled": null,
         "launch_day": "2025-09-21",
         "positives": null,
-        "universe": 5
+        "universe": 8
       },
       {
         "in_zone": null,
@@ -1368,21 +1368,21 @@
         "labeled": null,
         "launch_day": "2025-09-23",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-09-24",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-09-25",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -1410,7 +1410,7 @@
         "labeled": null,
         "launch_day": "2025-09-29",
         "positives": null,
-        "universe": 20
+        "universe": 21
       },
       {
         "in_zone": null,
@@ -1424,7 +1424,7 @@
         "labeled": null,
         "launch_day": "2025-10-01",
         "positives": null,
-        "universe": 14
+        "universe": 15
       },
       {
         "in_zone": null,
@@ -1459,7 +1459,7 @@
         "labeled": null,
         "launch_day": "2025-10-06",
         "positives": null,
-        "universe": 10
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -1480,7 +1480,7 @@
         "labeled": null,
         "launch_day": "2025-10-09",
         "positives": null,
-        "universe": 5
+        "universe": 6
       },
       {
         "in_zone": null,
@@ -1515,7 +1515,7 @@
         "labeled": null,
         "launch_day": "2025-10-14",
         "positives": null,
-        "universe": 15
+        "universe": 17
       },
       {
         "in_zone": null,
@@ -1536,14 +1536,14 @@
         "labeled": null,
         "launch_day": "2025-10-17",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-10-18",
         "positives": null,
-        "universe": 11
+        "universe": 13
       },
       {
         "in_zone": null,
@@ -1564,7 +1564,7 @@
         "labeled": null,
         "launch_day": "2025-10-21",
         "positives": null,
-        "universe": 11
+        "universe": 13
       },
       {
         "in_zone": null,
@@ -1578,7 +1578,7 @@
         "labeled": null,
         "launch_day": "2025-10-23",
         "positives": null,
-        "universe": 4
+        "universe": 5
       },
       {
         "in_zone": null,
@@ -1592,14 +1592,14 @@
         "labeled": null,
         "launch_day": "2025-10-25",
         "positives": null,
-        "universe": 4
+        "universe": 5
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-10-26",
         "positives": null,
-        "universe": 4
+        "universe": 5
       },
       {
         "in_zone": null,
@@ -1627,7 +1627,7 @@
         "labeled": null,
         "launch_day": "2025-10-30",
         "positives": null,
-        "universe": 10
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -1662,7 +1662,7 @@
         "labeled": null,
         "launch_day": "2025-11-04",
         "positives": null,
-        "universe": 5
+        "universe": 6
       },
       {
         "in_zone": null,
@@ -1683,7 +1683,7 @@
         "labeled": null,
         "launch_day": "2025-11-07",
         "positives": null,
-        "universe": 14
+        "universe": 16
       },
       {
         "in_zone": null,
@@ -1697,7 +1697,7 @@
         "labeled": null,
         "launch_day": "2025-11-09",
         "positives": null,
-        "universe": 6
+        "universe": 7
       },
       {
         "in_zone": null,
@@ -1711,7 +1711,7 @@
         "labeled": null,
         "launch_day": "2025-11-11",
         "positives": null,
-        "universe": 5
+        "universe": 6
       },
       {
         "in_zone": null,
@@ -1732,14 +1732,14 @@
         "labeled": null,
         "launch_day": "2025-11-14",
         "positives": null,
-        "universe": 9
+        "universe": 11
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-11-15",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -1760,7 +1760,7 @@
         "labeled": null,
         "launch_day": "2025-11-18",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
@@ -1802,14 +1802,14 @@
         "labeled": null,
         "launch_day": "2025-11-24",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-11-25",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
@@ -1823,7 +1823,7 @@
         "labeled": null,
         "launch_day": "2025-11-27",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -1865,7 +1865,7 @@
         "labeled": null,
         "launch_day": "2025-12-03",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -1879,14 +1879,14 @@
         "labeled": null,
         "launch_day": "2025-12-05",
         "positives": null,
-        "universe": 7
+        "universe": 8
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-06",
         "positives": null,
-        "universe": 15
+        "universe": 17
       },
       {
         "in_zone": null,
@@ -1900,7 +1900,7 @@
         "labeled": null,
         "launch_day": "2025-12-08",
         "positives": null,
-        "universe": 12
+        "universe": 13
       },
       {
         "in_zone": null,
@@ -1921,14 +1921,14 @@
         "labeled": null,
         "launch_day": "2025-12-11",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-12",
         "positives": null,
-        "universe": 10
+        "universe": 12
       },
       {
         "in_zone": null,
@@ -1942,28 +1942,28 @@
         "labeled": null,
         "launch_day": "2025-12-14",
         "positives": null,
-        "universe": 10
+        "universe": 12
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-15",
         "positives": null,
-        "universe": 5
+        "universe": 8
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-16",
         "positives": null,
-        "universe": 24
+        "universe": 26
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-17",
         "positives": null,
-        "universe": 33
+        "universe": 36
       },
       {
         "in_zone": null,
@@ -1991,7 +1991,7 @@
         "labeled": null,
         "launch_day": "2025-12-21",
         "positives": null,
-        "universe": 54
+        "universe": 55
       },
       {
         "in_zone": null,
@@ -2005,7 +2005,7 @@
         "labeled": null,
         "launch_day": "2025-12-23",
         "positives": null,
-        "universe": 10
+        "universe": 11
       },
       {
         "in_zone": null,
@@ -2019,49 +2019,49 @@
         "labeled": null,
         "launch_day": "2025-12-25",
         "positives": null,
-        "universe": 10
+        "universe": 11
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-26",
         "positives": null,
-        "universe": 12
+        "universe": 14
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-27",
         "positives": null,
-        "universe": 8
+        "universe": 11
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-28",
         "positives": null,
-        "universe": 13
+        "universe": 16
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-29",
         "positives": null,
-        "universe": 11
+        "universe": 12
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-30",
         "positives": null,
-        "universe": 8
+        "universe": 9
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2025-12-31",
         "positives": null,
-        "universe": 7
+        "universe": 8
       },
       {
         "in_zone": null,
@@ -2082,7 +2082,7 @@
         "labeled": null,
         "launch_day": "2026-01-03",
         "positives": null,
-        "universe": 9
+        "universe": 10
       },
       {
         "in_zone": null,
@@ -2096,14 +2096,14 @@
         "labeled": null,
         "launch_day": "2026-01-05",
         "positives": null,
-        "universe": 9
+        "universe": 11
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-01-06",
         "positives": null,
-        "universe": 12
+        "universe": 14
       },
       {
         "in_zone": null,
@@ -2117,7 +2117,7 @@
         "labeled": null,
         "launch_day": "2026-01-08",
         "positives": null,
-        "universe": 14
+        "universe": 16
       },
       {
         "in_zone": null,
@@ -2152,49 +2152,49 @@
         "labeled": null,
         "launch_day": "2026-01-13",
         "positives": null,
-        "universe": 20
+        "universe": 22
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-01-14",
         "positives": null,
-        "universe": 17
+        "universe": 20
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-01-15",
         "positives": null,
-        "universe": 21
+        "universe": 22
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-01-16",
         "positives": null,
-        "universe": 18
+        "universe": 20
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-01-17",
         "positives": null,
-        "universe": 12
+        "universe": 13
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-01-18",
         "positives": null,
-        "universe": 13
+        "universe": 14
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-01-19",
         "positives": null,
-        "universe": 17
+        "universe": 18
       },
       {
         "in_zone": null,
@@ -2222,7 +2222,7 @@
         "labeled": null,
         "launch_day": "2026-01-23",
         "positives": null,
-        "universe": 21
+        "universe": 22
       },
       {
         "in_zone": null,
@@ -2243,7 +2243,7 @@
         "labeled": null,
         "launch_day": "2026-01-26",
         "positives": null,
-        "universe": 13
+        "universe": 15
       },
       {
         "in_zone": null,
@@ -2257,14 +2257,14 @@
         "labeled": null,
         "launch_day": "2026-01-28",
         "positives": null,
-        "universe": 25
+        "universe": 28
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-01-29",
         "positives": null,
-        "universe": 28
+        "universe": 30
       },
       {
         "in_zone": null,
@@ -2278,7 +2278,7 @@
         "labeled": null,
         "launch_day": "2026-01-31",
         "positives": null,
-        "universe": 20
+        "universe": 22
       },
       {
         "in_zone": null,
@@ -2299,42 +2299,42 @@
         "labeled": null,
         "launch_day": "2026-02-03",
         "positives": null,
-        "universe": 29
+        "universe": 34
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-04",
         "positives": null,
-        "universe": 61
+        "universe": 62
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-05",
         "positives": null,
-        "universe": 29
+        "universe": 30
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-06",
         "positives": null,
-        "universe": 28
+        "universe": 30
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-07",
         "positives": null,
-        "universe": 24
+        "universe": 28
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-08",
         "positives": null,
-        "universe": 29
+        "universe": 31
       },
       {
         "in_zone": null,
@@ -2348,21 +2348,21 @@
         "labeled": null,
         "launch_day": "2026-02-10",
         "positives": null,
-        "universe": 51
+        "universe": 52
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-11",
         "positives": null,
-        "universe": 77
+        "universe": 80
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-12",
         "positives": null,
-        "universe": 51
+        "universe": 52
       },
       {
         "in_zone": null,
@@ -2376,28 +2376,28 @@
         "labeled": null,
         "launch_day": "2026-02-14",
         "positives": null,
-        "universe": 56
+        "universe": 57
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-15",
         "positives": null,
-        "universe": 58
+        "universe": 59
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-16",
         "positives": null,
-        "universe": 63
+        "universe": 64
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-17",
         "positives": null,
-        "universe": 48
+        "universe": 51
       },
       {
         "in_zone": null,
@@ -2411,14 +2411,14 @@
         "labeled": null,
         "launch_day": "2026-02-19",
         "positives": null,
-        "universe": 57
+        "universe": 58
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-20",
         "positives": null,
-        "universe": 39
+        "universe": 42
       },
       {
         "in_zone": null,
@@ -2432,14 +2432,14 @@
         "labeled": null,
         "launch_day": "2026-02-22",
         "positives": null,
-        "universe": 49
+        "universe": 50
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-23",
         "positives": null,
-        "universe": 55
+        "universe": 56
       },
       {
         "in_zone": null,
@@ -2453,70 +2453,70 @@
         "labeled": null,
         "launch_day": "2026-02-25",
         "positives": null,
-        "universe": 47
+        "universe": 48
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-26",
         "positives": null,
-        "universe": 45
+        "universe": 47
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-27",
         "positives": null,
-        "universe": 32
+        "universe": 33
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-02-28",
         "positives": null,
-        "universe": 25
+        "universe": 27
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-01",
         "positives": null,
-        "universe": 40
+        "universe": 42
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-02",
         "positives": null,
-        "universe": 56
+        "universe": 57
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-03",
         "positives": null,
-        "universe": 41
+        "universe": 42
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-04",
         "positives": null,
-        "universe": 58
+        "universe": 60
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-05",
         "positives": null,
-        "universe": 44
+        "universe": 45
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-06",
         "positives": null,
-        "universe": 58
+        "universe": 60
       },
       {
         "in_zone": null,
@@ -2530,28 +2530,28 @@
         "labeled": null,
         "launch_day": "2026-03-08",
         "positives": null,
-        "universe": 39
+        "universe": 40
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-09",
         "positives": null,
-        "universe": 55
+        "universe": 57
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-10",
         "positives": null,
-        "universe": 34
+        "universe": 37
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-11",
         "positives": null,
-        "universe": 60
+        "universe": 63
       },
       {
         "in_zone": null,
@@ -2572,7 +2572,7 @@
         "labeled": null,
         "launch_day": "2026-03-14",
         "positives": null,
-        "universe": 28
+        "universe": 29
       },
       {
         "in_zone": null,
@@ -2586,28 +2586,28 @@
         "labeled": null,
         "launch_day": "2026-03-16",
         "positives": null,
-        "universe": 54
+        "universe": 55
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-17",
         "positives": null,
-        "universe": 46
+        "universe": 47
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-18",
         "positives": null,
-        "universe": 45
+        "universe": 47
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-19",
         "positives": null,
-        "universe": 47
+        "universe": 49
       },
       {
         "in_zone": null,
@@ -2621,210 +2621,210 @@
         "labeled": null,
         "launch_day": "2026-03-21",
         "positives": null,
-        "universe": 55
+        "universe": 56
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-22",
         "positives": null,
-        "universe": 50
+        "universe": 53
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-23",
         "positives": null,
-        "universe": 61
+        "universe": 69
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-24",
         "positives": null,
-        "universe": 61
+        "universe": 62
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-25",
         "positives": null,
-        "universe": 67
+        "universe": 69
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-26",
         "positives": null,
-        "universe": 46
+        "universe": 47
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-27",
         "positives": null,
-        "universe": 83
+        "universe": 88
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-28",
         "positives": null,
-        "universe": 81
+        "universe": 83
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-29",
         "positives": null,
-        "universe": 38
+        "universe": 39
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-30",
         "positives": null,
-        "universe": 75
+        "universe": 77
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-03-31",
         "positives": null,
-        "universe": 74
+        "universe": 77
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-01",
         "positives": null,
-        "universe": 50
+        "universe": 51
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-02",
         "positives": null,
-        "universe": 57
+        "universe": 60
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-03",
         "positives": null,
-        "universe": 78
+        "universe": 80
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-04",
         "positives": null,
-        "universe": 66
+        "universe": 67
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-05",
         "positives": null,
-        "universe": 73
+        "universe": 75
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-06",
         "positives": null,
-        "universe": 71
+        "universe": 76
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-07",
         "positives": null,
-        "universe": 70
+        "universe": 71
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-08",
         "positives": null,
-        "universe": 68
+        "universe": 72
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-09",
         "positives": null,
-        "universe": 55
+        "universe": 58
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-10",
         "positives": null,
-        "universe": 58
+        "universe": 60
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-11",
         "positives": null,
-        "universe": 63
+        "universe": 65
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-12",
         "positives": null,
-        "universe": 44
+        "universe": 48
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-13",
         "positives": null,
-        "universe": 49
+        "universe": 51
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-14",
         "positives": null,
-        "universe": 60
+        "universe": 62
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-15",
         "positives": null,
-        "universe": 62
+        "universe": 65
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-16",
         "positives": null,
-        "universe": 71
+        "universe": 72
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-17",
         "positives": null,
-        "universe": 61
+        "universe": 62
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-18",
         "positives": null,
-        "universe": 57
+        "universe": 58
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-19",
         "positives": null,
-        "universe": 55
+        "universe": 58
       },
       {
         "in_zone": null,
@@ -2838,7 +2838,7 @@
         "labeled": null,
         "launch_day": "2026-04-21",
         "positives": null,
-        "universe": 73
+        "universe": 75
       },
       {
         "in_zone": null,
@@ -2852,56 +2852,56 @@
         "labeled": null,
         "launch_day": "2026-04-23",
         "positives": null,
-        "universe": 60
+        "universe": 62
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-24",
         "positives": null,
-        "universe": 63
+        "universe": 65
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-25",
         "positives": null,
-        "universe": 65
+        "universe": 68
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-26",
         "positives": null,
-        "universe": 65
+        "universe": 69
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-27",
         "positives": null,
-        "universe": 86
+        "universe": 88
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-28",
         "positives": null,
-        "universe": 74
+        "universe": 81
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-29",
         "positives": null,
-        "universe": 101
+        "universe": 103
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-04-30",
         "positives": null,
-        "universe": 101
+        "universe": 104
       },
       {
         "in_zone": null,
@@ -2915,42 +2915,42 @@
         "labeled": null,
         "launch_day": "2026-05-02",
         "positives": null,
-        "universe": 39
+        "universe": 40
       },
       {
         "in_zone": 55,
         "labeled": 210,
         "launch_day": "2026-05-03",
         "positives": 17,
-        "universe": 4310
+        "universe": 4312
       },
       {
         "in_zone": 59,
         "labeled": 197,
         "launch_day": "2026-05-04",
         "positives": 18,
-        "universe": 4769
+        "universe": 4770
       },
       {
         "in_zone": 64,
         "labeled": 211,
         "launch_day": "2026-05-05",
         "positives": 20,
-        "universe": 4161
+        "universe": 4162
       },
       {
         "in_zone": 65,
         "labeled": 232,
         "launch_day": "2026-05-06",
         "positives": 20,
-        "universe": 4414
+        "universe": 4415
       },
       {
         "in_zone": 80,
         "labeled": 251,
         "launch_day": "2026-05-07",
         "positives": 17,
-        "universe": 4614
+        "universe": 4615
       },
       {
         "in_zone": 81,
@@ -2964,7 +2964,7 @@
         "labeled": 214,
         "launch_day": "2026-05-09",
         "positives": 19,
-        "universe": 4061
+        "universe": 4064
       },
       {
         "in_zone": 45,
@@ -2978,14 +2978,14 @@
         "labeled": 263,
         "launch_day": "2026-05-11",
         "positives": 23,
-        "universe": 4847
+        "universe": 4848
       },
       {
         "in_zone": 84,
         "labeled": 294,
         "launch_day": "2026-05-12",
         "positives": 23,
-        "universe": 4560
+        "universe": 4561
       },
       {
         "in_zone": 64,
@@ -2999,7 +2999,7 @@
         "labeled": 340,
         "launch_day": "2026-05-14",
         "positives": 23,
-        "universe": 4585
+        "universe": 4586
       },
       {
         "in_zone": 145,
@@ -3013,7 +3013,7 @@
         "labeled": 241,
         "launch_day": "2026-05-16",
         "positives": 12,
-        "universe": 4791
+        "universe": 4792
       },
       {
         "in_zone": 68,
@@ -3027,14 +3027,14 @@
         "labeled": 222,
         "launch_day": "2026-05-18",
         "positives": 21,
-        "universe": 3840
+        "universe": 3841
       },
       {
         "in_zone": 30,
         "labeled": 115,
         "launch_day": "2026-05-19",
         "positives": 8,
-        "universe": 3220
+        "universe": 3221
       },
       {
         "in_zone": 66,
@@ -3048,7 +3048,7 @@
         "labeled": 151,
         "launch_day": "2026-05-21",
         "positives": 12,
-        "universe": 3334
+        "universe": 3336
       },
       {
         "in_zone": 64,
@@ -3062,21 +3062,21 @@
         "labeled": 158,
         "launch_day": "2026-05-23",
         "positives": 13,
-        "universe": 2946
+        "universe": 2948
       },
       {
         "in_zone": 42,
         "labeled": 151,
         "launch_day": "2026-05-24",
         "positives": 10,
-        "universe": 3089
+        "universe": 3090
       },
       {
         "in_zone": 60,
         "labeled": 178,
         "launch_day": "2026-05-25",
         "positives": 14,
-        "universe": 3761
+        "universe": 3762
       },
       {
         "in_zone": 52,
@@ -3097,7 +3097,7 @@
         "labeled": 185,
         "launch_day": "2026-05-28",
         "positives": 19,
-        "universe": 3687
+        "universe": 3689
       },
       {
         "in_zone": 55,
@@ -3111,7 +3111,7 @@
         "labeled": 167,
         "launch_day": "2026-05-30",
         "positives": 17,
-        "universe": 3289
+        "universe": 3291
       },
       {
         "in_zone": 62,
@@ -3125,7 +3125,7 @@
         "labeled": 196,
         "launch_day": "2026-06-01",
         "positives": 24,
-        "universe": 3581
+        "universe": 3582
       },
       {
         "in_zone": 61,
@@ -3139,21 +3139,21 @@
         "labeled": 137,
         "launch_day": "2026-06-03",
         "positives": 6,
-        "universe": 3084
+        "universe": 3085
       },
       {
         "in_zone": 33,
         "labeled": 123,
         "launch_day": "2026-06-04",
         "positives": 6,
-        "universe": 3266
+        "universe": 3267
       },
       {
         "in_zone": 23,
         "labeled": 104,
         "launch_day": "2026-06-05",
         "positives": 6,
-        "universe": 2927
+        "universe": 2928
       },
       {
         "in_zone": 29,
@@ -3174,84 +3174,84 @@
         "labeled": 158,
         "launch_day": "2026-06-08",
         "positives": 13,
-        "universe": 3515
+        "universe": 3516
       },
       {
         "in_zone": 29,
         "labeled": 92,
         "launch_day": "2026-06-09",
         "positives": 13,
-        "universe": 3078
+        "universe": 3082
       },
       {
         "in_zone": 29,
         "labeled": 104,
         "launch_day": "2026-06-10",
         "positives": 13,
-        "universe": 2678
+        "universe": 2679
       },
       {
         "in_zone": 36,
         "labeled": 168,
         "launch_day": "2026-06-11",
         "positives": 17,
-        "universe": 3305
+        "universe": 3307
       },
       {
         "in_zone": 45,
         "labeled": 138,
         "launch_day": "2026-06-12",
         "positives": 14,
-        "universe": 3296
+        "universe": 3298
       },
       {
         "in_zone": 33,
         "labeled": 142,
         "launch_day": "2026-06-13",
         "positives": 10,
-        "universe": 2968
+        "universe": 2971
       },
       {
         "in_zone": 29,
         "labeled": 122,
         "launch_day": "2026-06-14",
         "positives": 20,
-        "universe": 3093
+        "universe": 3096
       },
       {
         "in_zone": 41,
         "labeled": 176,
         "launch_day": "2026-06-15",
         "positives": 19,
-        "universe": 3818
+        "universe": 3819
       },
       {
         "in_zone": 66,
         "labeled": 222,
         "launch_day": "2026-06-16",
         "positives": 24,
-        "universe": 4013
+        "universe": 4015
       },
       {
         "in_zone": 43,
         "labeled": 185,
         "launch_day": "2026-06-17",
         "positives": 15,
-        "universe": 3505
+        "universe": 3507
       },
       {
         "in_zone": 44,
         "labeled": 190,
         "launch_day": "2026-06-18",
         "positives": 18,
-        "universe": 3254
+        "universe": 3257
       },
       {
         "in_zone": 41,
         "labeled": 163,
         "launch_day": "2026-06-19",
         "positives": 19,
-        "universe": 3533
+        "universe": 3535
       },
       {
         "in_zone": 41,
@@ -3265,35 +3265,35 @@
         "labeled": 120,
         "launch_day": "2026-06-21",
         "positives": 20,
-        "universe": 2339
+        "universe": 2340
       },
       {
         "in_zone": 50,
         "labeled": 161,
         "launch_day": "2026-06-22",
         "positives": 15,
-        "universe": 2765
+        "universe": 2767
       },
       {
         "in_zone": 38,
         "labeled": 136,
         "launch_day": "2026-06-23",
         "positives": 14,
-        "universe": 2222
+        "universe": 2223
       },
       {
         "in_zone": 35,
         "labeled": 155,
         "launch_day": "2026-06-24",
         "positives": 19,
-        "universe": 2858
+        "universe": 2861
       },
       {
         "in_zone": 43,
         "labeled": 144,
         "launch_day": "2026-06-25",
         "positives": 16,
-        "universe": 2651
+        "universe": 2652
       },
       {
         "in_zone": 48,
@@ -3314,56 +3314,56 @@
         "labeled": 171,
         "launch_day": "2026-06-28",
         "positives": 22,
-        "universe": 3498
+        "universe": 3499
       },
       {
         "in_zone": 59,
         "labeled": 190,
         "launch_day": "2026-06-29",
         "positives": 21,
-        "universe": 3474
+        "universe": 3475
       },
       {
         "in_zone": 59,
         "labeled": 230,
         "launch_day": "2026-06-30",
         "positives": 21,
-        "universe": 4144
+        "universe": 4145
       },
       {
         "in_zone": 61,
         "labeled": 253,
         "launch_day": "2026-07-01",
         "positives": 14,
-        "universe": 4379
+        "universe": 4381
       },
       {
         "in_zone": 65,
         "labeled": 257,
         "launch_day": "2026-07-02",
         "positives": 22,
-        "universe": 4648
+        "universe": 4651
       },
       {
         "in_zone": 67,
         "labeled": 253,
         "launch_day": "2026-07-03",
         "positives": 27,
-        "universe": 5174
+        "universe": 5176
       },
       {
         "in_zone": 72,
         "labeled": 216,
         "launch_day": "2026-07-04",
         "positives": 18,
-        "universe": 3993
+        "universe": 3994
       },
       {
         "in_zone": 49,
         "labeled": 177,
         "launch_day": "2026-07-05",
         "positives": 18,
-        "universe": 3311
+        "universe": 3312
       },
       {
         "in_zone": 47,
@@ -3377,28 +3377,28 @@
         "labeled": 221,
         "launch_day": "2026-07-07",
         "positives": 28,
-        "universe": 3603
+        "universe": 3604
       },
       {
         "in_zone": 45,
         "labeled": 169,
         "launch_day": "2026-07-08",
         "positives": 18,
-        "universe": 3320
+        "universe": 3322
       },
       {
         "in_zone": 64,
         "labeled": 200,
         "launch_day": "2026-07-09",
         "positives": 24,
-        "universe": 3508
+        "universe": 3510
       },
       {
         "in_zone": 43,
         "labeled": 147,
         "launch_day": "2026-07-10",
         "positives": 15,
-        "universe": 2788
+        "universe": 2789
       },
       {
         "in_zone": 32,
@@ -3412,70 +3412,70 @@
         "labeled": 124,
         "launch_day": "2026-07-12",
         "positives": 15,
-        "universe": 2250
+        "universe": 2251
       },
       {
         "in_zone": 33,
         "labeled": 128,
         "launch_day": "2026-07-13",
         "positives": 14,
-        "universe": 2941
+        "universe": 2942
       },
       {
         "in_zone": 17,
         "labeled": 103,
         "launch_day": "2026-07-14",
         "positives": 13,
-        "universe": 3016
+        "universe": 3019
       },
       {
         "in_zone": 14,
         "labeled": 87,
         "launch_day": "2026-07-15",
         "positives": 5,
-        "universe": 3059
+        "universe": 3063
       },
       {
         "in_zone": 21,
         "labeled": 69,
         "launch_day": "2026-07-16",
         "positives": 4,
-        "universe": 3060
+        "universe": 3062
       },
       {
         "in_zone": 8,
         "labeled": 42,
         "launch_day": "2026-07-17",
         "positives": 3,
-        "universe": 3122
+        "universe": 3128
       },
       {
         "in_zone": 4,
         "labeled": 36,
         "launch_day": "2026-07-18",
         "positives": 4,
-        "universe": 3134
+        "universe": 3138
       },
       {
         "in_zone": 2,
         "labeled": 13,
         "launch_day": "2026-07-19",
         "positives": 1,
-        "universe": 2932
+        "universe": 2935
       },
       {
         "in_zone": 0,
         "labeled": 3,
         "launch_day": "2026-07-20",
         "positives": 0,
-        "universe": 3455
+        "universe": 3460
       },
       {
         "in_zone": 0,
         "labeled": 4,
         "launch_day": "2026-07-21",
         "positives": 0,
-        "universe": 3633
+        "universe": 3637
       },
       {
         "in_zone": 1,
@@ -3489,161 +3489,161 @@
         "labeled": 4,
         "launch_day": "2026-07-23",
         "positives": 0,
-        "universe": 3513
+        "universe": 3515
       },
       {
         "in_zone": 1,
         "labeled": 4,
         "launch_day": "2026-07-24",
         "positives": 0,
-        "universe": 3571
+        "universe": 3561
       },
       {
         "in_zone": null,
         "labeled": null,
         "launch_day": "2026-07-25",
         "positives": null,
-        "universe": 3491
+        "universe": 3475
       },
       {
         "in_zone": 6,
         "labeled": 21,
         "launch_day": "2026-07-26",
         "positives": 3,
-        "universe": 3464
+        "universe": 3442
       },
       {
         "in_zone": 16,
         "labeled": 103,
         "launch_day": "2026-07-27",
         "positives": 16,
-        "universe": 4060
+        "universe": 4025
       },
       {
         "in_zone": 31,
         "labeled": 154,
         "launch_day": "2026-07-28",
         "positives": 17,
-        "universe": 4611
+        "universe": 4579
       },
       {
         "in_zone": 55,
         "labeled": 195,
         "launch_day": "2026-07-29",
         "positives": 24,
-        "universe": 4345
+        "universe": 4315
       },
       {
         "in_zone": 59,
         "labeled": 266,
         "launch_day": "2026-07-30",
         "positives": 29,
-        "universe": 4705
+        "universe": 4695
       },
       {
         "in_zone": 44,
         "labeled": 248,
         "launch_day": "2026-07-31",
         "positives": 20,
-        "universe": 4076
+        "universe": 4070
       },
       {
         "in_zone": 44,
         "labeled": 249,
         "launch_day": "2026-08-01",
         "positives": 29,
-        "universe": 3660
+        "universe": 3656
       },
       {
         "in_zone": 60,
         "labeled": 258,
         "launch_day": "2026-08-02",
         "positives": 23,
-        "universe": 3297
+        "universe": 3308
       },
       {
         "in_zone": 19,
         "labeled": 131,
         "launch_day": "2026-08-03",
         "positives": 7,
-        "universe": 12158
+        "universe": 12125
       },
       {
         "in_zone": 111,
         "labeled": 458,
         "launch_day": "2026-08-04",
         "positives": 50,
-        "universe": 42780
+        "universe": 42578
       },
       {
         "in_zone": 103,
         "labeled": 478,
         "launch_day": "2026-08-05",
         "positives": 51,
-        "universe": 33943
+        "universe": 33888
       },
       {
         "in_zone": 91,
         "labeled": 480,
         "launch_day": "2026-08-06",
         "positives": 45,
-        "universe": 32821
+        "universe": 32786
       },
       {
         "in_zone": 112,
         "labeled": 469,
         "launch_day": "2026-08-07",
         "positives": 55,
-        "universe": 31018
+        "universe": 31005
       },
       {
         "in_zone": 137,
         "labeled": 493,
         "launch_day": "2026-08-08",
         "positives": 74,
-        "universe": 32232
+        "universe": 32229
       },
       {
         "in_zone": 125,
         "labeled": 554,
         "launch_day": "2026-08-09",
         "positives": 59,
-        "universe": 35200
+        "universe": 35196
       },
       {
         "in_zone": 167,
         "labeled": 574,
         "launch_day": "2026-08-10",
         "positives": 70,
-        "universe": 33691
+        "universe": 33687
       },
       {
         "in_zone": 148,
         "labeled": 518,
         "launch_day": "2026-08-11",
         "positives": 63,
-        "universe": 32787
+        "universe": 32782
       },
       {
         "in_zone": 186,
         "labeled": 605,
         "launch_day": "2026-08-12",
         "positives": 80,
-        "universe": 35878
+        "universe": 35874
       },
       {
         "in_zone": 153,
         "labeled": 565,
         "launch_day": "2026-08-13",
         "positives": 80,
-        "universe": 35650
+        "universe": 35646
       },
       {
         "in_zone": 149,
         "labeled": 551,
         "launch_day": "2026-08-14",
         "positives": 71,
-        "universe": 32405
+        "universe": 32404
       },
       {
         "in_zone": 126,
@@ -3762,7 +3762,7 @@
         "labeled": 1384,
         "launch_day": "2026-09-04",
         "positives": 41,
-        "universe": 19339
+        "universe": 28453
       }
     ],
     "per_stratum": [
@@ -3771,7 +3771,7 @@
         "labeled": 8660,
         "positive_rate_per_fetched": 0.07360798650168729,
         "positives": 1047,
-        "size": 14755,
+        "size": 15370,
         "stratum": "candidate"
       },
       {
@@ -3779,7 +3779,7 @@
         "labeled": 9391,
         "positive_rate_per_fetched": 0.0012930792151571373,
         "positives": 23,
-        "size": 18821,
+        "size": 19908,
         "stratum": "unlikely_active"
       },
       {
@@ -3787,7 +3787,7 @@
         "labeled": 1409,
         "positive_rate_per_fetched": 0.00012270691453463402,
         "positives": 2,
-        "size": 83930,
+        "size": 87606,
         "stratum": "unlikely_quiet"
       },
       {
@@ -3795,7 +3795,7 @@
         "labeled": 471,
         "positive_rate_per_fetched": 0.00733652312599681,
         "positives": 23,
-        "size": 17953,
+        "size": 17991,
         "stratum": "unknown"
       },
       {
@@ -3803,7 +3803,7 @@
         "labeled": 0,
         "positive_rate_per_fetched": 0.0,
         "positives": 0,
-        "size": 25797,
+        "size": 26776,
         "stratum": "no_inflow"
       },
       {
@@ -3811,7 +3811,7 @@
         "labeled": 0,
         "positive_rate_per_fetched": 0.0,
         "positives": 0,
-        "size": 45219,
+        "size": 47938,
         "stratum": "mayhem"
       }
     ]

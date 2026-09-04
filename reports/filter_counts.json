@@ -9,7 +9,7 @@
     "train_n": 17060,
     "train_negatives_dropped": 21996,
     "train_pos": 3412,
-    "updated_at": 1788537206,
+    "updated_at": 1788557124,
     "val_n": 808,
     "val_pos": 49
   },
@@ -24,20 +24,20 @@
     "dropped_out_of_coverage": 8230,
     "labeled": 45810,
     "tokens_with_tape": 194877,
-    "updated_at": 1788537129
+    "updated_at": 1788557037
   },
   "prescreen": {
-    "fetch_queue": 316197,
+    "fetch_queue": 318644,
     "needed_sol_for_tp": 12.426,
-    "prescreen_mayhem_dropped": 45219,
-    "prescreen_no_inflow_dropped": 25797,
+    "prescreen_mayhem_dropped": 47938,
+    "prescreen_no_inflow_dropped": 26776,
     "queued": {
-      "candidate": 14755,
+      "candidate": 15370,
       "hist_candidate": 112640,
       "hist_rest": 149664,
-      "unknown": 3518,
-      "unlikely_active": 18821,
-      "unlikely_quiet": 16799
+      "unknown": 3527,
+      "unlikely_active": 19908,
+      "unlikely_quiet": 17535
     },
     "sample_rates": {
       "candidate": 1.0,
@@ -48,29 +48,29 @@
       "unlikely_quiet": 0.2
     },
     "strata": {
-      "candidate": 14755,
+      "candidate": 15370,
       "hist_candidate": 322062,
       "hist_rest": 704325,
-      "mayhem": 45219,
-      "no_inflow": 25797,
-      "unknown": 17953,
-      "unlikely_active": 18821,
-      "unlikely_quiet": 83930
+      "mayhem": 47938,
+      "no_inflow": 26776,
+      "unknown": 17991,
+      "unlikely_active": 19908,
+      "unlikely_quiet": 87606
     },
-    "universe_tokens": 1232862,
-    "updated_at": 1788535297
+    "universe_tokens": 1241976,
+    "updated_at": 1788555564
   },
   "universe": {
-    "attention_meta_total": 243627,
-    "in_date_range": 198082,
-    "pumpportal_frames_in_range": 189372,
-    "universe_added_from_frames": 24813,
+    "attention_meta_total": 254100,
+    "in_date_range": 207298,
+    "pumpportal_frames_in_range": 198110,
+    "universe_added_from_frames": 24960,
     "universe_bitquery_appended": 1026387,
-    "universe_mayhem_flagged": 45219,
-    "universe_mayhem_unknown": 17103,
+    "universe_mayhem_flagged": 47938,
+    "universe_mayhem_unknown": 17479,
     "universe_no_creator": 0,
-    "universe_seen_late_dropped": 16420,
-    "universe_tokens": 206475,
-    "updated_at": 1788535125
+    "universe_seen_late_dropped": 16669,
+    "universe_tokens": 215589,
+    "updated_at": 1788555365
   }
 }
