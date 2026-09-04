@@ -19,6 +19,7 @@ import polars as pl
 from pumpfun.config import Config
 from pumpfun.features.wallets import WALLETS, wallet_features
 from pumpfun.ingest.to_parquet import curve_params
+from pumpfun.label import curve_sim as cs
 
 SHAPE = [
     "n_trades",
@@ -146,30 +147,81 @@ def first_seen_level(cfg: Config, mint: str) -> float:
     return float(lo) + (float(hi) - float(lo)) * u
 
 
-def botlive_rows(rows: list[tuple], curve_sol: list[float], level: float) -> list[tuple]:
-    """The bot's view of a tape: the launch anchor (first trade) plus everything from the first trade after
-    which the curve held >= level. Below-level history in between is invisible to it."""
-    k = next((i for i, c in enumerate(curve_sol) if c is not None and c >= level), None)
-    if k is None or k <= 1:
-        return rows
-    return [rows[0], *rows[k:]]
+def botlive_series(rows: list[tuple], curve_sol: list[float], level: float, p0: float) -> list[tuple[float, float, float]]:
+    """The bot's view of a tape as (t, price, real_sol) samples: one per slot-write of the curve account
+    (the last state in each slot), starting at the first slot after which the curve held >= level, plus
+    the launch anchor (t=0, start price, 0 SOL). Below-level history before first sight is invisible."""
+    by_slot: dict[int, tuple[float, float, float]] = {}
+    order: list[int] = []
+    for r, c in zip(rows, curve_sol, strict=True):
+        slot = int(r[1])
+        if slot not in by_slot:
+            order.append(slot)
+        by_slot[slot] = (float(r[0]), float(r[6]), float(c) if c is not None else 0.0)
+    samples = [by_slot[sl] for sl in order]
+    k = next((i for i, smp in enumerate(samples) if smp[2] >= level), None)
+    tail = samples if k is None else samples[k:]
+    return [(0.0, p0, 0.0), *tail]
 
 
 def botlive_features(
-    cfg: Config,
-    rows: list[tuple],
-    curve_sol: list[float],
-    creator: str,
-    sol_at_entry: float,
-    entry_price: float,
-    entry_t: float,
-    level: float,
+    cfg: Config, rows: list[tuple], curve_sol: list[float], creator: str, entry_t: float, level: float, top10_share: float
 ) -> dict:
-    tr = botlive_rows(rows, curve_sol, level)
-    f = shape_and_holders(cfg, tr, creator, sol_at_entry, entry_price, entry_t)
-    out = {f"bl_{n}": f.get(n) for n in BOTLIVE_NAMES if n != "first_seen_sol"}
-    out["bl_first_seen_sol"] = level
-    return out
+    """Branch 2's exact live semantics over the bot-view series; holder read and launch buy from their own sources."""
+    p = curve_params(cfg)
+    p0 = cs.initial_reserves(p).spot_sol_per_token(p.raw_per_token)
+    ser = botlive_series(rows, curve_sol, level, p0)
+    T = max(float(entry_t), 1.0)
+    ts = [x[0] for x in ser]
+    ps = [x[1] for x in ser]
+    ss = [x[2] for x in ser]
+    s_now = ss[-1]
+
+    def sol_at_or_before(t_cut: float) -> float:
+        v = 0.0
+        for t_, _, sol in ser:
+            if t_ <= t_cut:
+                v = sol
+            else:
+                break
+        return v
+
+    rate_w = s_now / T
+    net_30 = s_now - sol_at_or_before(T - 30.0)
+    # lows / drawdown / run / peak on the sampled price path
+    peak, max_dd, lows = 0.0, 0.0, 0
+    state, local_high, local_low = "up", 0.0, math.inf
+    for px in ps:
+        peak = max(peak, px)
+        max_dd = max(max_dd, 1 - px / peak if peak > 0 else 0.0)
+        if state == "up":
+            local_high = max(local_high, px)
+            if px <= local_high * 0.95:
+                state, local_low = "down", px
+        else:
+            local_low = min(local_low, px)
+            if px >= local_low * 1.05:
+                lows += 1
+                state, local_high = "up", px
+    dev_first_buy = next((float(r[3]) for r in rows if r[2] and r[5] == creator), 0.0)
+    return {
+        "bl_price_slope": slope([math.log(x) for x in ps if x > 0], [t_ for t_, x in zip(ts, ps, strict=True) if x > 0]),
+        "bl_max_drawdown": max_dd,
+        "bl_lows": lows,
+        "bl_lows_per_min": lows / T * 60,
+        "bl_run_from_low": ps[-1] / min(ps) if min(ps) > 0 else 1.0,
+        "bl_from_peak": ps[-1] / max(ps) if max(ps) > 0 else 1.0,
+        "bl_log_ret_window": math.log(ps[-1] / ps[0]) if ps[0] > 0 and ps[-1] > 0 else 0.0,
+        "bl_sol_per_s_window": rate_w,
+        "bl_inflow_accel": max(-20.0, min(20.0, (net_30 / 30.0) / max(rate_w, 0.005))),
+        "bl_sol_last60": s_now - sol_at_or_before(T - 60.0),
+        "bl_trades_last60": sum(1 for t_ in ts if T - 60.0 < t_ <= T),
+        "bl_decision_age_s": T,
+        "bl_curve_sol_in": s_now,
+        "bl_top10_share": top10_share,
+        "bl_dev_buy_sol": dev_first_buy,
+        "bl_first_seen_sol": level,
+    }
 
 
 SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]
@@ -588,7 +640,7 @@ def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFr
         tup = list(g.select(cols).iter_rows())
         feats = shape_and_holders(cfg, tup, creator, sol_at_entry, entry_price, entry_t)
         level = first_seen_level(cfg, mint)
-        bl = botlive_features(cfg, tup, g["curve_sol_after"].to_list(), creator, sol_at_entry, entry_price, entry_t, level)
+        bl = botlive_features(cfg, tup, g["curve_sol_after"].to_list(), creator, entry_t, level, feats["top10_share"])
         rows.append({"mint": mint, "entry_t_": entry_t, **feats, **bl})
     df = (
         pl.DataFrame(rows)

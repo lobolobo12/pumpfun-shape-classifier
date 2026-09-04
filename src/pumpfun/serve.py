@@ -96,7 +96,9 @@ class Scorer:
         if self.truncated:
             level = float(req.get("first_seen_sol", 4.5))
             feats.update(
-                botlive_features(self.cfg, tup, [r["curve_sol_after"] for r in visible], creator, sol_at, px, entry_t, level)
+                botlive_features(
+                    self.cfg, tup, [r["curve_sol_after"] for r in visible], creator, entry_t, level, feats["top10_share"]
+                )
             )
         decision = {
             "entry_t": entry_t,
