@@ -139,11 +139,25 @@ BOTLIVE = [f"bl_{n}" for n in BOTLIVE_NAMES]
 
 
 def first_seen_level(cfg: Config, mint: str) -> float:
-    """Deterministic per-coin sample of the bot's first-sight level, until the empirical distribution lands."""
+    """Deterministic per-coin sample of the bot's first-sight level. `botlive.first_seen_sol` is either
+    [lo, hi] (uniform) or a mixture [[lo, hi, weight], ...] (e.g. scanner-seen 3-8 SOL vs band-first
+    8.6-10 SOL), until the empirical distribution from the bot's nn_scores replaces it."""
     import zlib
 
-    lo, hi = (cfg.raw.get("botlive") or {}).get("first_seen_sol", [3.0, 6.0])
-    u = (zlib.crc32(mint.encode()) % 10_000) / 10_000.0
+    spec = (cfg.raw.get("botlive") or {}).get("first_seen_sol", [3.0, 6.0])
+    h = zlib.crc32(mint.encode())
+    u = (h % 10_000) / 10_000.0
+    if spec and isinstance(spec[0], (list, tuple)):
+        w = (h // 10_000 % 10_000) / 10_000.0
+        acc = 0.0
+        total = sum(float(c[2]) for c in spec)
+        for lo, hi, wt in spec:
+            acc += float(wt) / total
+            if w <= acc:
+                return float(lo) + (float(hi) - float(lo)) * u
+        lo, hi, _ = spec[-1]
+        return float(lo) + (float(hi) - float(lo)) * u
+    lo, hi = spec
     return float(lo) + (float(hi) - float(lo)) * u
 
 
