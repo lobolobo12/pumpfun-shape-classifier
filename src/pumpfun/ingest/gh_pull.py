@@ -29,11 +29,16 @@ def _gh(*args: str) -> str:
 
 
 def recent_run_ids(limit: int, repo: str | None = None) -> list[int]:
-    args = ["run", "list", "--workflow", "fetch.yml", "--status", "success", "--limit", str(limit), "--json", "databaseId"]
-    if repo:
-        args += ["-R", repo]
-    out = _gh(*args)
-    return [int(r["databaseId"]) for r in json.loads(out)]
+    """Completed runs, newest first. A run whose one shard lost its runner is 'failure' as a whole while the
+    other shards' artifacts are intact, so failed runs are pulled too; missing artifacts are just skipped."""
+    ids: list[tuple[int, str]] = []
+    for status in ("success", "failure"):
+        args = ["run", "list", "--workflow", "fetch.yml", "--status", status, "--limit", str(limit), "--json", "databaseId,createdAt"]
+        if repo:
+            args += ["-R", repo]
+        ids += [(int(r["databaseId"]), str(r["createdAt"])) for r in json.loads(_gh(*args))]
+    ids.sort(key=lambda t: t[1], reverse=True)
+    return [i for i, _ in ids[:limit]]
 
 
 def merge_ledger(main: Path, incoming: Path) -> int:
