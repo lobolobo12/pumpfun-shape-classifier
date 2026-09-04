@@ -33,7 +33,18 @@ def recent_run_ids(limit: int, repo: str | None = None) -> list[int]:
     other shards' artifacts are intact, so failed runs are pulled too; missing artifacts are just skipped."""
     ids: list[tuple[int, str]] = []
     for status in ("success", "failure"):
-        args = ["run", "list", "--workflow", "fetch.yml", "--status", status, "--limit", str(limit), "--json", "databaseId,createdAt"]
+        args = [
+            "run",
+            "list",
+            "--workflow",
+            "fetch.yml",
+            "--status",
+            status,
+            "--limit",
+            str(limit),
+            "--json",
+            "databaseId,createdAt",
+        ]
         if repo:
             args += ["-R", repo]
         ids += [(int(r["databaseId"]), str(r["createdAt"])) for r in json.loads(_gh(*args))]
