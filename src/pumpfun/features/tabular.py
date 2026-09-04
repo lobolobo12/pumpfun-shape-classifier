@@ -128,7 +128,7 @@ BOTLIVE = [
     "curve_sol_in",
     "top10_share",
     "dev_buy_sol",  # creator's launch buy in SOL: exact live and in the tape; dev_share is pre-dump here, post-dump live
-    "holders_n",
+    # holders_n dropped: the bot only knows the exact count while its top-20 list is not full
 ]
 SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]
 GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR, "context": CONTEXT, "wallets": WALLETS}

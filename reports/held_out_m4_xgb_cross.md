@@ -10,8 +10,8 @@
 | xgb_wallets | 460 | 0.204 | 0.553 | 0.00 | 0.26 | 0.22 | -0.82 | -2.55 |
 | xgb_holders+wallets | 460 | 0.260 | 0.614 | 0.40 | 0.26 | 0.30 | 1.99 | -0.13 |
 | xgb_all+wallets | 460 | 0.342 | 0.632 | 0.80 | 0.52 | 0.46 | 7.03 | 4.86 |
-| xgb_botlive | 460 | 0.276 | 0.626 | 0.60 | 0.30 | 0.35 | 3.12 | 0.95 |
-| xgb_botlive+context | 460 | 0.340 | 0.629 | 0.80 | 0.57 | 0.41 | 5.27 | 3.10 |
+| xgb_botlive | 460 | 0.263 | 0.622 | 0.40 | 0.22 | 0.35 | 3.05 | 0.88 |
+| xgb_botlive+context | 460 | 0.364 | 0.635 | 0.80 | 0.52 | 0.46 | 7.15 | 4.99 |
 | logistic_repo_recipe | 460 | 0.233 | 0.548 | 0.60 | 0.22 | 0.22 | -2.09 | -3.78 |
 | human (M0) | — | not yet recorded: run `pf bench label` | | | | | | |
 
@@ -152,36 +152,35 @@
 
 ## xgb_botlive: top gain features
 
-- dev_buy_sol: 10.253
-- holders_n: 6.613
-- sol_last60: 5.969
-- max_drawdown: 4.731
+- dev_buy_sol: 13.163
+- sol_last60: 6.584
+- trades_last60: 5.487
+- max_drawdown: 5.234
+- lows: 5.18
+- top10_share: 4.27
 - decision_age_s: 4.222
-- run_from_low: 3.968
-- price_slope: 3.88
-- trades_last60: 3.867
-- lows_per_min: 3.783
-- inflow_accel: 3.734
-- curve_sol_in: 3.685
-- top10_share: 3.633
-- lows: 3.6
-- sol_per_s_window: 3.405
-- log_ret_window: 3.339
+- lows_per_min: 4.206
+- log_ret_window: 3.943
+- run_from_low: 3.933
+- curve_sol_in: 3.861
+- price_slope: 3.553
+- sol_per_s_window: 3.508
+- inflow_accel: 3.189
 
 ## xgb_botlive+context: top gain features
 
-- is_native_launch: 25.762
-- replies_at_entry: 24.802
-- dow_cos: 12.272
-- holders_n: 9.282
-- sol_last60: 9.249
-- dev_buy_sol: 8.462
-- market_recent_n: 7.992
-- market_candidate_rate: 6.54
-- max_drawdown: 6.44
-- twitter_is_status: 6.238
-- top10_share: 6.049
-- live_at_entry: 6.032
-- market_recent_tp_rate: 6.015
-- price_slope: 5.933
-- run_from_low: 5.856
+- is_native_launch: 23.947
+- replies_at_entry: 20.812
+- live_at_entry: 17.819
+- sol_last60: 9.394
+- dev_buy_sol: 8.632
+- dow_cos: 8.331
+- twitter_is_status: 7.326
+- max_drawdown: 6.985
+- market_candidate_rate: 6.742
+- market_recent_n: 6.651
+- price_slope: 6.533
+- top10_share: 6.505
+- curve_sol_in: 6.2
+- inflow_accel: 6.026
+- trades_last60: 6.007
