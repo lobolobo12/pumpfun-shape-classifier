@@ -141,6 +141,8 @@ cnn:
     cuts_per_tape: 3       # random decision moments per tape
     max_mints: 200000      # cap on tapes used (memory: cuts x 256 x 6 float32; 225k cuts ~ 1.4 GB)
     epochs: 20
+botlive:
+  first_seen_sol: [3.0, 6.0]   # bot first-sight level sampled per coin for the truncated training view
 ensemble:
   # rank-average of these models' saved test scores (trained in the same run: same split and mode)
   members: ["xgb_holders", "cnn_trades+side"]

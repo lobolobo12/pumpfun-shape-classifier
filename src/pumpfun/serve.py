@@ -23,7 +23,7 @@ import numpy as np
 import xgboost as xgb
 
 from pumpfun.config import Config
-from pumpfun.features.tabular import shape_and_holders
+from pumpfun.features.tabular import botlive_features, shape_and_holders
 from pumpfun.ingest.swap_api import TradeFile, parse_trade
 from pumpfun.ingest.to_parquet import tape_rows
 
@@ -39,6 +39,9 @@ class Scorer:
         self.cfg = cfg
         self.name = name
         self.features: list[str] = meta["features"]
+        # bot-facing names: the truncated training columns are "bl_<name>", the bot sends "<name>"
+        self.request_names: list[str] = [c[3:] if c.startswith("bl_") else c for c in self.features]
+        self.truncated = any(c.startswith("bl_") for c in self.features)
         self.splits = meta["splits"]
         self.test_scores: list[float] = meta["test_scores"]
         self.boosters: list[xgb.Booster] = []
@@ -87,9 +90,14 @@ class Scorer:
             (r["seconds_since_launch"], r["slot"], r["is_buy"], r["sol_amount"], r["token_amount"], r["trader"], r["price_sol"])
             for r in visible
         ]
-        feats = shape_and_holders(
-            self.cfg, tup, creator, float(visible[-1]["curve_sol_after"]), float(visible[-1]["price_sol"]), entry_t
-        )
+        sol_at = float(visible[-1]["curve_sol_after"])
+        px = float(visible[-1]["price_sol"])
+        feats = shape_and_holders(self.cfg, tup, creator, sol_at, px, entry_t)
+        if self.truncated:
+            level = float(req.get("first_seen_sol", 4.5))
+            feats.update(
+                botlive_features(self.cfg, tup, [r["curve_sol_after"] for r in visible], creator, sol_at, px, entry_t, level)
+            )
         decision = {
             "entry_t": entry_t,
             "curve_sol": float(visible[-1]["curve_sol_after"]),
@@ -99,8 +107,10 @@ class Scorer:
         return self._score_features(feats, t0, decision)
 
     def _score_features(self, feats: dict, t0: float, decision: dict) -> dict:
-        missing = [c for c in self.features if c not in feats]
-        x = np.array([[float(feats.get(c) if feats.get(c) is not None else np.nan) for c in self.features]], dtype=np.float32)
+        # accept either the training column names or the bot-facing names
+        vals = [feats.get(c, feats.get(r)) for c, r in zip(self.features, self.request_names, strict=True)]
+        missing = [r for r, v in zip(self.request_names, vals, strict=True) if v is None]
+        x = np.array([[float(v) if v is not None else np.nan for v in vals]], dtype=np.float32)
         dm = xgb.DMatrix(x)
         s = float(np.mean([b.predict(dm)[0] for b in self.boosters]))
         pct = 100.0 * bisect_left(self.test_scores, s) / max(1, len(self.test_scores))
@@ -143,7 +153,8 @@ def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
                         "model": scorer.name,
                         "splits": scorer.splits,
                         "n_features": len(scorer.features),
-                        "features": scorer.features,
+                        "features": scorer.request_names,
+                        "truncated_training": scorer.truncated,
                         "bag": len(scorer.boosters),
                     },
                 )

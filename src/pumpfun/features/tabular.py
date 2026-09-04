@@ -112,7 +112,11 @@ META_COLS = [
 ]
 # What the paper bot can compute live at a crossing without a per-trade tape: reserve-series shape,
 # speed, the decision moment, and its own holder pull. Served as model "xgb_botlive" (v0 book).
-BOTLIVE = [
+# The bot first sees a curve where its scanner ranks it (3-6 SOL raised) and anchors the series at the
+# launch state, so its path features see only [launch anchor] + [first sight .. decision]. Training
+# renders the same truncation ("bl_" columns) from a first-sight level sampled per coin; the bot sends
+# its actual level as first_seen_sol.
+BOTLIVE_NAMES = [
     "price_slope",
     "max_drawdown",
     "lows",
@@ -128,8 +132,46 @@ BOTLIVE = [
     "curve_sol_in",
     "top10_share",
     "dev_buy_sol",  # creator's launch buy in SOL: exact live and in the tape; dev_share is pre-dump here, post-dump live
-    # holders_n dropped: the bot only knows the exact count while its top-20 list is not full
+    "first_seen_sol",  # real SOL in the curve when the bot first sighted it (its own key)
 ]
+BOTLIVE = [f"bl_{n}" for n in BOTLIVE_NAMES]
+
+
+def first_seen_level(cfg: Config, mint: str) -> float:
+    """Deterministic per-coin sample of the bot's first-sight level, until the empirical distribution lands."""
+    import zlib
+
+    lo, hi = (cfg.raw.get("botlive") or {}).get("first_seen_sol", [3.0, 6.0])
+    u = (zlib.crc32(mint.encode()) % 10_000) / 10_000.0
+    return float(lo) + (float(hi) - float(lo)) * u
+
+
+def botlive_rows(rows: list[tuple], curve_sol: list[float], level: float) -> list[tuple]:
+    """The bot's view of a tape: the launch anchor (first trade) plus everything from the first trade after
+    which the curve held >= level. Below-level history in between is invisible to it."""
+    k = next((i for i, c in enumerate(curve_sol) if c is not None and c >= level), None)
+    if k is None or k <= 1:
+        return rows
+    return [rows[0], *rows[k:]]
+
+
+def botlive_features(
+    cfg: Config,
+    rows: list[tuple],
+    curve_sol: list[float],
+    creator: str,
+    sol_at_entry: float,
+    entry_price: float,
+    entry_t: float,
+    level: float,
+) -> dict:
+    tr = botlive_rows(rows, curve_sol, level)
+    f = shape_and_holders(cfg, tr, creator, sol_at_entry, entry_price, entry_t)
+    out = {f"bl_{n}": f.get(n) for n in BOTLIVE_NAMES if n != "first_seen_sol"}
+    out["bl_first_seen_sol"] = level
+    return out
+
+
 SIDE = ["curve_sol_at_entry", "in_zone", "active_at_entry"]
 GROUPS = {"shape": SHAPE, "holders": HOLDERS, "creator": CREATOR, "context": CONTEXT, "wallets": WALLETS}
 NATIVE_HOSTS = {"ipfs.io", "pump.mypinata.cloud"}
@@ -543,8 +585,11 @@ def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFr
     cols = ["seconds_since_launch", "slot", "is_buy", "sol_amount", "token_amount", "trader", "price_sol"]
     for (mint,), g in wt.group_by("mint", maintain_order=True):
         creator, sol_at_entry, entry_price, entry_t = meta[mint]
-        feats = shape_and_holders(cfg, list(g.select(cols).iter_rows()), creator, sol_at_entry, entry_price, entry_t)
-        rows.append({"mint": mint, "entry_t_": entry_t, **feats})
+        tup = list(g.select(cols).iter_rows())
+        feats = shape_and_holders(cfg, tup, creator, sol_at_entry, entry_price, entry_t)
+        level = first_seen_level(cfg, mint)
+        bl = botlive_features(cfg, tup, g["curve_sol_after"].to_list(), creator, sol_at_entry, entry_price, entry_t, level)
+        rows.append({"mint": mint, "entry_t_": entry_t, **feats, **bl})
     df = (
         pl.DataFrame(rows)
         .join(creator_history(cfg, tokens, labels), on="mint", how="left")
