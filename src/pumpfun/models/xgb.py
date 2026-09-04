@@ -36,6 +36,7 @@ VARIANTS = {
     "xgb_holders+wallets": HOLDERS + WALLETS,
     "xgb_all+wallets": SHAPE + HOLDERS + CREATOR + CONTEXT + WALLETS,
     "xgb_botlive": BOTLIVE,
+    "xgb_botlive+context": BOTLIVE + CONTEXT,
 }
 # analyse.ts MODEL_FEATURES, translated to our names (sameSlotShare and ageS have no counterpart here).
 LOGISTIC_FEATURES = [

@@ -11,6 +11,7 @@
 | xgb_holders+wallets | 460 | 0.260 | 0.614 | 0.40 | 0.26 | 0.30 | 1.99 | -0.13 |
 | xgb_all+wallets | 460 | 0.342 | 0.632 | 0.80 | 0.52 | 0.46 | 7.03 | 4.86 |
 | xgb_botlive | 460 | 0.261 | 0.577 | 0.60 | 0.26 | 0.30 | 2.00 | -0.17 |
+| xgb_botlive+context | 460 | 0.199 | 0.538 | 0.40 | 0.26 | 0.33 | 2.41 | 0.25 |
 | logistic_repo_recipe | 460 | 0.233 | 0.548 | 0.60 | 0.22 | 0.22 | -2.09 | -3.78 |
 | human (M0) | — | not yet recorded: run `pf bench label` | | | | | | |
 
@@ -166,3 +167,21 @@
 - inflow_accel: 3.997
 - sol_per_s_window: 3.991
 - lows: 3.74
+
+## xgb_botlive+context: top gain features
+
+- is_native_launch: 24.29
+- replies_at_entry: 23.923
+- dow_cos: 12.315
+- holders_n: 8.997
+- sol_last60: 8.952
+- market_recent_n: 8.302
+- twitter_is_status: 7.874
+- dev_share: 7.141
+- market_candidate_rate: 6.694
+- max_drawdown: 6.476
+- run_from_low: 6.101
+- log_ret_window: 5.933
+- price_slope: 5.921
+- market_recent_tp_rate: 5.771
+- has_twitter: 5.748
