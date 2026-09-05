@@ -19,6 +19,8 @@ else
   gh workflow run fetch.yml -f shards="${SHARDS:-20}" -f rps="${RPS:-0.28}" -f probe=0 -f max_minutes="${MAX_MINUTES:-300}"
   echo "dispatched fetch (${SHARDS:-20} shards)"
 fi
+# Fold the pulled tapes into the Parquet layer before anything trains on them.
+uv run pf to-parquet 2>&1 | tail -1 || echo "to-parquet failed"
 # Served bot-live models: retrain on the bot's task (entry at first sight) with yesterday as the held-out day, restart the scorer.
 # splits: train < D-2, val = D-2, test = D-1 (yesterday, the last complete day)
 YDAY=$(date -v-1d +%F 2>/dev/null || date -d "yesterday" +%F); D2=$(date -v-2d +%F 2>/dev/null || date -d "2 days ago" +%F)
