@@ -237,6 +237,9 @@ def pretrain(cfg: Config) -> dict:
         .join(tokens, on="mint", how="inner")
         .filter((pl.col("launch_day") < cfg.split_train_end) & ~pl.col("mayhem").fill_null(False))
     )
+    pre_min = str(pc.get("min_launch_day") or "")
+    if pre_min:
+        mints = mints.filter(pl.col("launch_day") >= pre_min)  # optional era cut for the pretraining set
     if mints.height > max_mints:
         mints = mints.sample(max_mints, seed=cfg.seed)
     lo, hi = float(cfg.raw.get("cross_min_age_seconds", 10)), float(cfg.window_seconds)
