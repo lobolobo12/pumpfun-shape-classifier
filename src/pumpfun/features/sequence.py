@@ -139,3 +139,39 @@ def encode_trades(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, steps: in
             )
             prev_t = t
     return x, mints
+
+
+BOTLIVE_CHANNELS = ["log_price_vs_start", "log1p_dt", "real_sol_frac", "is_anchor"]
+
+
+def encode_botlive(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, steps: int) -> tuple[np.ndarray, list[str]]:
+    """Dense [N, steps, 4] float32 over the bot-view sample series (one sample per slot from the coin's
+    first-sight level, plus the launch anchor), right-aligned at the decision. Same truncation and
+    per-coin first-sight level as the bl_ tabular features, so a served model sees what the bot sends."""
+    from pumpfun.features.tabular import botlive_series
+    from pumpfun.ingest.to_parquet import curve_params
+    from pumpfun.label import curve_sim as cs
+    from pumpfun.label.first_sight import first_seen_level
+
+    p = curve_params(cfg)
+    p0 = cs.initial_reserves(p).spot_sol_per_token(p.raw_per_token)
+    grad = graduation_sol(cfg)
+    mints = labels["mint"].to_list()
+    pos = {m: i for i, m in enumerate(mints)}
+    x = np.zeros((len(mints), steps, len(BOTLIVE_CHANNELS)), dtype=np.float32)
+    cols = ["seconds_since_launch", "slot", "is_buy", "sol_amount", "token_amount", "trader", "price_sol"]
+    for (mint,), g in wt.group_by("mint", maintain_order=True):
+        i = pos[mint]
+        rows = list(g.select(cols).iter_rows())
+        ser = botlive_series(rows, g["curve_sol_after"].to_list(), first_seen_level(cfg, mint), p0)[-steps:]
+        off = steps - len(ser)
+        prev_t = 0.0
+        for k, (t, px, sol) in enumerate(ser):
+            x[i, off + k] = (
+                np.log(px / p0) if px > 0 else 0.0,
+                np.log1p(max(0.0, t - prev_t)),
+                sol / grad,
+                1.0 if k == 0 and off + k == steps - len(ser) else 0.0,
+            )
+            prev_t = t
+    return x, mints

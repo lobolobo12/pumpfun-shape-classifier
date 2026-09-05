@@ -46,6 +46,8 @@ def run(cfg: Config) -> None:
     np.save(cfg.processed_dir / "sequences.npy", x)
     xt, _ = sequence.encode_trades(cfg, wt_ord, ordered, int(cfg.cnn["trade_steps"]))
     np.save(cfg.processed_dir / "sequences_trades.npy", xt)
+    xb, _ = sequence.encode_botlive(cfg, wt_ord, ordered, int(cfg.cnn.get("botlive_steps", 128)))
+    np.save(cfg.processed_dir / "sequences_botlive.npy", xb)
     pl.DataFrame({"mint": mints}).write_parquet(cfg.processed_dir / "sequence_index.parquet")
 
     update_counts(cfg.reports_dir, "features", {"labeled_in": labels.height, "features_out": tab.height, **counts})

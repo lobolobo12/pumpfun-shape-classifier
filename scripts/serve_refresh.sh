@@ -10,6 +10,9 @@ PF=(uv run pf --set decision_mode=cross --set "split_train_end=$TRAIN_END" --set
 "${PF[@]}" xgb 2>&1 | grep -E "botlive"
 mv -f reports/m4_xgb.json "reports/served_m4_xgb_firstsight.json"
 mv -f reports/m4_xgb.md "reports/served_m4_xgb_firstsight.md"
+"${PF[@]}" --set cnn.encoding=botlive cnn 2>&1 | grep -E "test PR-AUC|bag ->"
+mv -f "reports/m5_cnn_botlive+side.json" "reports/served_m5_cnn_botlive.json" 2>/dev/null || true
+mv -f "reports/m5_cnn_botlive+side.md" "reports/served_m5_cnn_botlive.md" 2>/dev/null || true
 pkill -f "pf.*serve" || true
 sleep 1
 mkdir -p logs

@@ -16,7 +16,7 @@ import torch
 from torch import nn
 
 from pumpfun.config import Config
-from pumpfun.features.tabular import CREATOR, HOLDERS, SHAPE
+from pumpfun.features.tabular import BOTLIVE, CREATOR, HOLDERS, SHAPE
 from pumpfun.features.wallets import WALLETS
 from pumpfun.models import metrics
 from pumpfun.reports import append_history, write_json
@@ -24,6 +24,12 @@ from pumpfun.reports import append_history, write_json
 log = logging.getLogger(__name__)
 
 SIDE_COLS = SHAPE + HOLDERS + CREATOR + WALLETS
+SEQ_FILES = {"steps": "sequences.npy", "trades": "sequences_trades.npy", "botlive": "sequences_botlive.npy"}
+
+
+def side_cols(enc: str) -> list[str]:
+    """The tape models see every tabular group; the bot-view model only what the bot can send."""
+    return BOTLIVE if enc == "botlive" else SIDE_COLS
 
 
 class Block(nn.Module):
@@ -81,7 +87,7 @@ def _load(cfg: Config, enc: str) -> tuple[pl.DataFrame, np.ndarray]:
     feats = pl.read_parquet(cfg.processed_dir / "features.parquet")
     labels = pl.read_parquet(cfg.interim_dir / "labels.parquet").select("mint", "entry_cost_sol", "exit_net_sol")
     feats = feats.join(labels, on="mint", how="left")
-    seq = np.load(cfg.processed_dir / ("sequences.npy" if enc == "steps" else "sequences_trades.npy"))
+    seq = np.load(cfg.processed_dir / SEQ_FILES[enc])
     idx = pl.read_parquet(cfg.processed_dir / "sequence_index.parquet").with_row_index("row")
     feats = feats.join(idx, on="mint", how="inner")
     return feats, seq
@@ -103,6 +109,7 @@ def train_one(
     torch.manual_seed(seed)
     np.random.seed(seed)
     c = cfg.cnn
+    SIDE_COLS = side_cols(str(cfg.cnn.get("encoding", "steps")))  # noqa: N806
     xs = torch.tensor(_prep_seq(seq[tr["row"].to_numpy()], str(cfg.cnn.get("encoding", "steps"))))
     xv = torch.tensor(_prep_seq(seq[va["row"].to_numpy()], str(cfg.cnn.get("encoding", "steps"))))
     ys = torch.tensor(tr["label"].to_numpy(), dtype=torch.float32)
@@ -343,6 +350,7 @@ def run(cfg: Config) -> dict:
     te = feats.filter(pl.col("split") == "test")
     if min(tr.height, va.height, te.height) == 0:
         raise SystemExit("empty split")
+    SIDE_COLS = side_cols(enc)  # noqa: N806
     side_tr = tr.select(SIDE_COLS).fill_null(0).fill_nan(0).to_numpy()
     side_stats = (side_tr.mean(axis=0), side_tr.std(axis=0) + 1e-6)
     dev = _device()
@@ -350,8 +358,10 @@ def run(cfg: Config) -> dict:
     preds = []
     vals = []
     n_params = 0
+    models = []
     for s in range(int(cfg.cnn["seeds"])):
         model, best_val, n_params = train_one(cfg, cfg.seed + s, tr, va, seq, side_stats, use_side, dev)
+        models.append(model)
         side_te = (
             ((te.select(SIDE_COLS).fill_null(0).fill_nan(0).to_numpy() - side_stats[0]) / side_stats[1]) if use_side else None
         )
@@ -361,6 +371,30 @@ def run(cfg: Config) -> dict:
     name = f"cnn_{enc}" + ("+side" if use_side else "") + ("+pre" if pretrained_path(cfg) is not None else "")
     result = metrics.evaluate(cfg, te, p)
     metrics.save_predictions(cfg, name, te, p)
+    if enc == "botlive":
+        d = cfg.processed_dir / "models" / cfg.decision_mode
+        d.mkdir(parents=True, exist_ok=True)
+        torch.save(
+            {
+                "state_dicts": [{k: v.cpu() for k, v in m.state_dict().items()} for m in models],
+                "side_cols": SIDE_COLS if use_side else [],
+                "side_mean": side_stats[0].tolist(),
+                "side_std": side_stats[1].tolist(),
+                "arch": {
+                    "in_ch": int(seq.shape[2]),
+                    "channels": cfg.cnn["channels"],
+                    "blocks": cfg.cnn["blocks"],
+                    "kernel": cfg.cnn["kernel"],
+                    "dropout": cfg.cnn["dropout"],
+                },
+                "steps": int(seq.shape[1]),
+                "splits": {"train_end": cfg.split_train_end, "val_end": cfg.split_val_end},
+                "test_scores": [float(v) for v in np.sort(p)],
+                "test_pnl": [float(v) for v in (te["exit_net_sol"] - te["entry_cost_sol"]).to_numpy()[np.argsort(p)]],
+            },
+            d / f"{name}.pt",
+        )
+        log.info("bot-view CNN bag -> %s", d / f"{name}.pt")
     result["val_pr_auc_per_seed"] = [float(v) for v in vals]
     result["n_params"] = int(n_params)
     report = {"results": {name: result}, "config": cfg.cnn, "preset": cfg.preset}
