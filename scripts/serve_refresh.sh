@@ -7,6 +7,10 @@ TRAIN_END="${1:?train_end}"; VAL_END="${2:?val_end}"
 PF=(uv run pf --set decision_mode=cross --set "split_train_end=$TRAIN_END" --set "split_val_end=$VAL_END" --set botlive.entry_at_first_sight=true)
 "${PF[@]}" label 2>&1 | tail -1
 "${PF[@]}" features 2>&1 | tail -1
+# recent-only twin of every variant first (ledger names "+recent"); the history pass below writes the served files
+"${PF[@]}" --set train.recent_only=true xgb 2>&1 | grep -E "botlive"
+mv -f reports/m4_xgb.json "reports/served_m4_xgb_firstsight_recent.json"
+mv -f reports/m4_xgb.md "reports/served_m4_xgb_firstsight_recent.md"
 "${PF[@]}" xgb 2>&1 | grep -E "botlive"
 mv -f reports/m4_xgb.json "reports/served_m4_xgb_firstsight.json"
 mv -f reports/m4_xgb.md "reports/served_m4_xgb_firstsight.md"

@@ -45,6 +45,7 @@ PNL_VARIANTS = {
     "xgb_pnl:botlive+context": BOTLIVE + CONTEXT,
 }
 PNL_CLIP = (-1.5, 1.5)
+RECENT_SOURCES = ["sweep", "pumpportal", "curve", "graduated", "tracked"]
 # analyse.ts MODEL_FEATURES, translated to our names (sameSlotShare and ageS have no counterpart here).
 LOGISTIC_FEATURES = [
     "top10_share",
@@ -182,6 +183,11 @@ def run(cfg: Config) -> dict:
     train = feats.filter(pl.col("split") == "train")
     val = feats.filter(pl.col("split") == "val")
     test = feats.filter(pl.col("split") == "test")
+    suffix = ""
+    if bool(cfg.train.get("recent_only", False)) and "source" in train.columns:
+        # the live collector's eras only (no Bitquery/Dune history): regime-matched but small
+        train = train.filter(pl.col("source").is_in(RECENT_SOURCES))
+        suffix = "+recent"
     log.info(
         "train %d (%d pos) val %d (%d pos) test %d (%d pos)",
         train.height,
@@ -197,11 +203,12 @@ def run(cfg: Config) -> dict:
     results: dict[str, dict] = {}
     importances: dict[str, dict[str, float]] = {}
     n_bag = int(cfg.xgb.get("bag_seeds", 1) or 1)
-    for name, cols in {**VARIANTS, **PNL_VARIANTS}.items():
-        is_pnl = name in PNL_VARIANTS
+    for base_name, cols in {**VARIANTS, **PNL_VARIANTS}.items():
+        name = base_name + suffix
+        is_pnl = base_name in PNL_VARIANTS
         fit = fit_xgb_reg if is_pnl else fit_xgb
         # bag of seeds: early stopping on one small validation day is noisy; served models always >= 5
-        k_bag = max(n_bag, 5) if name.startswith("xgb_botlive") else n_bag
+        k_bag = max(n_bag, 5) if base_name.startswith("xgb_botlive") else n_bag
         bag = [fit(replace_seed(cfg, cfg.seed + k), train, val, cols) for k in range(k_bag)]
         model = bag[0]
 

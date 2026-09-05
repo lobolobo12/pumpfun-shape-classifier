@@ -27,7 +27,7 @@ def run(cfg: Config) -> None:
         assert_causal(g.with_columns(block_time=pl.col("seconds_since_launch")), int(entry[mint]), str(mint))
 
     labels = labels.filter(pl.col("mint").is_in(wt["mint"].unique().implode()))
-    tab = tabular.build(cfg, wt, labels, tokens).join(tokens.select("mint", "creator"), on="mint", how="left")
+    tab = tabular.build(cfg, wt, labels, tokens).join(tokens.select("mint", "creator", "source"), on="mint", how="left")
     strata_path = cfg.interim_dir / "strata.parquet"
     if strata_path.exists():
         tab = tab.join(
