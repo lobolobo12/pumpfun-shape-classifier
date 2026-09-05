@@ -145,6 +145,7 @@ cnn:
     horizons_s: [60, 600]  # regress log(curve SOL at cut+h / at cut) for each horizon
     cuts_per_tape: 3       # random decision moments per tape
     max_mints: 200000      # cap on tapes used (memory: cuts x 256 x 6 float32; 225k cuts ~ 1.4 GB)
+    min_launch_day: ""     # optional era cut for the pretraining set (empty = every tape)
     epochs: 20
 botlive:
   # bot first-sight level sampled per coin for the truncated training view: scanner-seen coins (3-8 SOL)
