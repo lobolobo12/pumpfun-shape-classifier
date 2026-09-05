@@ -1,42 +1,43 @@
 {
   "features": {
-    "creator_straddle_dropped": 454,
-    "features_out": 9163,
-    "labeled_in": 9617,
-    "test_n": 617,
-    "test_pos": 113,
-    "test_serial_launcher_share": 0.32901134521880065,
-    "train_n": 8340,
-    "train_negatives_dropped": 0,
-    "train_pos": 2871,
-    "updated_at": 1788559135,
-    "val_n": 206,
-    "val_pos": 52
+    "creator_straddle_dropped": 2633,
+    "features_out": 20270,
+    "labeled_in": 45810,
+    "test_n": 691,
+    "test_pos": 18,
+    "test_serial_launcher_share": 0.21273516642547033,
+    "train_n": 17620,
+    "train_negatives_dropped": 22907,
+    "train_pos": 3524,
+    "updated_at": 1788577400,
+    "val_n": 1959,
+    "val_pos": 94
   },
   "label": {
-    "dropped_crossed_too_young": 38777,
-    "dropped_graduated_before_entry": 7,
-    "dropped_lt_min_trades": 482,
+    "dropped_entry_completes_curve": 2,
+    "dropped_entry_zero_tokens": 59,
+    "dropped_graduated_before_entry": 4755,
+    "dropped_lifetime_lt_window": 79880,
+    "dropped_lt_min_trades": 22060,
     "dropped_mayhem_mode": 3267,
-    "dropped_never_crossed_level": 128876,
-    "dropped_non_standard_curve": 5621,
+    "dropped_non_standard_curve": 30814,
     "dropped_out_of_coverage": 8230,
-    "labeled": 9617,
+    "labeled": 45810,
     "tokens_with_tape": 194877,
-    "updated_at": 1788559103
+    "updated_at": 1788577320
   },
   "prescreen": {
-    "fetch_queue": 318644,
+    "fetch_queue": 320542,
     "needed_sol_for_tp": 12.426,
-    "prescreen_mayhem_dropped": 47938,
-    "prescreen_no_inflow_dropped": 26776,
+    "prescreen_mayhem_dropped": 50280,
+    "prescreen_no_inflow_dropped": 27534,
     "queued": {
-      "candidate": 15370,
+      "candidate": 15719,
       "hist_candidate": 112640,
       "hist_rest": 149664,
-      "unknown": 3527,
-      "unlikely_active": 19908,
-      "unlikely_quiet": 17535
+      "unknown": 3535,
+      "unlikely_active": 20929,
+      "unlikely_quiet": 18055
     },
     "sample_rates": {
       "candidate": 1.0,
@@ -47,29 +48,29 @@
       "unlikely_quiet": 0.2
     },
     "strata": {
-      "candidate": 15370,
+      "candidate": 15719,
       "hist_candidate": 322062,
       "hist_rest": 704325,
-      "mayhem": 47938,
-      "no_inflow": 26776,
-      "unknown": 17991,
-      "unlikely_active": 19908,
-      "unlikely_quiet": 87606
+      "mayhem": 50280,
+      "no_inflow": 27534,
+      "unknown": 18030,
+      "unlikely_active": 20929,
+      "unlikely_quiet": 90173
     },
-    "universe_tokens": 1241976,
-    "updated_at": 1788555564
+    "universe_tokens": 1249052,
+    "updated_at": 1788575629
   },
   "universe": {
-    "attention_meta_total": 254100,
-    "in_date_range": 207298,
-    "pumpportal_frames_in_range": 198110,
-    "universe_added_from_frames": 24960,
+    "attention_meta_total": 262264,
+    "in_date_range": 214434,
+    "pumpportal_frames_in_range": 204538,
+    "universe_added_from_frames": 25092,
     "universe_bitquery_appended": 1026387,
-    "universe_mayhem_flagged": 47938,
-    "universe_mayhem_unknown": 17479,
+    "universe_mayhem_flagged": 50280,
+    "universe_mayhem_unknown": 18127,
     "universe_no_creator": 0,
-    "universe_seen_late_dropped": 16669,
-    "universe_tokens": 215589,
-    "updated_at": 1788555365
+    "universe_seen_late_dropped": 16861,
+    "universe_tokens": 222665,
+    "updated_at": 1788575414
   }
 }

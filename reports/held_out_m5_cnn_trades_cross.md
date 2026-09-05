@@ -2,6 +2,6 @@
 
 | model | n | PR-AUC | ROC-AUC | P@1% | P@5% | P@10% | PnL@10% (SOL) | ex-top-3 |
 |---|---|---|---|---|---|---|---|---|
-| cnn_trades+side | 612 | 0.293 | 0.653 | 0.33 | 0.29 | 0.36 | 4.12 | 2.02 |
+| cnn_trades+side | 129 | 0.357 | 0.678 | 1.00 | 0.33 | 0.46 | 1.63 | 0.04 |
 | human (M0) | — | not yet recorded: run `pf bench label` | | | | | | |
 
