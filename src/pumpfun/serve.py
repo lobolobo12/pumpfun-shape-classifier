@@ -148,6 +148,90 @@ class Scorer:
         return out
 
 
+class CnnScorer:
+    """Bot-view series CNN (cnn_botlive+side): the sampled reserve series + the 16 bot-live features."""
+
+    def __init__(self, cfg: Config, name: str = "cnn_botlive+side"):
+        import torch
+
+        from pumpfun.models.cnn import ShapeNet
+
+        d = cfg.processed_dir / "models" / cfg.decision_mode
+        blob = torch.load(d / f"{name}.pt", map_location="cpu")
+        self.cfg, self.name, self.torch = cfg, name, torch
+        a = blob["arch"]
+        self.models = []
+        for sd in blob["state_dicts"]:
+            m = ShapeNet(a["in_ch"], len(blob["side_cols"]), a["channels"], a["blocks"], a["kernel"], a["dropout"])
+            m.load_state_dict(sd)
+            m.eval()
+            self.models.append(m)
+        self.side_cols: list[str] = blob["side_cols"]
+        self.request_names = [c[3:] if c.startswith("bl_") else c for c in self.side_cols]
+        self.side_mean = np.array(blob["side_mean"], dtype=np.float32)
+        self.side_std = np.array(blob["side_std"], dtype=np.float32)
+        self.steps = int(blob["steps"])
+        self.splits = blob["splits"]
+        self.test_scores: list[float] = blob["test_scores"]
+        self.test_pnl: list[float] | None = blob.get("test_pnl")
+        self.features = self.request_names
+        self.truncated = True
+        self.boosters = self.models
+        self.stats = {"requests": 0, "scored": 0, "skipped": 0, "errors": 0, "fired_pct95": 0, "last_request_at": None}
+        self.level = float(cfg.raw.get("cross_level_sol", 0.0) or 0.0)
+        self.min_age = float(cfg.raw.get("cross_min_age_seconds", 0) or 0)
+        log.info("loaded %s (%d seeds, %d steps, %d side features)", name, len(self.models), self.steps, len(self.side_cols))
+
+    _ev_at = Scorer._ev_at
+
+    def _encode(self, series: list) -> np.ndarray:
+        from pumpfun.features.sequence import graduation_sol
+        from pumpfun.ingest.to_parquet import curve_params
+        from pumpfun.label import curve_sim as cs
+
+        p = curve_params(self.cfg)
+        p0 = cs.initial_reserves(p).spot_sol_per_token(p.raw_per_token)
+        grad = graduation_sol(self.cfg)
+        ser = [(float(t), float(px), float(sol)) for t, px, sol in series][-self.steps :]
+        x = np.zeros((1, self.steps, 4), dtype=np.float32)
+        off = self.steps - len(ser)
+        prev = 0.0
+        for k, (t, px, sol) in enumerate(ser):
+            x[0, off + k] = (np.log(px / p0) if px > 0 else 0.0, np.log1p(max(0.0, t - prev)), sol / grad, 1.0 if k == 0 else 0.0)
+            prev = t
+        return x.transpose(0, 2, 1)
+
+    def score(self, req: dict) -> dict:
+        t0 = time.perf_counter()
+        feats = req.get("features") or {}
+        series = req.get("series")
+        if not series:
+            return {"skip": "no series"}
+        cross_age = feats.get("cross_age_s")
+        if cross_age is not None and float(cross_age) < self.min_age:
+            return {"skip": "crossed_too_young", "cross_age_s": float(cross_age)}
+        vals = [feats.get(c, feats.get(r)) for c, r in zip(self.side_cols, self.request_names, strict=True)]
+        missing = [r for r, v in zip(self.request_names, vals, strict=True) if v is None]
+        side = np.array([[float(v) if v is not None else 0.0 for v in vals]], dtype=np.float32)
+        side = (side - self.side_mean) / self.side_std
+        x = self.torch.tensor(self._encode(series))
+        sd = self.torch.tensor(side) if self.side_cols else None
+        with self.torch.no_grad():
+            s = float(np.mean([self.torch.sigmoid(m(x, sd)).item() for m in self.models]))
+        pct = 100.0 * bisect_left(self.test_scores, s) / max(1, len(self.test_scores))
+        out = {
+            "score": s,
+            "pct": round(pct, 1),
+            "ev_sol": self._ev_at(s),
+            "model": self.name,
+            "decision": {"source": "series", "n_samples": len(series)},
+            "latency_ms": round(1000 * (time.perf_counter() - t0), 1),
+        }
+        if missing:
+            out["missing_features"] = missing
+        return out
+
+
 def _from_internal(r: dict):
     from pumpfun.ingest.swap_api import Trade
 
@@ -155,7 +239,7 @@ def _from_internal(r: dict):
 
 
 def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
-    scorer = Scorer(cfg, name)
+    scorer = CnnScorer(cfg, name) if name.startswith("cnn_") else Scorer(cfg, name)
 
     class H(BaseHTTPRequestHandler):
         def _send(self, code: int, body: dict) -> None:
