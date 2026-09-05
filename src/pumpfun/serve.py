@@ -19,8 +19,6 @@ import os
 # inside the first convolution unless the duplicate is tolerated. Must be set before either import.
 os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
-import torch  # noqa: E402, F401, I001 — torch must be imported BEFORE xgboost or the first conv segfaults on macOS
-
 import json  # noqa: E402
 import logging
 import time
@@ -28,7 +26,6 @@ from bisect import bisect_left
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import numpy as np
-import xgboost as xgb
 
 from pumpfun.config import Config
 from pumpfun.features.tabular import botlive_features, shape_and_holders
@@ -42,6 +39,9 @@ DEFAULT_MODEL = "xgb_shape+holders"
 
 class Scorer:
     def __init__(self, cfg: Config, name: str = DEFAULT_MODEL):
+        import xgboost as xgb
+
+        self.xgb = xgb
         d = cfg.processed_dir / "models" / cfg.decision_mode
         meta = json.loads((d / f"{name}.json").read_text())
         self.cfg = cfg
@@ -55,7 +55,7 @@ class Scorer:
         self.test_pnl: list[float] | None = meta.get("test_pnl")
         self.boosters: list[xgb.Booster] = []
         for path in [d / f"{name}.ubj", *sorted(d.glob(f"{name}.*.ubj"))]:
-            b = xgb.Booster()
+            b = self.xgb.Booster()
             b.load_model(str(path))
             self.boosters.append(b)
         self.level = float(cfg.raw.get("cross_level_sol", 0.0) or 0.0)
@@ -139,7 +139,7 @@ class Scorer:
         vals = [feats.get(c, feats.get(r)) for c, r in zip(self.features, self.request_names, strict=True)]
         missing = [r for r, v in zip(self.request_names, vals, strict=True) if v is None]
         x = np.array([[float(v) if v is not None else np.nan for v in vals]], dtype=np.float32)
-        dm = xgb.DMatrix(x)
+        dm = self.xgb.DMatrix(x)
         s = float(np.mean([b.predict(dm)[0] for b in self.boosters]))
         pct = 100.0 * bisect_left(self.test_scores, s) / max(1, len(self.test_scores))
         out = {
@@ -164,7 +164,7 @@ class CnnScorer:
         from pumpfun.models.cnn import ShapeNet
 
         d = cfg.processed_dir / "models" / cfg.decision_mode
-        blob = torch.load(d / f"{name}.pt", map_location="cpu")
+        blob = self.torch.load(d / f"{name}.pt", map_location="cpu")
         self.cfg, self.name, self.torch = cfg, name, torch
         a = blob["arch"]
         self.models = []
@@ -254,10 +254,19 @@ def _from_internal(r: dict):
 
 def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
     scorer = CnnScorer(cfg, name) if name.startswith("cnn_") else Scorer(cfg, name)
-    companion = None
-    cnn_path = cfg.processed_dir / "models" / cfg.decision_mode / "cnn_botlive+side.pt"
-    if not name.startswith("cnn_") and cnn_path.exists():
-        companion = CnnScorer(cfg, "cnn_botlive+side")
+    # xgboost and torch cannot share a process (two OpenMP runtimes: a booster call after a torch op, or
+    # the reverse, segfaults on macOS), so the bot-view CNN runs as its own `pf serve --model cnn_botlive+side`
+    # on the companion port and the primary forwards the request to it over loopback.
+    companion_url = None if name.startswith("cnn_") else f"http://127.0.0.1:{port + 1}/score"
+    companion_name = None
+    if companion_url:
+        try:
+            import urllib.request
+
+            with urllib.request.urlopen(companion_url.replace("/score", "/health"), timeout=1) as r:
+                companion_name = json.loads(r.read()).get("model")
+        except Exception:  # noqa: BLE001
+            companion_url = None
 
     class H(BaseHTTPRequestHandler):
         def _send(self, code: int, body: dict) -> None:
@@ -281,7 +290,7 @@ def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
                         "truncated_training": scorer.truncated,
                         "stats": scorer.stats,
                         "ev_available": scorer.test_pnl is not None,
-                        "companion": None if companion is None else companion.name,
+                        "companion": companion_name,
                         "bag": len(scorer.boosters),
                     },
                 )
@@ -299,9 +308,15 @@ def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
             try:
                 req = json.loads(self.rfile.read(n) or b"{}")
                 out = scorer.score(req)
-                if companion is not None and req.get("series") and "score" in out:
+                if companion_url and req.get("series") and "score" in out:
                     try:
-                        out["cnn"] = companion.score(req)
+                        import urllib.request
+
+                        creq = urllib.request.Request(
+                            companion_url, data=json.dumps(req).encode(), headers={"content-type": "application/json"}
+                        )
+                        with urllib.request.urlopen(creq, timeout=0.5) as r:
+                            out["cnn"] = json.loads(r.read())
                     except Exception as e:  # noqa: BLE001 — the companion never blocks the primary answer
                         out["cnn"] = {"error": f"{e.__class__.__name__}: {e}"}
                 st["scored" if "score" in out else "skipped"] += 1

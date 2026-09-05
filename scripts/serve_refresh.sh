@@ -13,9 +13,12 @@ mv -f reports/m4_xgb.md "reports/served_m4_xgb_firstsight.md"
 "${PF[@]}" --set cnn.encoding=botlive cnn 2>&1 | grep -E "test PR-AUC|bag ->"
 mv -f "reports/m5_cnn_botlive+side.json" "reports/served_m5_cnn_botlive.json" 2>/dev/null || true
 mv -f "reports/m5_cnn_botlive+side.md" "reports/served_m5_cnn_botlive.md" 2>/dev/null || true
-pkill -f "pf.*serve" || true
+pkill -f "pumpfun.*serve --port" || true
 sleep 1
 mkdir -p logs
+# the bot-view CNN in its own process (torch and xgboost cannot share one), then the primary that forwards to it
+nohup uv run pf --set decision_mode=cross serve --port 8792 --model "cnn_botlive+side" > logs/serve_cnn.log 2>&1 &
+sleep 20
 nohup uv run pf --set decision_mode=cross serve --port 8791 --model "${SERVE_MODEL:-xgb_botlive}" > logs/serve.log 2>&1 &
-sleep 6
+sleep 12
 curl -s http://127.0.0.1:8791/health | head -c 400; echo
