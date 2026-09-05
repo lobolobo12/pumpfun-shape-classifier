@@ -22,3 +22,5 @@ fi
 # Served bot-live models: retrain on the bot's task (entry at first sight) with yesterday as the held-out day, restart the scorer.
 TODAY=$(date +%F); YDAY=$(date -v-1d +%F 2>/dev/null || date -d "yesterday" +%F)
 scripts/serve_refresh.sh "$YDAY" "$TODAY" 2>&1 | tail -3 || echo "serve refresh failed"
+# Standing check: what the bot posted in the last 24 h vs what the model trained on.
+uv run pf --set decision_mode=cross live-audit 2>&1 | tail -20 || echo "LIVE AUDIT FLAGGED"

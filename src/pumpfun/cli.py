@@ -63,6 +63,8 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("cnn-pretrain", help="self-supervised trunk pretraining on every tape (labels untouched)")
     sub.add_parser("ensemble", help="rank-average the saved test scores of ensemble.members")
     sub.add_parser("ledger", help="average every model over its held-out days from reports/model_history.jsonl")
+    la = sub.add_parser("live-audit", help="posted feature dicts (bot nn_scores) vs the training distribution")
+    la.add_argument("--since-hours", type=float, default=24.0)
     sv = sub.add_parser("serve", help="local scoring endpoint for the paper bot (POST /score)")
     sv.add_argument("--host", default="127.0.0.1")
     sv.add_argument("--port", type=int, default=8791)
@@ -187,6 +189,13 @@ def main(argv: list[str] | None = None) -> int:
         from pumpfun.models import ledger
 
         ledger.run(cfg)
+    elif args.cmd == "live-audit":
+        import time as _t
+
+        from pumpfun import live_audit
+
+        res = live_audit.run(cfg, int((_t.time() - args.since_hours * 3600) * 1000))
+        return 1 if res["flags"] else 0
     elif args.cmd == "serve":
         from pumpfun.serve import serve
 
