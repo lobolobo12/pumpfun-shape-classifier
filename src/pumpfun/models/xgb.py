@@ -184,6 +184,10 @@ def run(cfg: Config) -> dict:
     val = feats.filter(pl.col("split") == "val")
     test = feats.filter(pl.col("split") == "test")
     suffix = ""
+    min_day = str(cfg.train.get("min_launch_day") or "")
+    if min_day:
+        # regime cut: the May-June 2026 hot market misleads a model trading now (measured 5 Sep: 0.262 -> 0.289)
+        train = train.filter(pl.col("launch_day") >= min_day)
     if bool(cfg.train.get("recent_only", False)) and "source" in train.columns:
         # the live collector's eras only (no Bitquery/Dune history): regime-matched but small
         train = train.filter(pl.col("source").is_in(RECENT_SOURCES))

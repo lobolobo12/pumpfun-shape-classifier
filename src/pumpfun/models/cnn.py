@@ -346,6 +346,9 @@ def run(cfg: Config) -> dict:
     if str(cfg.raw.get("population", "all")) == "active":
         feats = feats.filter(pl.col("active_at_entry").fill_null(False))
     tr = feats.filter(pl.col("split") == "train")
+    min_day = str(cfg.train.get("min_launch_day") or "")
+    if min_day:
+        tr = tr.filter(pl.col("launch_day") >= min_day)  # same regime cut as the tabular models
     va = feats.filter(pl.col("split") == "val")
     te = feats.filter(pl.col("split") == "test")
     if min(tr.height, va.height, te.height) == 0:
