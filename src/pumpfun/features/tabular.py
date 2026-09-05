@@ -254,6 +254,18 @@ def slope(y: list[float], t: list[float]) -> float:
     return float((a * (b - b.mean())).sum() / den) if den > 0 else 0.0
 
 
+def creator_or_launch_buyer(creator: str | None, rows: list[tuple]) -> str:
+    """Historical tokens (Bitquery/Dune universe) carry no creator address. On 93 % of coins the tape's
+    first trade is the creator's launch buy from the create transaction itself (same SOL as the create
+    frame), so when the creator is unknown, a first trade that is a buy inside the first second names it.
+    Keeps dev_buy_sol / dev_share / dev_sold populated the way the bot sees them live."""
+    if creator:
+        return creator
+    if rows and rows[0][2] and float(rows[0][0]) <= 1.0:
+        return str(rows[0][5])
+    return ""
+
+
 def shape_and_holders(
     cfg: Config, rows: list[tuple], creator: str, curve_sol_at_entry: float, entry_price: float, window_s: float
 ) -> dict:
@@ -630,6 +642,7 @@ def build(cfg: Config, wt: pl.DataFrame, labels: pl.DataFrame, tokens: pl.DataFr
     for (mint,), g in wt.group_by("mint", maintain_order=True):
         creator, sol_at_entry, entry_price, entry_t = meta[mint]
         tup = list(g.select(cols).iter_rows())
+        creator = creator_or_launch_buyer(creator, tup)
         feats = shape_and_holders(cfg, tup, creator, sol_at_entry, entry_price, entry_t)
         level = first_seen_level(cfg, mint)
         bl = botlive_features(cfg, tup, g["curve_sol_after"].to_list(), creator, entry_t, level, feats["top10_share"])
