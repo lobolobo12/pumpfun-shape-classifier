@@ -186,7 +186,8 @@ def run(cfg: Config) -> dict:
     suffix = ""
     min_day = str(cfg.train.get("min_launch_day") or "")
     if min_day:
-        # regime cut: the May-June 2026 hot market misleads a model trading now (measured 5 Sep: 0.262 -> 0.289)
+        # regime cut: the May-July 2026 hot market (crossing win rate ~50 % vs ~20 % since August) misleads a
+        # model trading now; cut chosen with Lovro on 5 Sep
         train = train.filter(pl.col("launch_day") >= min_day)
     if bool(cfg.train.get("recent_only", False)) and "source" in train.columns:
         # the live collector's eras only (no Bitquery/Dune history): regime-matched but small

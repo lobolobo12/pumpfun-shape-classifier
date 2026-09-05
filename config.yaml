@@ -110,9 +110,10 @@ train:
   # weight = 0.5 ** (age_days / recency_half_life_days). 0 disables (all equal).
   recency_half_life_days: 7
   recent_only: false          # true: train on the live collector's eras only (ledger names get '+recent')
-  # Training rows launched before this day are dropped (labels/features still built for them). May-June 2026
-  # was a hot regime; cutting it measured best on Sep 4 (bot-live 0.262 -> 0.289) while keeping 4.7k rows.
-  min_launch_day: "2026-07-01"
+  # Training rows launched before this day are dropped (labels/features are still built for them, and CNN
+  # pretraining still uses every tape). The regime broke between July and August 2026: crossing win rate
+  # ~50 % May-July vs ~20 % since. Decided 5 Sep with Lovro.
+  min_launch_day: "2026-08-01"
 xgb:
   n_estimators: 600
   max_depth: 4

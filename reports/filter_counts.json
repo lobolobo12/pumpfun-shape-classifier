@@ -9,7 +9,7 @@
     "train_n": 6830,
     "train_negatives_dropped": 0,
     "train_pos": 2646,
-    "updated_at": 1788601943,
+    "updated_at": 1788602364,
     "val_n": 443,
     "val_pos": 83
   },
@@ -23,7 +23,7 @@
     "dropped_out_of_coverage": 8230,
     "labeled": 7805,
     "tokens_with_tape": 194877,
-    "updated_at": 1788601893
+    "updated_at": 1788602308
   },
   "prescreen": {
     "fetch_queue": 321708,
