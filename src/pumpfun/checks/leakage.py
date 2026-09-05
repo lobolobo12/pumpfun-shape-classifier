@@ -79,7 +79,10 @@ def run(cfg: Config) -> dict:
     )
     # the outcome (label, exit_t) stays with the coin, since market heat is built from resolved outcomes
     lab_sw = lab_sw.join(labels.select("mint", "label", "exit_t").rename({"label": "true_label"}), on="mint")
-    perm_feats = tabular.build(cfg, swapped, lab_sw.drop("label").rename({"true_label": "label"}), tokens)
+    # the creator is read from the window when the universe has none (launch-buyer fallback), so it is a
+    # window attribute for this test: let each coin's token row travel with its window like entry_t does
+    tokens_sw = tokens.with_columns(pl.col("mint").replace(remap))
+    perm_feats = tabular.build(cfg, swapped, lab_sw.drop("label").rename({"true_label": "label"}), tokens_sw)
     y = perm_feats["label"].to_numpy()
     corrs = {c: _corr(perm_feats[c].to_numpy(), y) for c in window_cols}
     threshold = max(BASE_THRESHOLD, Z / max(len(y), 1) ** 0.5)
