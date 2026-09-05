@@ -44,6 +44,7 @@ class Scorer:
         self.truncated = any(c.startswith("bl_") for c in self.features)
         self.splits = meta["splits"]
         self.test_scores: list[float] = meta["test_scores"]
+        self.test_pnl: list[float] | None = meta.get("test_pnl")
         self.boosters: list[xgb.Booster] = []
         for path in [d / f"{name}.ubj", *sorted(d.glob(f"{name}.*.ubj"))]:
             b = xgb.Booster()
@@ -116,6 +117,15 @@ class Scorer:
         }
         return self._score_features(feats, t0, decision)
 
+    def _ev_at(self, s: float, min_rows: int = 8) -> float | None:
+        if not self.test_pnl:
+            return None
+        i = bisect_left(self.test_scores, s)
+        tail = self.test_pnl[i:]
+        if len(tail) < min_rows:
+            tail = self.test_pnl[-min_rows:]
+        return round(float(np.mean(tail)), 4) if tail else None
+
     def _score_features(self, feats: dict, t0: float, decision: dict) -> dict:
         # accept either the training column names or the bot-facing names
         vals = [feats.get(c, feats.get(r)) for c, r in zip(self.features, self.request_names, strict=True)]
@@ -127,6 +137,8 @@ class Scorer:
         out = {
             "score": s,
             "pct": round(pct, 1),
+            # expected PnL per 0.5 SOL trade if every held-out coin scoring at least this high had been bought
+            "ev_sol": self._ev_at(s),
             "model": self.name,
             "decision": decision,
             "latency_ms": round(1000 * (time.perf_counter() - t0), 1),
@@ -166,6 +178,7 @@ def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
                         "features": scorer.request_names,
                         "truncated_training": scorer.truncated,
                         "stats": scorer.stats,
+                        "ev_available": scorer.test_pnl is not None,
                         "bag": len(scorer.boosters),
                     },
                 )

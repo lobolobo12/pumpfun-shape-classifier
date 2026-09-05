@@ -139,7 +139,9 @@ def replace_seed(cfg: Config, seed: int) -> Config:
     return dataclasses.replace(cfg, seed=seed)
 
 
-def save_model(cfg: Config, name: str, bag: list, cols: list[str], test_scores: np.ndarray) -> None:
+def save_model(
+    cfg: Config, name: str, bag: list, cols: list[str], test_scores: np.ndarray, test_pnl: np.ndarray | None = None
+) -> None:
     """Boosters (one file per seed) + feature list + the held-out score distribution (for live percentiles)."""
     d = model_dir(cfg)
     d.mkdir(parents=True, exist_ok=True)
@@ -156,6 +158,8 @@ def save_model(cfg: Config, name: str, bag: list, cols: list[str], test_scores: 
                 "bag": len(bag),
                 "splits": {"train_end": cfg.split_train_end, "val_end": cfg.split_val_end},
                 "test_scores": [float(s) for s in np.sort(test_scores)],
+                # realized PnL (SOL, fees included) of each held-out row, in the same order: the EV gate's table
+                "test_pnl": None if test_pnl is None else [float(v) for v in test_pnl[np.argsort(test_scores)]],
             }
         )
     )
@@ -208,7 +212,7 @@ def run(cfg: Config) -> dict:
         p = score(test)
         results[name] = metrics.evaluate(cfg, test, p)
         metrics.save_predictions(cfg, name, test, p)
-        save_model(cfg, name, bag, cols, p)
+        save_model(cfg, name, bag, cols, p, (test["exit_net_sol"] - test["entry_cost_sol"]).to_numpy())
         results[name]["best_iteration"] = int(model.best_iteration)
         results[name]["bag"] = k_bag
         results[name]["val_pr_auc"] = metrics.evaluate(cfg, val, score(val))["pr_auc"]
