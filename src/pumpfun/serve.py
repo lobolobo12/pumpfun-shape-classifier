@@ -13,7 +13,15 @@ the bot can act on "top 5 %" without knowing the score scale. Stdlib HTTP server
 
 from __future__ import annotations
 
-import json
+import os
+
+# xgboost and torch each bundle their own OpenMP runtime; loading both in one process segfaults on macOS
+# inside the first convolution unless the duplicate is tolerated. Must be set before either import.
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
+
+import torch  # noqa: E402, F401, I001 — torch must be imported BEFORE xgboost or the first conv segfaults on macOS
+
+import json  # noqa: E402
 import logging
 import time
 from bisect import bisect_left
@@ -152,7 +160,6 @@ class CnnScorer:
     """Bot-view series CNN (cnn_botlive+side): the sampled reserve series + the 16 bot-live features."""
 
     def __init__(self, cfg: Config, name: str = "cnn_botlive+side"):
-        import torch
 
         from pumpfun.models.cnn import ShapeNet
 
@@ -190,9 +197,16 @@ class CnnScorer:
         from pumpfun.label import curve_sim as cs
 
         p = curve_params(self.cfg)
-        p0 = cs.initial_reserves(p).spot_sol_per_token(p.raw_per_token)
         grad = graduation_sol(self.cfg)
-        ser = [(float(t), float(px), float(sol)) for t, px, sol in series][-self.steps :]
+        ser = [(float(t), float(px), float(sol)) for t, px, sol in series]
+        # the bot sends price as virtual SOL lamports per raw token unit; training used SOL per token. Both
+        # are the same curve constant times a fixed factor, so pick the launch price in whichever unit the
+        # first sample is closest to (a coin's first sample is within a few x of the start price).
+        p0_sol = cs.initial_reserves(p).spot_sol_per_token(p.raw_per_token)
+        p0_raw = p.initial_virtual_sol / p.initial_virtual_token
+        first = ser[0][1] if ser else p0_sol
+        p0 = min((p0_sol, p0_raw), key=lambda c: abs(np.log(max(first, 1e-30) / c)))
+        ser = ser[-self.steps :]
         x = np.zeros((1, self.steps, 4), dtype=np.float32)
         off = self.steps - len(ser)
         prev = 0.0
@@ -240,6 +254,10 @@ def _from_internal(r: dict):
 
 def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
     scorer = CnnScorer(cfg, name) if name.startswith("cnn_") else Scorer(cfg, name)
+    companion = None
+    cnn_path = cfg.processed_dir / "models" / cfg.decision_mode / "cnn_botlive+side.pt"
+    if not name.startswith("cnn_") and cnn_path.exists():
+        companion = CnnScorer(cfg, "cnn_botlive+side")
 
     class H(BaseHTTPRequestHandler):
         def _send(self, code: int, body: dict) -> None:
@@ -263,6 +281,7 @@ def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
                         "truncated_training": scorer.truncated,
                         "stats": scorer.stats,
                         "ev_available": scorer.test_pnl is not None,
+                        "companion": None if companion is None else companion.name,
                         "bag": len(scorer.boosters),
                     },
                 )
@@ -280,6 +299,11 @@ def serve(cfg: Config, host: str, port: int, name: str = DEFAULT_MODEL) -> None:
             try:
                 req = json.loads(self.rfile.read(n) or b"{}")
                 out = scorer.score(req)
+                if companion is not None and req.get("series") and "score" in out:
+                    try:
+                        out["cnn"] = companion.score(req)
+                    except Exception as e:  # noqa: BLE001 — the companion never blocks the primary answer
+                        out["cnn"] = {"error": f"{e.__class__.__name__}: {e}"}
                 st["scored" if "score" in out else "skipped"] += 1
                 if out.get("pct", 0) >= 95:
                     st["fired_pct95"] += 1
