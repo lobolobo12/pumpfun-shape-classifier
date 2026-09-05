@@ -91,8 +91,8 @@ def run(cfg: Config, since_ms: int | None = None) -> dict:
     write_json(cfg.reports_dir / "live_audit.json", out)
     print(f"live audit: {len(rows)} crossings, {len(scored)} scored, skips {skips}")
     for n, e in out["features"].items():
-        print(
-            f"  {n:18s} live {e['live_median']:9.3f} / train {e['train_median']:9.3f}   p90 {e['live_p90']:9.3f} / {e['train_p90']:9.3f}"
-        )
+        med = f"live {e['live_median']:9.3f} / train {e['train_median']:9.3f}"
+        p90 = f"p90 {e['live_p90']:9.3f} / {e['train_p90']:9.3f}"
+        print(f"  {n:18s} {med}   {p90}")
     print("  flags:", out["flags"] or "none")
     return out
