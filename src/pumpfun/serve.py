@@ -160,6 +160,7 @@ class CnnScorer:
     """Bot-view series CNN (cnn_botlive+side): the sampled reserve series + the 16 bot-live features."""
 
     def __init__(self, cfg: Config, name: str = "cnn_botlive+side"):
+        import torch  # only in the CNN process; never next to xgboost
 
         from pumpfun.models.cnn import ShapeNet
 
