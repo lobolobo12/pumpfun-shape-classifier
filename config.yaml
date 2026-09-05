@@ -27,8 +27,8 @@ zone_sol: [4, 30]            # the friends' zone (real SOL in curve at entry); r
 # --- dates / splits (launch day, in split_timezone) -----------------------
 date_start: "2026-08-28"
 date_end: "2026-12-31"     # open-ended: the daily cycle extends the universe; splits below pick the test day
-split_train_end: "2026-09-02"
-split_val_end: "2026-09-03"
+split_train_end: "2026-09-03"
+split_val_end: "2026-09-04"
 split_timezone: "Europe/Ljubljana"
 
 # --- costs (verified on mainnet, see nn-side-project-handoff.md and axiom-holy-sol/docs/pre-graduation.md)
