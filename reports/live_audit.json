@@ -1,132 +1,134 @@
 {
-  "crossings": 233,
+  "crossings": 2218,
   "features": {
     "curve_sol_in": {
-      "live_median": 9.234168022999999,
-      "live_p90": 10.1878336925,
-      "n_live": 36,
+      "live_median": 9.154538848,
+      "live_p90": 13.135284105,
+      "n_live": 341,
       "train_median": 10.012494247,
       "train_p90": 12.9121471157
     },
     "decision_age_s": {
-      "live_median": 85.8255,
-      "live_p90": 1877.1060000000002,
-      "n_live": 36,
+      "live_median": 34.951,
+      "live_p90": 995.661,
+      "n_live": 341,
       "train_median": 63.5,
       "train_p90": 595.4999999999995
     },
     "dev_buy_sol": {
-      "live_median": 0.392,
-      "live_p90": 3.475308641,
-      "n_live": 36,
+      "live_median": 0.98765432,
+      "live_p90": 4.938271603,
+      "n_live": 341,
       "train_median": 1.3088536285,
       "train_p90": 5.264197529
     },
     "first_seen_sol": {
-      "live_median": 8.752688535,
-      "live_p90": 10.1878336925,
-      "n_live": 36,
+      "live_median": 8.796119876,
+      "live_p90": 10.816912292,
+      "n_live": 341,
       "train_median": 9.319320000000001,
       "train_p90": 11.43564
     },
     "from_peak": {
       "live_median": 1.0,
       "live_p90": 1.0,
-      "n_live": 36,
+      "n_live": 341,
       "train_median": 1.0,
       "train_p90": 1.0
     },
     "inflow_accel": {
-      "live_median": 1.896651484248998,
+      "live_median": 1.0250666666666666,
       "live_p90": 20.0,
-      "n_live": 36,
+      "n_live": 341,
       "train_median": 1.9666666666666668,
       "train_p90": 17.163079999999997
     },
     "log_ret_window": {
-      "live_median": 0.5453009844204466,
-      "live_p90": 1.3553766855772977,
-      "n_live": 36,
+      "live_median": 0.5498499066406348,
+      "live_p90": 1.0267863309398622,
+      "n_live": 341,
       "train_median": 0.5759885670000233,
       "train_p90": 0.7159134109834463
     },
     "lows": {
       "live_median": 0.0,
       "live_p90": 2.0,
-      "n_live": 36,
+      "n_live": 341,
       "train_median": 0.0,
       "train_p90": 0.0
     },
     "lows_per_min": {
       "live_median": 0.0,
-      "live_p90": 1.1119288600836408,
-      "n_live": 36,
+      "live_p90": 5.750982459503499,
+      "n_live": 341,
       "train_median": 0.0,
       "train_p90": 0.0
     },
     "max_drawdown": {
       "live_median": 0.0,
-      "live_p90": 0.13412285653648642,
-      "n_live": 36,
+      "live_p90": 0.18209530319847642,
+      "n_live": 341,
       "train_median": 0.0,
       "train_p90": 0.0
     },
     "price_slope": {
-      "live_median": 0.0055420878408061515,
-      "live_p90": 0.025028206424944355,
-      "n_live": 36,
+      "live_median": 0.012073607324376326,
+      "live_p90": 0.047498356039569055,
+      "n_live": 341,
       "train_median": 0.009045181146523681,
       "train_p90": 0.0405355834174503
     },
     "run_from_low": {
-      "live_median": 1.7251275603743055,
-      "live_p90": 3.976453372139651,
-      "n_live": 36,
+      "live_median": 1.7329928876217133,
+      "live_p90": 2.792078584848864,
+      "n_live": 341,
       "train_median": 1.7788888908763778,
       "train_p90": 2.0460616607578874
     },
     "sol_last60": {
-      "live_median": 9.1830609565,
-      "live_p90": 10.1878336925,
-      "n_live": 36,
+      "live_median": 9.085077156,
+      "live_p90": 12.955835104,
+      "n_live": 341,
       "train_median": 9.9933174045,
       "train_p90": 12.9121471157
     },
     "sol_per_s_window": {
-      "live_median": 0.10369215013663317,
-      "live_p90": 0.41303655234982006,
-      "n_live": 36,
+      "live_median": 0.2645011922859927,
+      "live_p90": 1.1369137878701323,
+      "n_live": 341,
       "train_median": 0.17050742312165118,
       "train_p90": 0.7018268020676922
     },
     "top10_share": {
-      "live_median": 0.9106423651826773,
-      "live_p90": 1.0,
-      "n_live": 36,
+      "live_median": 0.981015822491682,
+      "live_p90": 3.743340560398029,
+      "n_live": 336,
       "train_median": 0.94551415282821,
       "train_p90": 1.0
     },
     "trades_last60": {
       "live_median": 2.0,
-      "live_p90": 19.0,
-      "n_live": 36,
+      "live_p90": 62.0,
+      "n_live": 341,
       "train_median": 2.0,
       "train_p90": 2.299999999999997
     }
   },
   "flags": [
-    "dev_buy_sol: live median 0.392 vs training 1.309"
+    "top10_share: live values outside [0, 1]"
   ],
   "score": {
-    "live_median": 0.3119181990623474,
-    "share_pct95": 0.08333333333333333
+    "live_median": 0.3423976004123688,
+    "share_pct95": 0.17888563049853373
   },
-  "scored": 36,
-  "since_ms": 1788587621408,
+  "scored": 341,
+  "since_ms": 1788531720231,
   "skipped": {
-    "bundle": 127,
+    "bundle": 916,
     "error": 1,
-    "no_launch": 63,
-    "unknown": 6
+    "no_history": 129,
+    "no_launch": 786,
+    "stale": 5,
+    "unknown": 40
   }
 }

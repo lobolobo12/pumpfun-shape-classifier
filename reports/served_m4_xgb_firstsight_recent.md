@@ -5,15 +5,15 @@
 | xgb_shape+recent | 138 | 0.211 | 0.554 | 0.00 | 0.14 | 0.21 | -0.89 | -2.44 |
 | xgb_holders+recent | 138 | 0.238 | 0.563 | 0.00 | 0.29 | 0.21 | -1.04 | -2.65 |
 | xgb_shape+holders+recent | 138 | 0.210 | 0.553 | 0.00 | 0.14 | 0.14 | -1.61 | -2.61 |
-| xgb_all+recent | 138 | 0.204 | 0.574 | 0.00 | 0.00 | 0.00 | -2.78 | -2.65 |
+| xgb_all+recent | 138 | 0.202 | 0.568 | 0.00 | 0.00 | 0.07 | -2.07 | -2.65 |
 | xgb_context+recent | 138 | 0.229 | 0.522 | 1.00 | 0.29 | 0.14 | -0.81 | -1.88 |
 | xgb_wallets+recent | 138 | 0.233 | 0.544 | 0.00 | 0.29 | 0.21 | -0.40 | -1.96 |
 | xgb_holders+wallets+recent | 138 | 0.240 | 0.575 | 0.00 | 0.29 | 0.21 | -0.78 | -2.32 |
-| xgb_all+wallets+recent | 138 | 0.198 | 0.544 | 0.00 | 0.00 | 0.14 | -1.30 | -2.43 |
+| xgb_all+wallets+recent | 138 | 0.200 | 0.547 | 0.00 | 0.00 | 0.14 | -1.30 | -2.43 |
 | xgb_botlive+recent | 138 | 0.269 | 0.502 | 1.00 | 0.29 | 0.29 | -0.03 | -1.61 |
 | xgb_botlive+context+recent | 138 | 0.269 | 0.534 | 1.00 | 0.29 | 0.36 | 0.72 | -0.91 |
 | xgb_pnl:all+wallets+recent | 138 | 0.191 | 0.526 | 0.00 | 0.00 | 0.14 | -0.59 | -1.78 |
-| xgb_pnl:botlive+context+recent | 138 | 0.274 | 0.599 | 0.00 | 0.43 | 0.29 | 0.41 | -1.16 |
+| xgb_pnl:botlive+context+recent | 138 | 0.271 | 0.593 | 0.00 | 0.29 | 0.36 | 1.08 | -0.50 |
 | logistic_repo_recipe | 138 | 0.269 | 0.651 | 0.00 | 0.14 | 0.29 | -0.41 | -1.98 |
 | human (M0) | — | not yet recorded: run `pf bench label` | | | | | | |
 
@@ -72,21 +72,21 @@
 
 ## xgb_all+recent: top gain features
 
-- has_website: 21.313
-- holders_n: 17.299
-- iti_median: 15.725
-- max_drawdown: 14.979
-- n_trades: 14.952
-- buyers_last60: 14.817
-- sol_last60: 14.489
-- sellers_last60: 13.627
-- description_len: 13.452
-- top3_share: 13.234
-- has_twitter: 12.96
-- launch_bundle_share: 12.899
-- exited_share: 12.869
-- buy_ratio_count: 12.372
-- flipper_share: 12.355
+- has_website: 21.322
+- holders_n: 17.302
+- iti_median: 15.728
+- max_drawdown: 14.978
+- buyers_last60: 14.823
+- sol_last60: 14.494
+- n_trades: 14.246
+- sellers_last60: 13.612
+- description_len: 13.457
+- top3_share: 13.226
+- has_twitter: 12.958
+- launch_bundle_share: 12.9
+- exited_share: 12.863
+- buy_ratio_count: 12.375
+- flipper_share: 12.359
 
 ## xgb_context+recent: top gain features
 
